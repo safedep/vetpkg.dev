@@ -1,0 +1,4 @@
+# Run secrets scanner
+if command -v gitleaks > /dev/null 2>&1; then gitleaks protect --no-banner --staged --redact --verbose; else echo "WARNING: gitleaks is not installed. Please install it. See https://github.com/gitleaks/gitleaks#installing"; fi
+
+npx lint-staged
