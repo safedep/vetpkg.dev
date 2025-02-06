@@ -1,4 +1,3 @@
-import { UserProvider } from "@auth0/nextjs-auth0/client";
 import "@radix-ui/themes/styles.css";
 import type { Metadata } from "next";
 import localFont from "next/font/local";
@@ -19,9 +18,10 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "SafeDep | Open Source Software Supply Chain Security Platform",
+  title: "vet Open Source Packages",
   description:
-    "Welcome to SafeDep. Onboard to SafeDep cloud, generate authentication credentials and access platform APIs",
+    "vet Open Source Software (OSS) packages before using them in your projects. " +
+    "Protect against malicious code, vulnerabilities, and licensing issues. ",
   icons: {
     icon: "/safedep.svg",
   },
@@ -34,16 +34,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <UserProvider>
-        <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col min-h-screen`}
-        >
-          <Theme>
-            <main className="flex-grow">{children}</main>
-            <Toaster />
-          </Theme>
-        </body>
-      </UserProvider>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col min-h-screen`}
+      >
+        <Theme>
+          <main className="flex-grow">{children}</main>
+          <Toaster />
+        </Theme>
+      </body>
     </html>
   );
 }

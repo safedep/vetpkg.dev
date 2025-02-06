@@ -1,126 +1,191 @@
-import { getUserAccess } from "@/lib/rpc/client";
-import { logger } from "@/utils/logger";
-import { getAccessToken, getSession } from "@auth0/nextjs-auth0";
-import { GetUserInfoResponse } from "@buf/safedep_api.bufbuild_es/safedep/services/controltower/v1/user_pb";
-import { UserIcon } from "lucide-react";
-import { redirect } from "next/navigation";
+"use client";
 
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Form, FormField, FormItem, FormMessage } from "@/components/ui/form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
 
-const defaultPostAuthOnboardingPath = "/onboard";
-const defaultPreAuthPath = "/auth";
+const verboseInputFormSchema = z.object({
+  ecosystem: z.string().min(1),
+  name: z.string().min(1),
+  version: z.string().min(1),
+});
 
-export default async function Home() {
-  const session = await getSession();
-  const userInfo = new GetUserInfoResponse();
-  const currentTenant = {
-    tenant: "",
+const purlInputFormSchema = z.object({
+  purl: z.string().min(5),
+});
+
+export default function Home() {
+  const [usePurlBasedQuery, setUsePurlBasedQuery] = useState<boolean>(false);
+
+  const verboseInputForm = useForm<z.infer<typeof verboseInputFormSchema>>({
+    resolver: zodResolver(verboseInputFormSchema),
+    defaultValues: {
+      ecosystem: "npm",
+      name: "express",
+      version: "4.17.1",
+    },
+  });
+
+  const purlInputForm = useForm<z.infer<typeof purlInputFormSchema>>({
+    resolver: zodResolver(purlInputFormSchema),
+    defaultValues: {
+      purl: "pkg:npm/express@4.17.1",
+    },
+  });
+
+  const onSubmitVerboseInputForm = (
+    data: z.infer<typeof verboseInputFormSchema>,
+  ) => {
+    console.log("Verbose input form data: ", data);
   };
 
-  if (!session?.user) {
-    redirect(defaultPreAuthPath);
-  } else {
-    /**
-     * Check if user is alreaady onboarded on SafeDep Cloud
-     * and redirect accordingly.
-     */
-    let path = "";
-    try {
-      const { accessToken } = await getAccessToken();
-      const res = await getUserAccess(accessToken as string);
-
-      if (!res?.access) {
-        throw new Error("No access found");
-      }
-
-      if (res.access.length === 0) {
-        throw new Error("No tenant found");
-      }
-
-      userInfo.access = res.access;
-    } catch (error) {
-      logger.debug("User not onboarded: ", error);
-      path = defaultPostAuthOnboardingPath;
-    } finally {
-      if (path !== "") {
-        redirect(path);
-      }
-    }
-  }
-
-  async function handleSetTenant(tenant: string) {
-    "use server";
-
-    logger.debug("Selected tenant: ", tenant);
-    currentTenant.tenant = tenant;
-
-    redirect("/api/tenant/redirect/" + tenant);
-  }
-
-  async function handleLogout() {
-    "use server";
-    redirect("/api/auth/logout");
-  }
+  const onSubmitPurlInputForm = (data: z.infer<typeof purlInputFormSchema>) => {
+    console.log("PURL input form data: ", data);
+  };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 px-4 sm:px-6 lg:px-8">
-      <div className="flex items-center space-x-2 py-2">
-        <UserIcon size={18} />
-        <span className="text-sm">Welcome {session?.user?.email}</span>
+    <div className="flex flex-col items-center justify-center min-h-screen py-2 max-w-4xl mx-auto p-4">
+      <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">
+        <span className="text-indigo-500">vet</span> an Open Source Package
+      </h1>
+      <div className="flex items-center justify-around max-w-4xl mt-6 sm:w-full">
+        <div className="flex items-center border-b border-b-1 border-indigo-500 py-2">
+          {usePurlBasedQuery && (
+            <Form {...purlInputForm}>
+              <form
+                className="w-full"
+                onSubmit={purlInputForm.handleSubmit(onSubmitPurlInputForm)}
+              >
+                <FormItem>
+                  <FormField
+                    control={purlInputForm.control}
+                    name="purl"
+                    render={({ field }) => (
+                      <input
+                        {...field}
+                        type="text"
+                        placeholder="pkg:npm/express@4.17.1"
+                        className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                      ></input>
+                    )}
+                  ></FormField>
+                </FormItem>
+                <button
+                  type="submit"
+                  className="w-full px-3 py-2 mt-2 text-white bg-indigo-600 border border-indigo-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                >
+                  Lets go!
+                </button>
+
+                <p className="mt-2 text-sm text-gray-500 text-right">
+                  Lost? Switch to{" "}
+                  <a
+                    href="#"
+                    onClick={() => setUsePurlBasedQuery(false)}
+                    className="text-indigo-600"
+                  >
+                    verbose input
+                  </a>
+                </p>
+              </form>
+            </Form>
+          )}
+
+          {!usePurlBasedQuery && (
+            <Form {...verboseInputForm}>
+              <form
+                className="w-full max-w-lg"
+                onSubmit={verboseInputForm.handleSubmit(
+                  onSubmitVerboseInputForm,
+                )}
+              >
+                <FormField
+                  control={verboseInputForm.control}
+                  name="ecosystem"
+                  render={({ field }) => (
+                    <select
+                      {...field}
+                      className="w-full px-3 py-2 mb-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                      aria-placeholder="Select an ecosystem"
+                    >
+                      <option>Select an ecosystem</option>
+                      <option value="npm">npm</option>
+                      <option value="pypi">pypi</option>
+                      <option value="maven">maven</option>
+                      <option value="rubygem">rubygem</option>
+                      <option value="Go">Go</option>
+                    </select>
+                  )}
+                ></FormField>
+                <FormField
+                  control={verboseInputForm.control}
+                  name="name"
+                  render={({ field }) => (
+                    <input
+                      {...field}
+                      type="text"
+                      placeholder="express"
+                      className="w-full px-3 py-2 mb-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                    ></input>
+                  )}
+                ></FormField>
+                <FormField
+                  control={verboseInputForm.control}
+                  name="version"
+                  render={({ field }) => (
+                    <input
+                      {...field}
+                      type="text"
+                      placeholder="4.17.1"
+                      className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                    ></input>
+                  )}
+                ></FormField>
+                <button
+                  type="submit"
+                  className="w-full px-3 py-2 mt-2 text-white bg-indigo-600 border border-indigo-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                >
+                  Lets go!
+                </button>
+
+                <p className="mt-2 text-sm text-gray-500 text-right">
+                  Boring? Switch to{" "}
+                  <a
+                    href="#"
+                    onClick={() => setUsePurlBasedQuery(true)}
+                    className="text-indigo-600"
+                  >
+                    PURL based query
+                  </a>
+                </p>
+              </form>
+            </Form>
+          )}
+        </div>
       </div>
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle>Select Tenant</CardTitle>
-          <CardDescription>
-            Select the tenant for use with the application
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form>
-            <div className="grid w-full items-center gap-4">
-              <div className="flex flex-col space-y-1.5">
-                <Label htmlFor="framework">Tenant</Label>
-                <Select name="tenant" onValueChange={handleSetTenant}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select tenant to continue ..." />
-                  </SelectTrigger>
-                  <SelectContent position="popper">
-                    {userInfo?.access.map((access) => (
-                      <SelectItem
-                        key={access?.tenant?.domain}
-                        value={access?.tenant?.domain ?? ""}
-                      >
-                        {access.tenant?.domain}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-          </form>
-        </CardContent>
-        <CardFooter className="flex justify-between">
-          <Button variant="outline" onClick={handleLogout}>
-            Logout
-          </Button>
-        </CardFooter>
-      </Card>
+      <div className="flex items-center justify-around max-w-4xl mt-6 sm:w-full">
+        <p className="text-sm text-gray-500 text-center">
+          Built with <span className="text-indigo-600">♥</span> by
+          <a
+            href="https://safedep.io"
+            className="text-indigo-600"
+            target="_blank"
+          >
+            SafeDep Team
+          </a>{" "}
+          using
+          <a
+            href="https://docs.safedep.io/cloud"
+            className="text-indigo-600"
+            target="_blank"
+          >
+            {" "}
+            SafeDep Cloud API{" "}
+          </a>
+        </p>
+      </div>
     </div>
   );
 }
