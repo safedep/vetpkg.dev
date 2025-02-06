@@ -51,27 +51,28 @@ export default function Home() {
         <span className="text-indigo-500">vet</span> an Open Source Package
       </h1>
       <div className="flex items-center justify-around max-w-4xl mt-6 sm:w-full">
-        <div className="flex items-center border-b border-b-1 border-indigo-500 py-2">
+        <div className="flex w-full max-w-lg items-center border-b border-b-1 border-indigo-500 py-2">
           {usePurlBasedQuery && (
             <Form {...purlInputForm}>
               <form
-                className="w-full"
+                className="w-full max-w-lg"
                 onSubmit={purlInputForm.handleSubmit(onSubmitPurlInputForm)}
               >
-                <FormItem>
-                  <FormField
-                    control={purlInputForm.control}
-                    name="purl"
-                    render={({ field }) => (
+                <FormField
+                  control={purlInputForm.control}
+                  name="purl"
+                  render={({ field }) => (
+                    <FormItem>
                       <input
                         {...field}
                         type="text"
                         placeholder="pkg:npm/express@4.17.1"
                         className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                       ></input>
-                    )}
-                  ></FormField>
-                </FormItem>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                ></FormField>
                 <button
                   type="submit"
                   className="w-full px-3 py-2 mt-2 text-white bg-indigo-600 border border-indigo-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
@@ -79,7 +80,7 @@ export default function Home() {
                   Lets go!
                 </button>
 
-                <p className="mt-2 text-sm text-gray-500 text-right">
+                <p className="w-full mt-2 text-sm text-gray-500 text-right">
                   Lost? Switch to{" "}
                   <a
                     href="#"
@@ -105,42 +106,51 @@ export default function Home() {
                   control={verboseInputForm.control}
                   name="ecosystem"
                   render={({ field }) => (
-                    <select
-                      {...field}
-                      className="w-full px-3 py-2 mb-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                      aria-placeholder="Select an ecosystem"
-                    >
-                      <option>Select an ecosystem</option>
-                      <option value="npm">npm</option>
-                      <option value="pypi">pypi</option>
-                      <option value="maven">maven</option>
-                      <option value="rubygem">rubygem</option>
-                      <option value="Go">Go</option>
-                    </select>
+                    <FormItem>
+                      <select
+                        {...field}
+                        className="w-full px-3 py-2 mb-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                        aria-placeholder="Select an ecosystem"
+                      >
+                        <option>Select an ecosystem</option>
+                        <option value="npm">npm</option>
+                        <option value="pypi">pypi</option>
+                        <option value="maven">maven</option>
+                        <option value="rubygem">rubygem</option>
+                        <option value="Go">Go</option>
+                      </select>
+                      <FormMessage />
+                    </FormItem>
                   )}
                 ></FormField>
                 <FormField
                   control={verboseInputForm.control}
                   name="name"
                   render={({ field }) => (
-                    <input
-                      {...field}
-                      type="text"
-                      placeholder="express"
-                      className="w-full px-3 py-2 mb-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                    ></input>
+                    <FormItem>
+                      <input
+                        {...field}
+                        type="text"
+                        placeholder="express"
+                        className="w-full px-3 py-2 mb-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                      ></input>
+                      <FormMessage />
+                    </FormItem>
                   )}
                 ></FormField>
                 <FormField
                   control={verboseInputForm.control}
                   name="version"
                   render={({ field }) => (
-                    <input
-                      {...field}
-                      type="text"
-                      placeholder="4.17.1"
-                      className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                    ></input>
+                    <FormItem>
+                      <input
+                        {...field}
+                        type="text"
+                        placeholder="4.17.1"
+                        className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                      ></input>
+                      <FormMessage />
+                    </FormItem>
                   )}
                 ></FormField>
                 <button
