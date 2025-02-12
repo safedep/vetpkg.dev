@@ -37,6 +37,7 @@ import {
 } from "recharts";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import ReactMarkdown from "react-markdown";
 
 enum MalwareStatus {
   Safe = "Safe",
@@ -44,13 +45,17 @@ enum MalwareStatus {
   Malicious = "Malicious",
 }
 
-// interface Vulnerability {
-//   id: string;
-//   title: string;
-//   severity: string;
-//   description: string;
-//   reference_url: string;
-// }
+enum Confidence {
+  High = "High",
+  Medium = "Medium",
+  Low = "Low",
+}
+
+interface Version {
+  version: string;
+  published_at: string;
+  is_default: boolean;
+}
 
 function getEcosystemIcon(ecosystem: string) {
   switch (ecosystem.toLowerCase()) {
@@ -67,6 +72,22 @@ function getEcosystemIcon(ecosystem: string) {
     default:
       return "📦";
   }
+}
+
+function sortVersions(versions: Version[]): Version[] {
+  return [...versions].sort((a, b) => {
+    const aParts = a.version.split(".").map(Number);
+    const bParts = b.version.split(".").map(Number);
+
+    for (let i = 0; i < Math.max(aParts.length, bParts.length); i++) {
+      const aNum = aParts[i] || 0;
+      const bNum = bParts[i] || 0;
+      if (aNum !== bNum) {
+        return bNum - aNum; // Descending order
+      }
+    }
+    return 0;
+  });
 }
 
 export default function Page() {
@@ -124,6 +145,46 @@ export default function Page() {
         severity: "Medium",
         description: "Description of vulnerability 2",
         reference_url: "https://example.com/vuln2",
+      },
+    ],
+    code_analysis: {
+      is_malware: true,
+      is_verified: true,
+      reason: "The package is malware",
+      details: "The package is malware because of various reasons",
+      evidences: [
+        {
+          source: "Project Analyzer",
+          confidence: Confidence.High,
+          description: "The package is malware because of various reasons",
+        },
+        {
+          source: "File Source Analyzer",
+          confidence: Confidence.Medium,
+          description: "The package is malware because of various reasons",
+        },
+        {
+          source: "Network Source Analyzer",
+          confidence: Confidence.Low,
+          description: "The package is malware because of various reasons",
+        },
+      ],
+    },
+    versions: [
+      {
+        version: "1.0.0",
+        published_at: "2024-03-15",
+        is_default: false,
+      },
+      {
+        version: "1.0.1-2024-03-16-1234567890",
+        published_at: "2024-03-16",
+        is_default: true,
+      },
+      {
+        version: "1.0.2",
+        published_at: "2024-03-17",
+        is_default: false,
       },
     ],
   };
@@ -633,13 +694,106 @@ export default function Page() {
           <TabsContent value="code">
             <Card>
               <CardHeader>
-                <CardTitle>Static Code Analysis</CardTitle>
                 <CardDescription>
-                  Detailed code quality and security analysis
+                  <p className="text-sm text-muted-foreground justify-left flex items-center gap-1 bg-slate-100 p-2 rounded-md">
+                    Malicious code scanning is performed using
+                    <a
+                      href="https://docs.safedep.io/cloud/malware-analysis"
+                      className="text-blue-500 hover:underline flex items-center gap-1"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <ExternalLink className="h-4 w-4" /> SafeDep Malicious
+                      Package Scanning API
+                    </a>
+                  </p>
                 </CardDescription>
               </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground">Coming soon...</p>
+              <CardContent className="space-y-6">
+                {/* Status Summary */}
+                <div className="rounded-lg border p-4">
+                  <div className="flex items-center gap-2 mb-4">
+                    <span
+                      className={`text-lg font-semibold ${
+                        securityMetrics.code_analysis.is_malware
+                          ? "text-red-600"
+                          : "text-green-600"
+                      }`}
+                    >
+                      {securityMetrics.code_analysis.is_malware
+                        ? "⚠️ Malware Detected"
+                        : "✅ Clean Package"}
+                    </span>
+                    {securityMetrics.code_analysis.is_verified && (
+                      <Badge
+                        variant="outline"
+                        className="bg-blue-100 text-blue-800"
+                      >
+                        Verified
+                      </Badge>
+                    )}
+                  </div>
+                  <div className="space-y-2">
+                    <p className="font-medium">Reason:</p>
+                    <p className="text-sm text-muted-foreground">
+                      <ReactMarkdown>
+                        {securityMetrics.code_analysis.reason}
+                      </ReactMarkdown>
+                    </p>
+                    <p className="font-medium mt-4">Details:</p>
+                    <div className="text-sm text-muted-foreground prose prose-sm max-w-none">
+                      <ReactMarkdown>
+                        {securityMetrics.code_analysis.details}
+                      </ReactMarkdown>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Evidence Table */}
+                <div>
+                  <h3 className="text-lg font-semibold mb-4">
+                    Analysis Evidence
+                  </h3>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Source</TableHead>
+                        <TableHead>Confidence</TableHead>
+                        <TableHead>Description</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {securityMetrics.code_analysis.evidences.map(
+                        (evidence, index) => (
+                          <TableRow key={index}>
+                            <TableCell className="font-medium">
+                              {evidence.source}
+                            </TableCell>
+                            <TableCell>
+                              <Badge
+                                variant="outline"
+                                className={`
+                              ${
+                                evidence.confidence === Confidence.High
+                                  ? "bg-red-100 text-red-800"
+                                  : evidence.confidence === Confidence.Medium
+                                    ? "bg-yellow-100 text-yellow-800"
+                                    : "bg-blue-100 text-blue-800"
+                              }
+                            `}
+                              >
+                                {evidence.confidence}
+                              </Badge>
+                            </TableCell>
+                            <TableCell className="max-w-xl">
+                              {evidence.description}
+                            </TableCell>
+                          </TableRow>
+                        ),
+                      )}
+                    </TableBody>
+                  </Table>
+                </div>
               </CardContent>
             </Card>
           </TabsContent>
@@ -647,13 +801,55 @@ export default function Page() {
           <TabsContent value="versions">
             <Card>
               <CardHeader>
-                <CardTitle>Version History</CardTitle>
                 <CardDescription>
-                  Available versions and their security status
+                  <p className="text-sm text-muted-foreground justify-left flex items-center gap-1 bg-slate-100 p-2 rounded-md">
+                    Vulnerabilities detected in the package using
+                    <a
+                      href="https://docs.safedep.io/guides/insights-api-using-typescript"
+                      className="text-blue-500 hover:underline flex items-center gap-1"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <ExternalLink className="h-4 w-4" /> SafeDep Insights API
+                    </a>
+                  </p>
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <p className="text-sm text-muted-foreground">Coming soon...</p>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Version</TableHead>
+                      <TableHead>Published At</TableHead>
+                      <TableHead>Status</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {sortVersions(securityMetrics.versions).map((version) => (
+                      <TableRow
+                        key={version.version}
+                        className={version.is_default ? "bg-blue-50" : ""}
+                      >
+                        <TableCell className="font-medium">
+                          {version.version}
+                        </TableCell>
+                        <TableCell>
+                          {new Date(version.published_at).toLocaleDateString()}
+                        </TableCell>
+                        <TableCell>
+                          {version.is_default && (
+                            <Badge
+                              variant="outline"
+                              className="bg-blue-100 text-blue-800"
+                            >
+                              Default
+                            </Badge>
+                          )}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
               </CardContent>
             </Card>
           </TabsContent>
