@@ -1,6 +1,12 @@
 "use client";
 
-import { Scale, Shield, ShieldAlert, ShieldCheck } from "lucide-react";
+import {
+  ExternalLink,
+  Scale,
+  Shield,
+  ShieldAlert,
+  ShieldCheck,
+} from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import {
@@ -38,6 +44,31 @@ enum MalwareStatus {
   Malicious = "Malicious",
 }
 
+// interface Vulnerability {
+//   id: string;
+//   title: string;
+//   severity: string;
+//   description: string;
+//   reference_url: string;
+// }
+
+function getEcosystemIcon(ecosystem: string) {
+  switch (ecosystem.toLowerCase()) {
+    case "npm":
+      return "📦";
+    case "rubygems":
+      return "💎";
+    case "go":
+      return "🐹";
+    case "maven":
+      return "☕";
+    case "pypi":
+      return "🐍";
+    default:
+      return "📦";
+  }
+}
+
 export default function Page() {
   const params = useParams<{
     ecosystem: string;
@@ -47,7 +78,7 @@ export default function Page() {
 
   // Mock data - replace with API calls
   const securityMetrics = {
-    vulnerabilities: {
+    vulnerability_stats: {
       critical: 1,
       high: 3,
       medium: 7,
@@ -69,6 +100,32 @@ export default function Page() {
       { category: "Packaging", score: 9 },
       { category: "Signed Releases", score: 7 },
     ],
+    repository: {
+      url: "https://github.com/organization/package-name",
+      stars: 1234,
+      forks: 245,
+      openIssues: 34,
+      pullRequests: 12,
+      lastCommit: "2024-03-15",
+      contributors: 67,
+      weeklyDownloads: 45678,
+    },
+    vulnerabilities: [
+      {
+        id: "1",
+        title: "Vulnerability 1",
+        severity: "High",
+        description: "Description of vulnerability 1",
+        reference_url: "https://example.com/vuln1",
+      },
+      {
+        id: "2",
+        title: "Vulnerability 2",
+        severity: "Medium",
+        description: "Description of vulnerability 2",
+        reference_url: "https://example.com/vuln2",
+      },
+    ],
   };
 
   return (
@@ -88,7 +145,12 @@ export default function Page() {
                 <CardTitle className="text-2xl">
                   {params.name} v{params.version}
                 </CardTitle>
-                <CardDescription>{params.ecosystem} Package</CardDescription>
+                <CardDescription>
+                  <span className="bg-slate-100 px-2 py-1 rounded-md">
+                    {getEcosystemIcon(params.ecosystem)} {params.ecosystem}{" "}
+                    Package
+                  </span>
+                </CardDescription>
               </div>
               <Badge
                 variant="default"
@@ -150,7 +212,7 @@ export default function Page() {
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold text-red-500">
-                    {securityMetrics.vulnerabilities.critical}
+                    {securityMetrics.vulnerability_stats.critical}
                   </div>
                 </CardContent>
               </Card>
@@ -250,7 +312,7 @@ export default function Page() {
                           </Badge>
                         </TableCell>
                         <TableCell>
-                          {securityMetrics.vulnerabilities.critical}
+                          {securityMetrics.vulnerability_stats.critical}
                         </TableCell>
                         <TableCell>
                           <Badge variant="destructive">Action Required</Badge>
@@ -266,7 +328,7 @@ export default function Page() {
                           </Badge>
                         </TableCell>
                         <TableCell>
-                          {securityMetrics.vulnerabilities.high}
+                          {securityMetrics.vulnerability_stats.high}
                         </TableCell>
                         <TableCell>
                           <Badge variant="destructive">Action Required</Badge>
@@ -282,7 +344,7 @@ export default function Page() {
                           </Badge>
                         </TableCell>
                         <TableCell>
-                          {securityMetrics.vulnerabilities.medium}
+                          {securityMetrics.vulnerability_stats.medium}
                         </TableCell>
                         <TableCell>
                           <Badge variant="outline">Review</Badge>
@@ -298,7 +360,7 @@ export default function Page() {
                           </Badge>
                         </TableCell>
                         <TableCell>
-                          {securityMetrics.vulnerabilities.low}
+                          {securityMetrics.vulnerability_stats.low}
                         </TableCell>
                         <TableCell>
                           <Badge variant="outline">Monitor</Badge>
@@ -389,19 +451,181 @@ export default function Page() {
                   </div>
                 </CardContent>
               </Card>
+
+              {/* Repository Information */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Repository Information</CardTitle>
+                  <CardDescription>
+                    Open source project metrics and activity
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div>
+                      <h4 className="mb-2 font-medium">Repository</h4>
+                      <a
+                        href={securityMetrics.repository.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-500 hover:underline"
+                      >
+                        {securityMetrics.repository.url}
+                      </a>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <h4 className="text-sm font-medium text-muted-foreground">
+                          Stars
+                        </h4>
+                        <p className="text-2xl font-bold">
+                          {securityMetrics.repository.stars.toLocaleString()}
+                        </p>
+                      </div>
+                      <div>
+                        <h4 className="text-sm font-medium text-muted-foreground">
+                          Forks
+                        </h4>
+                        <p className="text-2xl font-bold">
+                          {securityMetrics.repository.forks.toLocaleString()}
+                        </p>
+                      </div>
+                      <div>
+                        <h4 className="text-sm font-medium text-muted-foreground">
+                          Open Issues
+                        </h4>
+                        <p className="text-2xl font-bold">
+                          {securityMetrics.repository.openIssues.toLocaleString()}
+                        </p>
+                      </div>
+                      <div>
+                        <h4 className="text-sm font-medium text-muted-foreground">
+                          Pull Requests
+                        </h4>
+                        <p className="text-2xl font-bold">
+                          {securityMetrics.repository.pullRequests.toLocaleString()}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <div className="flex justify-between">
+                        <span className="text-sm text-muted-foreground">
+                          Contributors
+                        </span>
+                        <span className="font-medium">
+                          {securityMetrics.repository.contributors.toLocaleString()}
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-sm text-muted-foreground">
+                          Last Commit
+                        </span>
+                        <span className="font-medium">
+                          {new Date(
+                            securityMetrics.repository.lastCommit,
+                          ).toLocaleDateString()}
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-sm text-muted-foreground">
+                          Weekly Downloads
+                        </span>
+                        <span className="font-medium">
+                          {securityMetrics.repository.weeklyDownloads.toLocaleString()}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
           </TabsContent>
 
           <TabsContent value="vulnerabilities">
             <Card>
               <CardHeader>
-                <CardTitle>Vulnerability Details</CardTitle>
                 <CardDescription>
-                  Comprehensive list of detected vulnerabilities
+                  <p className="text-sm text-muted-foreground justify-left flex items-center gap-1 bg-slate-100 p-2 rounded-md">
+                    Vulnerabilities detected in the package using
+                    <a
+                      href="https://docs.safedep.io/guides/insights-api-using-typescript"
+                      className="text-blue-500 hover:underline flex items-center gap-1"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <ExternalLink className="h-4 w-4" /> SafeDep Insights API
+                    </a>
+                  </p>
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <p className="text-sm text-muted-foreground">Coming soon...</p>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>ID</TableHead>
+                      <TableHead>Title</TableHead>
+                      <TableHead>Severity</TableHead>
+                      <TableHead>Description</TableHead>
+                      <TableHead>Reference</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {securityMetrics.vulnerabilities.map((vuln) => (
+                      <TableRow key={vuln.id}>
+                        <TableCell className="font-mono">{vuln.id}</TableCell>
+                        <TableCell className="font-medium">
+                          {vuln.title}
+                        </TableCell>
+                        <TableCell>
+                          <Badge
+                            variant="outline"
+                            className={`
+                              ${
+                                vuln.severity === "Critical"
+                                  ? "bg-red-100 text-red-800"
+                                  : vuln.severity === "High"
+                                    ? "bg-orange-100 text-orange-800"
+                                    : vuln.severity === "Medium"
+                                      ? "bg-yellow-100 text-yellow-800"
+                                      : "bg-green-100 text-green-800"
+                              }
+                            `}
+                          >
+                            {vuln.severity}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="max-w-md">
+                          {vuln.description}
+                        </TableCell>
+                        <TableCell>
+                          <a
+                            href={vuln.reference_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1 text-blue-500 hover:text-blue-700"
+                          >
+                            <span>View Details</span>
+                            <svg
+                              className="h-4 w-4"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                              />
+                            </svg>
+                          </a>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
               </CardContent>
             </Card>
           </TabsContent>
