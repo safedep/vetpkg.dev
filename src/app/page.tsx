@@ -47,15 +47,25 @@ export default function Home() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen py-2 max-w-4xl mx-auto p-4">
-      <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">
+      <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl mb-4">
         <span className="text-indigo-500">vet</span> an Open Source Package
+        <span className="ml-2" role="img" aria-label="magnifying glass">
+          🔍
+        </span>
       </h1>
-      <div className="flex items-center justify-around max-w-4xl mt-6 sm:w-full">
-        <div className="flex w-full max-w-lg items-center border-b border-b-1 border-indigo-500 py-2">
+
+      <p className="text-lg text-gray-600 mb-8 text-justify max-w-2xl font-mono">
+        Analyze OSS dependencies for security vulnerabilities, malicious code,
+        maintainability issues, and other supply chain risks to protect your
+        application.
+      </p>
+
+      <div className="flex items-center justify-around max-w-4xl w-full">
+        <div className="flex w-full max-w-lg items-center border border-indigo-200 rounded-lg shadow-lg bg-white p-6">
           {usePurlBasedQuery && (
             <Form {...purlInputForm}>
               <form
-                className="w-full max-w-lg"
+                className="w-full space-y-4"
                 onSubmit={purlInputForm.handleSubmit(onSubmitPurlInputForm)}
               >
                 <FormField
@@ -63,31 +73,34 @@ export default function Home() {
                   name="purl"
                   render={({ field }) => (
                     <FormItem>
+                      <div className="font-mono text-sm text-gray-500 mb-2">
+                        Package URL (PURL)
+                      </div>
                       <input
                         {...field}
                         type="text"
                         placeholder="pkg:npm/express@4.17.1"
-                        className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                      ></input>
+                        className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent font-mono text-sm transition-all"
+                      />
                       <FormMessage />
                     </FormItem>
                   )}
-                ></FormField>
+                />
                 <button
                   type="submit"
-                  className="w-full px-3 py-2 mt-2 text-white bg-indigo-600 border border-indigo-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                  className="w-full px-4 py-3 text-white bg-indigo-600 hover:bg-indigo-700 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors font-semibold"
                 >
-                  Lets go!
+                  Analyze Package 🚀
                 </button>
 
-                <p className="w-full mt-2 text-sm text-gray-500 text-right">
-                  Lost? Switch to{" "}
+                <p className="text-sm text-gray-500 text-right">
+                  Need help? Switch to{" "}
                   <a
                     href="#"
                     onClick={() => setUsePurlBasedQuery(false)}
-                    className="text-indigo-600"
+                    className="text-indigo-600 hover:text-indigo-800 font-medium"
                   >
-                    verbose input
+                    detailed input →
                   </a>
                 </p>
               </form>
@@ -97,7 +110,7 @@ export default function Home() {
           {!usePurlBasedQuery && (
             <Form {...verboseInputForm}>
               <form
-                className="w-full max-w-lg"
+                className="w-full space-y-4"
                 onSubmit={verboseInputForm.handleSubmit(
                   onSubmitVerboseInputForm,
                 )}
@@ -107,67 +120,75 @@ export default function Home() {
                   name="ecosystem"
                   render={({ field }) => (
                     <FormItem>
+                      <div className="font-mono text-sm text-gray-500 mb-2">
+                        Package Ecosystem
+                      </div>
                       <select
                         {...field}
-                        className="w-full px-3 py-2 mb-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                        aria-placeholder="Select an ecosystem"
+                        className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
                       >
-                        <option>Select an ecosystem</option>
-                        <option value="npm">npm</option>
-                        <option value="pypi">pypi</option>
-                        <option value="maven">maven</option>
-                        <option value="rubygem">rubygem</option>
-                        <option value="Go">Go</option>
+                        <option value="">Select an ecosystem</option>
+                        <option value="npm">npm 📦</option>
+                        <option value="pypi">PyPI 🐍</option>
+                        <option value="maven">Maven ☕️</option>
+                        <option value="rubygem">RubyGems 💎</option>
+                        <option value="Go">Go 🐹</option>
                       </select>
                       <FormMessage />
                     </FormItem>
                   )}
-                ></FormField>
+                />
                 <FormField
                   control={verboseInputForm.control}
                   name="name"
                   render={({ field }) => (
                     <FormItem>
+                      <div className="font-mono text-sm text-gray-500 mb-2">
+                        Package Name
+                      </div>
                       <input
                         {...field}
                         type="text"
                         placeholder="express"
-                        className="w-full px-3 py-2 mb-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                      ></input>
+                        className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent font-mono text-sm transition-all"
+                      />
                       <FormMessage />
                     </FormItem>
                   )}
-                ></FormField>
+                />
                 <FormField
                   control={verboseInputForm.control}
                   name="version"
                   render={({ field }) => (
                     <FormItem>
+                      <div className="font-mono text-sm text-gray-500 mb-2">
+                        Version
+                      </div>
                       <input
                         {...field}
                         type="text"
                         placeholder="4.17.1"
-                        className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                      ></input>
+                        className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent font-mono text-sm transition-all"
+                      />
                       <FormMessage />
                     </FormItem>
                   )}
-                ></FormField>
+                />
                 <button
                   type="submit"
-                  className="w-full px-3 py-2 mt-2 text-white bg-indigo-600 border border-indigo-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                  className="w-full px-4 py-3 text-white bg-indigo-600 hover:bg-indigo-700 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors font-semibold"
                 >
-                  Lets go!
+                  Analyze Package 🚀
                 </button>
 
-                <p className="mt-2 text-sm text-gray-500 text-right">
-                  Boring? Switch to{" "}
+                <p className="text-sm text-gray-500 text-right">
+                  Know PURL? Switch to{" "}
                   <a
                     href="#"
                     onClick={() => setUsePurlBasedQuery(true)}
-                    className="text-indigo-600"
+                    className="text-indigo-600 hover:text-indigo-800 font-medium"
                   >
-                    PURL based query
+                    quick input →
                   </a>
                 </p>
               </form>
@@ -175,25 +196,26 @@ export default function Home() {
           )}
         </div>
       </div>
-      <div className="flex items-center justify-around max-w-4xl mt-6 sm:w-full">
-        <p className="text-sm text-gray-500 text-center">
-          Built with <span className="text-indigo-600">♥</span> by
+
+      <div className="flex items-center justify-around max-w-4xl mt-8 sm:w-full">
+        <p className="text-sm text-gray-500 text-center font-mono">
+          Built with <span className="text-red-500">♥</span> by{" "}
           <a
             href="https://safedep.io"
-            className="text-indigo-600"
+            className="text-indigo-600 hover:text-indigo-800 font-medium"
             target="_blank"
           >
             SafeDep Team
           </a>{" "}
-          using
+          using{" "}
           <a
             href="https://docs.safedep.io/cloud"
-            className="text-indigo-600"
+            className="text-indigo-600 hover:text-indigo-800 font-medium"
             target="_blank"
           >
-            {" "}
-            SafeDep Cloud API{" "}
-          </a>
+            SafeDep Cloud API
+          </a>{" "}
+          ⚡️
         </p>
       </div>
     </div>
