@@ -40,8 +40,15 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ReactMarkdown from "react-markdown";
 import { useEffect, useState } from "react";
 import { PackageVersionInsight } from "@buf/safedep_api.bufbuild_es/safedep/messages/package/v1/package_version_insight_pb";
-import { getPackageVersionInfo, queryMalwareAnalysis } from "../../actions";
+import { getPackageVersionInfo, queryMalwareAnalysis } from "./actions";
 import { QueryPackageAnalysisResponse } from "@buf/safedep_api.bufbuild_es/safedep/services/malysis/v1/malysis_pb";
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Severity_Risk,
+  Severity_RiskSchema,
+} from "@buf/safedep_api.bufbuild_es/safedep/messages/vulnerability/v1/severity_pb";
+import { VulnerabilityIdentifierType } from "@buf/safedep_api.bufbuild_es/safedep/messages/vulnerability/v1/vulnerability_pb";
+import { LicenseMeta } from "@buf/safedep_api.bufbuild_es/safedep/messages/package/v1/license_meta_pb";
 
 enum MalwareStatus {
   Safe = "Safe",
@@ -53,6 +60,14 @@ enum Confidence {
   High = "High",
   Medium = "Medium",
   Low = "Low",
+}
+
+interface Vulnerability {
+  id: string;
+  title: string;
+  severity: Severity_Risk;
+  reference_url?: string;
+  cve?: string;
 }
 
 interface Version {
@@ -76,6 +91,52 @@ function getEcosystemIcon(ecosystem: string) {
     default:
       return "📦";
   }
+}
+
+function getCriticalVulnerabilitiesCount(
+  insights: PackageVersionInsight | null,
+): number {
+  return (
+    insights?.vulnerabilities.filter(
+      (v) =>
+        v.severities.filter((s) => s.risk === Severity_Risk.CRITICAL).length >
+        0,
+    ).length ?? 0
+  );
+}
+
+function getVulnerabilitiesCountBySeverity(
+  insights: PackageVersionInsight | null,
+  severity: Severity_Risk,
+): number {
+  return (
+    insights?.vulnerabilities.filter(
+      (v) => v.severities.filter((s) => s.risk === severity).length > 0,
+    ).length ?? 0
+  );
+}
+
+function getVulnerabilities(
+  insights: PackageVersionInsight | null,
+): Vulnerability[] {
+  return (
+    insights?.vulnerabilities.map((v) => ({
+      id: v.id?.value ?? "",
+      title: v.summary,
+      severity: v.severities[0]?.risk,
+      cve: v.aliases.find((a) => a.type === VulnerabilityIdentifierType.CVE)
+        ?.value,
+    })) ?? []
+  );
+}
+
+function getRiskName(risk: Severity_Risk): string {
+  return Severity_RiskSchema.values[risk].name.replace("RISK_", "");
+}
+
+function getLicense(licenses: LicenseMeta[]): string {
+  const name = licenses.length > 0 ? licenses[0].licenseId : "";
+  return name.length > 0 ? name : "Unknown";
 }
 
 function sortVersions(versions: Version[]): Version[] {
@@ -122,6 +183,69 @@ export default function Page() {
       .then(() => setMalwareAnalysisLoading(false))
       .catch(console.error);
   }, [params.ecosystem, params.name, params.version]);
+
+  if (insightsLoading) {
+    return (
+      <div className="flex min-h-screen w-full flex-col">
+        <div className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8">
+          {/* Package Header Skeleton */}
+          <Card className="border-l-4 border-l-gray-200">
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div className="space-y-2">
+                  <Skeleton className="h-8 w-[250px]" />
+                  <Skeleton className="h-6 w-[150px]" />
+                </div>
+                <Skeleton className="h-8 w-[120px]" />
+              </div>
+            </CardHeader>
+          </Card>
+
+          {/* Tabs Skeleton */}
+          <div className="w-full">
+            <div className="grid w-full grid-cols-4 gap-2 mb-4">
+              {[...Array(4)].map((_, i) => (
+                <Skeleton key={i} className="h-10" />
+              ))}
+            </div>
+
+            {/* Content Skeleton */}
+            <div className="grid gap-4 md:grid-cols-4">
+              {[...Array(4)].map((_, i) => (
+                <Card key={i}>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <Skeleton className="h-5 w-[140px]" />
+                    <Skeleton className="h-4 w-4 rounded-full" />
+                  </CardHeader>
+                  <CardContent>
+                    <Skeleton className="h-8 w-[70px]" />
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+
+            <div className="grid gap-4 md:grid-cols-2 mt-4">
+              {[...Array(2)].map((_, i) => (
+                <Card key={i}>
+                  <CardHeader>
+                    <Skeleton className="h-6 w-[200px] mb-2" />
+                    <Skeleton className="h-4 w-[300px]" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-2">
+                      {[...Array(4)].map((_, j) => (
+                        <Skeleton key={j} className="h-4 w-full" />
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   // Mock data - replace with API calls
   const securityMetrics = {
@@ -230,7 +354,7 @@ export default function Page() {
             <div className="flex items-center justify-between">
               <div>
                 <CardTitle className="text-2xl">
-                  {params.name} v{params.version}
+                  🧩 {params.name}@{params.version}
                 </CardTitle>
                 <CardDescription>
                   <span className="bg-slate-100 px-2 py-1 rounded-md">
@@ -299,7 +423,7 @@ export default function Page() {
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold text-red-500">
-                    {securityMetrics.vulnerability_stats.critical}
+                    {getCriticalVulnerabilitiesCount(insights)}
                   </div>
                 </CardContent>
               </Card>
@@ -364,7 +488,7 @@ export default function Page() {
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">
-                    {securityMetrics.license}
+                    {getLicense(insights?.licenses?.licenses ?? [])}
                   </div>
                 </CardContent>
               </Card>
@@ -399,7 +523,10 @@ export default function Page() {
                           </Badge>
                         </TableCell>
                         <TableCell>
-                          {securityMetrics.vulnerability_stats.critical}
+                          {getVulnerabilitiesCountBySeverity(
+                            insights,
+                            Severity_Risk.CRITICAL,
+                          )}
                         </TableCell>
                         <TableCell>
                           <Badge variant="destructive">Action Required</Badge>
@@ -415,7 +542,10 @@ export default function Page() {
                           </Badge>
                         </TableCell>
                         <TableCell>
-                          {securityMetrics.vulnerability_stats.high}
+                          {getVulnerabilitiesCountBySeverity(
+                            insights,
+                            Severity_Risk.HIGH,
+                          )}
                         </TableCell>
                         <TableCell>
                           <Badge variant="destructive">Action Required</Badge>
@@ -431,7 +561,10 @@ export default function Page() {
                           </Badge>
                         </TableCell>
                         <TableCell>
-                          {securityMetrics.vulnerability_stats.medium}
+                          {getVulnerabilitiesCountBySeverity(
+                            insights,
+                            Severity_Risk.MEDIUM,
+                          )}
                         </TableCell>
                         <TableCell>
                           <Badge variant="outline">Review</Badge>
@@ -447,7 +580,10 @@ export default function Page() {
                           </Badge>
                         </TableCell>
                         <TableCell>
-                          {securityMetrics.vulnerability_stats.low}
+                          {getVulnerabilitiesCountBySeverity(
+                            insights,
+                            Severity_Risk.LOW,
+                          )}
                         </TableCell>
                         <TableCell>
                           <Badge variant="outline">Monitor</Badge>
@@ -652,16 +788,17 @@ export default function Page() {
                   <TableHeader>
                     <TableRow>
                       <TableHead>ID</TableHead>
+                      <TableHead>CVE</TableHead>
                       <TableHead>Title</TableHead>
                       <TableHead>Severity</TableHead>
-                      <TableHead>Description</TableHead>
                       <TableHead>Reference</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {securityMetrics.vulnerabilities.map((vuln) => (
+                    {getVulnerabilities(insights).map((vuln) => (
                       <TableRow key={vuln.id}>
                         <TableCell className="font-mono">{vuln.id}</TableCell>
+                        <TableCell className="font-mono">{vuln.cve}</TableCell>
                         <TableCell className="font-medium">
                           {vuln.title}
                         </TableCell>
@@ -670,21 +807,18 @@ export default function Page() {
                             variant="outline"
                             className={`
                               ${
-                                vuln.severity === "Critical"
+                                vuln.severity === Severity_Risk.CRITICAL
                                   ? "bg-red-100 text-red-800"
-                                  : vuln.severity === "High"
+                                  : vuln.severity === Severity_Risk.HIGH
                                     ? "bg-orange-100 text-orange-800"
-                                    : vuln.severity === "Medium"
+                                    : vuln.severity === Severity_Risk.MEDIUM
                                       ? "bg-yellow-100 text-yellow-800"
                                       : "bg-green-100 text-green-800"
                               }
                             `}
                           >
-                            {vuln.severity}
+                            {getRiskName(vuln.severity)}
                           </Badge>
-                        </TableCell>
-                        <TableCell className="max-w-md">
-                          {vuln.description}
                         </TableCell>
                         <TableCell>
                           <a
