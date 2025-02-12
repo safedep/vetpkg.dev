@@ -38,6 +38,10 @@ import {
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ReactMarkdown from "react-markdown";
+import { useEffect, useState } from "react";
+import { PackageVersionInsight } from "@buf/safedep_api.bufbuild_es/safedep/messages/package/v1/package_version_insight_pb";
+import { getPackageVersionInfo, queryMalwareAnalysis } from "../../actions";
+import { QueryPackageAnalysisResponse } from "@buf/safedep_api.bufbuild_es/safedep/services/malysis/v1/malysis_pb";
 
 enum MalwareStatus {
   Safe = "Safe",
@@ -96,6 +100,28 @@ export default function Page() {
     name: string;
     version: string;
   }>();
+
+  const [insights, setInsights] = useState<PackageVersionInsight | null>(null);
+  const [insightsLoading, setInsightsLoading] = useState(true);
+
+  const [malwareAnalysis, setMalwareAnalysis] =
+    useState<QueryPackageAnalysisResponse | null>(null);
+  const [malwareAnalysisLoading, setMalwareAnalysisLoading] = useState(true);
+
+  useEffect(() => {
+    setInsightsLoading(true);
+    setMalwareAnalysisLoading(true);
+
+    getPackageVersionInfo(params.ecosystem, params.name, params.version)
+      .then(setInsights)
+      .then(() => setInsightsLoading(false))
+      .catch(console.error);
+
+    queryMalwareAnalysis(params.ecosystem, params.name, params.version)
+      .then(setMalwareAnalysis)
+      .then(() => setMalwareAnalysisLoading(false))
+      .catch(console.error);
+  }, [params.ecosystem, params.name, params.version]);
 
   // Mock data - replace with API calls
   const securityMetrics = {

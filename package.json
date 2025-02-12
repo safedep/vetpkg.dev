@@ -14,12 +14,10 @@
     "**/*": "prettier --write --ignore-unknown"
   },
   "dependencies": {
-    "@buf/safedep_api.bufbuild_es": "1.10.0-20250203053921-75ead1519f84.1",
-    "@buf/safedep_api.connectrpc_es": "1.6.1-20250203053921-75ead1519f84.2",
-    "@bufbuild/protobuf": "^1.10.0",
+    "@buf/safedep_api.bufbuild_es": "2.2.3-20250212070940-a267494d7b0b.1",
     "@codemirror/lang-sql": "^6.8.0",
-    "@connectrpc/connect": "^1.6.1",
-    "@connectrpc/connect-node": "^1.6.1",
+    "@connectrpc/connect": "^2.0.1",
+    "@connectrpc/connect-node": "^2.0.1",
     "@headlessui/react": "^2.2.0",
     "@heroicons/react": "^2.2.0",
     "@hookform/resolvers": "^3.10.0",

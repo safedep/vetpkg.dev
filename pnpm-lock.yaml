@@ -9,23 +9,17 @@ importers:
   .:
     dependencies:
       '@buf/safedep_api.bufbuild_es':
-        specifier: 1.10.0-20250203053921-75ead1519f84.1
-        version: 1.10.0-20250203053921-75ead1519f84.1(@bufbuild/protobuf@1.10.0)
-      '@buf/safedep_api.connectrpc_es':
-        specifier: 1.6.1-20250203053921-75ead1519f84.2
-        version: 1.6.1-20250203053921-75ead1519f84.2(@bufbuild/protobuf@1.10.0)(@connectrpc/connect@1.6.1(@bufbuild/protobuf@1.10.0))
-      '@bufbuild/protobuf':
-        specifier: ^1.10.0
-        version: 1.10.0
+        specifier: 2.2.3-20250212070940-a267494d7b0b.1
+        version: 2.2.3-20250212070940-a267494d7b0b.1(@bufbuild/protobuf@2.2.3)
       '@codemirror/lang-sql':
         specifier: ^6.8.0
         version: 6.8.0
       '@connectrpc/connect':
-        specifier: ^1.6.1
-        version: 1.6.1(@bufbuild/protobuf@1.10.0)
+        specifier: ^2.0.1
+        version: 2.0.1(@bufbuild/protobuf@2.2.3)
       '@connectrpc/connect-node':
-        specifier: ^1.6.1
-        version: 1.6.1(@bufbuild/protobuf@1.10.0)(@connectrpc/connect@1.6.1(@bufbuild/protobuf@1.10.0))
+        specifier: ^2.0.1
+        version: 2.0.1(@bufbuild/protobuf@2.2.3)(@connectrpc/connect@2.0.1(@bufbuild/protobuf@2.2.3))
       '@headlessui/react':
         specifier: ^2.2.0
         version: 2.2.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -320,28 +314,18 @@ packages:
     resolution: {integrity: sha512-6zABk/ECA/QYSCQ1NGiVwwbQerUCZ+TQbp64Q3AgmfNvurHH0j8TtXa1qbShXA6qqkpAj4V5W8pP6mLe1mcMqA==}
     engines: {node: '>=18'}
 
-  '@buf/bufbuild_protovalidate.bufbuild_es@1.10.0-20240508200655-46a4cf4ba109.1':
-    resolution: {tarball: https://buf.build/gen/npm/v1/@buf/bufbuild_protovalidate.bufbuild_es/-/bufbuild_protovalidate.bufbuild_es-1.10.0-20240508200655-46a4cf4ba109.1.tgz}
+  '@buf/bufbuild_protovalidate.bufbuild_es@2.2.3-20240508200655-46a4cf4ba109.1':
+    resolution: {tarball: https://buf.build/gen/npm/v1/@buf/bufbuild_protovalidate.bufbuild_es/-/bufbuild_protovalidate.bufbuild_es-2.2.3-20240508200655-46a4cf4ba109.1.tgz}
     peerDependencies:
-      '@bufbuild/protobuf': ^1.10.0
+      '@bufbuild/protobuf': ^2.2.3
 
-  '@buf/bufbuild_protovalidate.connectrpc_es@1.6.1-20240508200655-46a4cf4ba109.2':
-    resolution: {tarball: https://buf.build/gen/npm/v1/@buf/bufbuild_protovalidate.connectrpc_es/-/bufbuild_protovalidate.connectrpc_es-1.6.1-20240508200655-46a4cf4ba109.2.tgz}
+  '@buf/safedep_api.bufbuild_es@2.2.3-20250212070940-a267494d7b0b.1':
+    resolution: {tarball: https://buf.build/gen/npm/v1/@buf/safedep_api.bufbuild_es/-/safedep_api.bufbuild_es-2.2.3-20250212070940-a267494d7b0b.1.tgz}
     peerDependencies:
-      '@connectrpc/connect': ^1.6.1
+      '@bufbuild/protobuf': ^2.2.3
 
-  '@buf/safedep_api.bufbuild_es@1.10.0-20250203053921-75ead1519f84.1':
-    resolution: {tarball: https://buf.build/gen/npm/v1/@buf/safedep_api.bufbuild_es/-/safedep_api.bufbuild_es-1.10.0-20250203053921-75ead1519f84.1.tgz}
-    peerDependencies:
-      '@bufbuild/protobuf': ^1.10.0
-
-  '@buf/safedep_api.connectrpc_es@1.6.1-20250203053921-75ead1519f84.2':
-    resolution: {tarball: https://buf.build/gen/npm/v1/@buf/safedep_api.connectrpc_es/-/safedep_api.connectrpc_es-1.6.1-20250203053921-75ead1519f84.2.tgz}
-    peerDependencies:
-      '@connectrpc/connect': ^1.6.1
-
-  '@bufbuild/protobuf@1.10.0':
-    resolution: {integrity: sha512-QDdVFLoN93Zjg36NoQPZfsVH9tZew7wKDKyV5qRdj8ntT4wQCOradQjRaTdwMhWUYsgKsvCINKKm87FdEk96Ag==}
+  '@bufbuild/protobuf@2.2.3':
+    resolution: {integrity: sha512-tFQoXHJdkEOSwj5tRIZSPNUuXK3RaR7T1nUrPgbYX1pUbvqqaaZAsfo+NXBPsz5rZMSKVFrgK1WL8Q/MSLvprg==}
 
   '@bundled-es-modules/cookie@2.0.1':
     resolution: {integrity: sha512-8o+5fRPLNbjbdGRRmJj3h6Hh1AQJf2dk3qQ/5ZFb+PXkRNiSoMGGUKlsgLfrxneb72axVJyIYji64E2+nNfYyw==}
@@ -379,17 +363,17 @@ packages:
   '@codemirror/view@6.36.2':
     resolution: {integrity: sha512-DZ6ONbs8qdJK0fdN7AB82CgI6tYXf4HWk1wSVa0+9bhVznCuuvhQtX8bFBoy3dv8rZSQqUd8GvhVAcielcidrA==}
 
-  '@connectrpc/connect-node@1.6.1':
-    resolution: {integrity: sha512-DxcD1wsF/aX9GegjAtl7VbpiZNjVJozy87VbaFoN6AF0Ln1Q757r5dgV59Gz0wmlk5f17txUsrEr1f2inlnnAg==}
-    engines: {node: '>=16.0.0'}
+  '@connectrpc/connect-node@2.0.1':
+    resolution: {integrity: sha512-jXE9vMZ71aZnIXPDBqedwQyT/nN5pYs6pI8BScvvxJEKPJNAuwxltdJ2u0RpPaqox/dEW+ipzAN7kjYQIy3NHg==}
+    engines: {node: '>=18.14.1'}
     peerDependencies:
-      '@bufbuild/protobuf': ^1.10.0
-      '@connectrpc/connect': 1.6.1
+      '@bufbuild/protobuf': ^2.2.0
+      '@connectrpc/connect': 2.0.1
 
-  '@connectrpc/connect@1.6.1':
-    resolution: {integrity: sha512-KchMDNtU4CDTdkyf0qG7ugJ6qHTOR/aI7XebYn3OTCNagaDYWiZUVKgRgwH79yeMkpNgvEUaXSK7wKjaBK9b/Q==}
+  '@connectrpc/connect@2.0.1':
+    resolution: {integrity: sha512-o+MauvcOnfN4vjpS8ngoX+ubhcCDvnexlLwtk/VnkCLjoRMUz2PKqi87Si58ViWq0vzmGYPRf2LNwhJk5kcCXA==}
     peerDependencies:
-      '@bufbuild/protobuf': ^1.10.0
+      '@bufbuild/protobuf': ^2.2.0
 
   '@cspotcode/source-map-support@0.8.1':
     resolution: {integrity: sha512-IchNf6dN4tHoMFIn/7OE8LWZ19Y6q/67Bmf6vnGREv8RSbBVb9LPJxEcnwrcwX6ixSvaiGoomAUvu4YSxXrVgw==}
@@ -593,10 +577,6 @@ packages:
   '@eslint/js@8.57.1':
     resolution: {integrity: sha512-d9zaMRSTIKDLhctzH12MtXvJKSSUhaHcjV+2Z+GK+EEY7XKpP5yR4x+N3TAcHTcu963nIr+TMcCb4DBCYX1z6Q==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
-
-  '@fastify/busboy@2.1.1':
-    resolution: {integrity: sha512-vBZP4NlzfOlerQTnba4aqZoMhE/a9HY7HRqoOPaETQcSQuWEIyZMHGfVu6w9wGtGK5fED5qRs2DteVCjOH60sA==}
-    engines: {node: '>=14'}
 
   '@floating-ui/core@1.6.9':
     resolution: {integrity: sha512-uMXCuQ3BItDUbAMhIXw7UPXRfAlOAvZzdK9BWpE60MCn+Svt3aLn9jsPTi/WNGlRUu2uI0v5S7JiIUsbsvh3fw==}
@@ -5141,10 +5121,6 @@ packages:
   undici-types@6.19.8:
     resolution: {integrity: sha512-ve2KP6f/JnbPBFyobGHuerC9g1FYGn/F8n1LWTwNxCEzd6IfqTwUQcNXgEtmmQ6DlRrC1hrSrBnCZPokRrDHjw==}
 
-  undici@5.28.5:
-    resolution: {integrity: sha512-zICwjrDrcrUE0pyyJc1I2QzBkLM8FINsgOrt6WjA+BgajVq9Nxu2PbFFXUrAggLfDXlZGZBVZYw7WNV5KiBiBA==}
-    engines: {node: '>=14.0'}
-
   unified@11.0.5:
     resolution: {integrity: sha512-xKvGhPWw3k84Qjh8bI3ZeJjqnyadK+GEFtazSfZv/rKeTkTjOJho6mFqh2SM96iIcZokxiOpg78GazTSg8+KHA==}
 
@@ -5607,31 +5583,16 @@ snapshots:
 
   '@bcoe/v8-coverage@1.0.2': {}
 
-  '@buf/bufbuild_protovalidate.bufbuild_es@1.10.0-20240508200655-46a4cf4ba109.1(@bufbuild/protobuf@1.10.0)':
+  '@buf/bufbuild_protovalidate.bufbuild_es@2.2.3-20240508200655-46a4cf4ba109.1(@bufbuild/protobuf@2.2.3)':
     dependencies:
-      '@bufbuild/protobuf': 1.10.0
+      '@bufbuild/protobuf': 2.2.3
 
-  '@buf/bufbuild_protovalidate.connectrpc_es@1.6.1-20240508200655-46a4cf4ba109.2(@bufbuild/protobuf@1.10.0)(@connectrpc/connect@1.6.1(@bufbuild/protobuf@1.10.0))':
+  '@buf/safedep_api.bufbuild_es@2.2.3-20250212070940-a267494d7b0b.1(@bufbuild/protobuf@2.2.3)':
     dependencies:
-      '@buf/bufbuild_protovalidate.bufbuild_es': 1.10.0-20240508200655-46a4cf4ba109.1(@bufbuild/protobuf@1.10.0)
-      '@connectrpc/connect': 1.6.1(@bufbuild/protobuf@1.10.0)
-    transitivePeerDependencies:
-      - '@bufbuild/protobuf'
+      '@buf/bufbuild_protovalidate.bufbuild_es': 2.2.3-20240508200655-46a4cf4ba109.1(@bufbuild/protobuf@2.2.3)
+      '@bufbuild/protobuf': 2.2.3
 
-  '@buf/safedep_api.bufbuild_es@1.10.0-20250203053921-75ead1519f84.1(@bufbuild/protobuf@1.10.0)':
-    dependencies:
-      '@buf/bufbuild_protovalidate.bufbuild_es': 1.10.0-20240508200655-46a4cf4ba109.1(@bufbuild/protobuf@1.10.0)
-      '@bufbuild/protobuf': 1.10.0
-
-  '@buf/safedep_api.connectrpc_es@1.6.1-20250203053921-75ead1519f84.2(@bufbuild/protobuf@1.10.0)(@connectrpc/connect@1.6.1(@bufbuild/protobuf@1.10.0))':
-    dependencies:
-      '@buf/bufbuild_protovalidate.connectrpc_es': 1.6.1-20240508200655-46a4cf4ba109.2(@bufbuild/protobuf@1.10.0)(@connectrpc/connect@1.6.1(@bufbuild/protobuf@1.10.0))
-      '@buf/safedep_api.bufbuild_es': 1.10.0-20250203053921-75ead1519f84.1(@bufbuild/protobuf@1.10.0)
-      '@connectrpc/connect': 1.6.1(@bufbuild/protobuf@1.10.0)
-    transitivePeerDependencies:
-      - '@bufbuild/protobuf'
-
-  '@bufbuild/protobuf@1.10.0': {}
+  '@bufbuild/protobuf@2.2.3': {}
 
   '@bundled-es-modules/cookie@2.0.1':
     dependencies:
@@ -5710,15 +5671,14 @@ snapshots:
       style-mod: 4.1.2
       w3c-keyname: 2.2.8
 
-  '@connectrpc/connect-node@1.6.1(@bufbuild/protobuf@1.10.0)(@connectrpc/connect@1.6.1(@bufbuild/protobuf@1.10.0))':
+  '@connectrpc/connect-node@2.0.1(@bufbuild/protobuf@2.2.3)(@connectrpc/connect@2.0.1(@bufbuild/protobuf@2.2.3))':
     dependencies:
-      '@bufbuild/protobuf': 1.10.0
-      '@connectrpc/connect': 1.6.1(@bufbuild/protobuf@1.10.0)
-      undici: 5.28.5
+      '@bufbuild/protobuf': 2.2.3
+      '@connectrpc/connect': 2.0.1(@bufbuild/protobuf@2.2.3)
 
-  '@connectrpc/connect@1.6.1(@bufbuild/protobuf@1.10.0)':
+  '@connectrpc/connect@2.0.1(@bufbuild/protobuf@2.2.3)':
     dependencies:
-      '@bufbuild/protobuf': 1.10.0
+      '@bufbuild/protobuf': 2.2.3
 
   '@cspotcode/source-map-support@0.8.1':
     dependencies:
@@ -5846,8 +5806,6 @@ snapshots:
       - supports-color
 
   '@eslint/js@8.57.1': {}
-
-  '@fastify/busboy@2.1.1': {}
 
   '@floating-ui/core@1.6.9':
     dependencies:
@@ -11131,10 +11089,6 @@ snapshots:
       which-boxed-primitive: 1.1.1
 
   undici-types@6.19.8: {}
-
-  undici@5.28.5:
-    dependencies:
-      '@fastify/busboy': 2.1.1
 
   unified@11.0.5:
     dependencies:
