@@ -1,6 +1,6 @@
 # vetpkg.dev 🚀
 
-This application is live at `https://vetpkg.dev`
+This application is live at [https://vetpkg.dev](https://vetpkg.dev)
 
 ## Development
 
