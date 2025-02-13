@@ -71,12 +71,6 @@ enum MalwareStatus {
   Unknown = "Unknown",
 }
 
-enum Confidence {
-  High = "High",
-  Medium = "Medium",
-  Low = "Low",
-}
-
 enum PackageSafetyStatus {
   Safe = "Safe",
   PossiblyMalicious = "Possibly Malicious",
@@ -260,24 +254,24 @@ function getMalwareEvidences(
 ): MalwareEvidence[] {
   const evidences: MalwareEvidence[] =
     malwareAnalysis?.report?.fileEvidences.map((e) => ({
-      source: e.evidence?.source!,
+      source: e.evidence?.source || "",
       fileKey: e.fileKey,
-      confidence: e.evidence?.confidence!,
-      title: e.evidence?.title!,
-      details: e.evidence?.details!,
+      confidence: e.evidence?.confidence || Report_Evidence_Confidence.LOW,
+      title: e.evidence?.title || "",
+      details: e.evidence?.details || "",
     })) ?? [];
 
   malwareAnalysis?.report?.projectEvidences.forEach((e) => {
     evidences.push({
-      source: e.evidence?.source!,
-      confidence: e.evidence?.confidence!,
-      title: e.evidence?.title!,
-      details: e.evidence?.details!,
+      source: e.evidence?.source || "",
+      confidence: e.evidence?.confidence || Report_Evidence_Confidence.LOW,
+      title: e.evidence?.title || "",
+      details: e.evidence?.details || "",
       projectSource: e.project?.url,
     });
   });
 
-  return evidences ?? [];
+  return evidences;
 }
 
 function getInferredBehavior(
@@ -293,7 +287,6 @@ function getInferredBehavior(
 
     const source = evidence.source.toLowerCase();
     const title = evidence.title.toLowerCase();
-    const details = evidence.details.toLowerCase();
 
     if (source.includes("yara")) {
       if (title.includes("exotic") || title.includes("url")) {
@@ -317,11 +310,7 @@ function getInferredBehavior(
   });
 
   const provenances = insights?.slsaProvenances ?? [];
-  if (provenances.length > 0) {
-    behavior.package_signature_missing = false;
-  } else {
-    behavior.package_signature_missing = true;
-  }
+  behavior.package_signature_missing = provenances.length === 0;
 
   return behavior;
 }

@@ -94,7 +94,7 @@ export default function AboutPage() {
                   <CardContent>
                     <p className="text-sm text-muted-foreground">
                       Security health metrics from the Open Source Security
-                      Foundation's Scorecard project.
+                      Foundation&apos;s Scorecard project.
                     </p>
                     <Link
                       href="https://securityscorecards.dev"
@@ -113,7 +113,7 @@ export default function AboutPage() {
                   </CardHeader>
                   <CardContent>
                     <p className="text-sm text-muted-foreground">
-                      Google's OSS insights project providing insights into
+                      Google&apos;s OSS insights project providing insights into
                       package metadata, dependencies, and security information
                       across multiple ecosystems.
                     </p>
