@@ -12,6 +12,8 @@ export function parseEcosystem(ecosystem: string): Ecosystem {
       return Ecosystem.NPM;
     case "rubygems":
       return Ecosystem.RUBYGEMS;
+    case "rubygem":
+      return Ecosystem.RUBYGEMS;
     case "go":
       return Ecosystem.GO;
     case "maven":

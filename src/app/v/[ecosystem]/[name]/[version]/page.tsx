@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  ChevronDown,
   ExternalLink,
   Scale,
   Shield,
@@ -108,6 +109,15 @@ interface Version {
   version: string;
   published_at: string;
   is_default: boolean;
+}
+
+interface MalwareEvidence {
+  source: string;
+  fileKey?: string;
+  projectSource?: string;
+  confidence: Report_Evidence_Confidence;
+  title: string;
+  details: string;
 }
 
 function getEcosystemIcon(ecosystem: string) {
@@ -235,6 +245,31 @@ function getMalwareAnalysisStatus(
   }
 
   return MalwareStatus.PossiblyMalicious;
+}
+
+function getMalwareEvidences(
+  malwareAnalysis: QueryPackageAnalysisResponse | null,
+): MalwareEvidence[] {
+  const evidences: MalwareEvidence[] =
+    malwareAnalysis?.report?.fileEvidences.map((e) => ({
+      source: e.evidence?.source!,
+      fileKey: e.fileKey,
+      confidence: e.evidence?.confidence!,
+      title: e.evidence?.title!,
+      details: e.evidence?.details!,
+    })) ?? [];
+
+  malwareAnalysis?.report?.projectEvidences.forEach((e) => {
+    evidences.push({
+      source: e.evidence?.source!,
+      confidence: e.evidence?.confidence!,
+      title: e.evidence?.title!,
+      details: e.evidence?.details!,
+      projectSource: e.project?.url,
+    });
+  });
+
+  return evidences ?? [];
 }
 
 /**
@@ -392,6 +427,9 @@ export default function Page() {
       openIssues?: number;
       pullRequests?: number;
     }>({});
+  const [malwareEvidences, setMalwareEvidences] = useState<MalwareEvidence[]>(
+    [],
+  );
 
   useEffect(() => {
     setInsightsLoading(true);
@@ -405,12 +443,12 @@ export default function Page() {
 
     getPackageVersionInfo(ecosystem, name, version)
       .then(setInsights)
-      .catch(console.error)
+      .catch(() => console.error("Failed to fetch package insights"))
       .finally(() => setInsightsLoading(false));
 
     queryMalwareAnalysis(ecosystem, name, version)
       .then(setMalwareAnalysis)
-      .catch(console.error)
+      .catch(() => console.error("Failed to fetch malware analysis"))
       .finally(() => setMalwareAnalysisLoading(false));
   }, [params.ecosystem, params.name, params.version]);
 
@@ -432,6 +470,10 @@ export default function Page() {
   useEffect(() => {
     setProjectRepositoryInformation(getProjectRepositoryInformation(insights));
   }, [insights]);
+
+  useEffect(() => {
+    setMalwareEvidences(getMalwareEvidences(malwareAnalysis));
+  }, [malwareAnalysis]);
 
   if (insightsLoading || malwareAnalysisLoading) {
     return (
@@ -495,98 +537,6 @@ export default function Page() {
       </div>
     );
   }
-
-  // Mock data - replace with API calls
-  const securityMetrics = {
-    vulnerability_stats: {
-      critical: 1,
-      high: 3,
-      medium: 7,
-      low: 12,
-    },
-    malwareScore: {
-      score: 98,
-      status: MalwareStatus.Malicious,
-    },
-    openSSFScore: 8.2,
-    license: "MIT",
-    scanStatus: MalwareStatus.Malicious,
-    openSSFMetrics: [
-      { category: "Vulnerability", score: 8 },
-      { category: "Maintenance", score: 7 },
-      { category: "SAST", score: 9 },
-      { category: "Code Review", score: 6 },
-      { category: "Contributors", score: 8 },
-      { category: "Packaging", score: 9 },
-      { category: "Signed Releases", score: 7 },
-    ],
-    repository: {
-      url: "https://github.com/organization/package-name",
-      stars: 1234,
-      forks: 245,
-      openIssues: 34,
-      pullRequests: 12,
-      lastCommit: "2024-03-15",
-      contributors: 67,
-      weeklyDownloads: 45678,
-    },
-    vulnerabilities: [
-      {
-        id: "1",
-        title: "Vulnerability 1",
-        severity: "High",
-        description: "Description of vulnerability 1",
-        reference_url: "https://example.com/vuln1",
-      },
-      {
-        id: "2",
-        title: "Vulnerability 2",
-        severity: "Medium",
-        description: "Description of vulnerability 2",
-        reference_url: "https://example.com/vuln2",
-      },
-    ],
-    code_analysis: {
-      is_malware: true,
-      is_verified: true,
-      reason: "The package is malware",
-      details: "The package is malware because of various reasons",
-      evidences: [
-        {
-          source: "Project Analyzer",
-          confidence: Confidence.High,
-          description: "The package is malware because of various reasons",
-        },
-        {
-          source: "File Source Analyzer",
-          confidence: Confidence.Medium,
-          description: "The package is malware because of various reasons",
-        },
-        {
-          source: "Network Source Analyzer",
-          confidence: Confidence.Low,
-          description: "The package is malware because of various reasons",
-        },
-      ],
-    },
-    versions: [
-      {
-        version: "1.0.0",
-        published_at: "2024-03-15",
-        is_default: false,
-      },
-      {
-        version: "1.0.1-2024-03-16-1234567890",
-        published_at: "2024-03-16",
-        is_default: true,
-      },
-      {
-        version: "1.0.2",
-        published_at: "2024-03-17",
-        is_default: false,
-      },
-    ],
-  };
 
   if (showRawJSON) {
     return (
@@ -1320,41 +1270,77 @@ export default function Page() {
                         <TableHead>Source</TableHead>
                         <TableHead>Confidence</TableHead>
                         <TableHead>Description</TableHead>
+                        <TableHead>File Name</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {malwareAnalysis?.report?.fileEvidences.map(
-                        (evidence, index) => (
+                      {malwareEvidences.map((evidence, index) => (
+                        <>
                           <TableRow key={index}>
                             <TableCell className="font-medium">
-                              {evidence.evidence?.source}
+                              {evidence.source}
+                            </TableCell>
+                            <TableCell className="text-sm">
+                              {evidence.fileKey}
                             </TableCell>
                             <TableCell>
                               <Badge
                                 variant="outline"
                                 className={`
-                              ${
-                                evidence.evidence?.confidence ===
-                                Report_Evidence_Confidence.HIGH
-                                  ? "bg-red-100 text-red-800"
-                                  : evidence.evidence?.confidence ===
-                                      Report_Evidence_Confidence.MEDIUM
-                                    ? "bg-yellow-100 text-yellow-800"
-                                    : "bg-blue-100 text-blue-800"
-                              }
-                            `}
+                                  ${
+                                    evidence.confidence ===
+                                    Report_Evidence_Confidence.HIGH
+                                      ? "bg-red-100 text-red-800"
+                                      : evidence.confidence ===
+                                          Report_Evidence_Confidence.MEDIUM
+                                        ? "bg-yellow-100 text-yellow-800"
+                                        : "bg-blue-100 text-blue-800"
+                                  }`}
                               >
-                                {getConfidenceName(
-                                  evidence.evidence?.confidence,
-                                )}
+                                {getConfidenceName(evidence.confidence)}
                               </Badge>
                             </TableCell>
                             <TableCell className="max-w-xl">
-                              {evidence.evidence?.details}
+                              <Link
+                                href="#"
+                                className="hover:underline"
+                                onClick={() => {
+                                  const allEvidenceDetails =
+                                    document.querySelectorAll(
+                                      ".hidden-evidence-details",
+                                    );
+                                  allEvidenceDetails.forEach(
+                                    (evidenceDetails) => {
+                                      evidenceDetails.classList.add("hidden");
+                                    },
+                                  );
+
+                                  const evidenceDetails =
+                                    document.getElementById(
+                                      `evidence-${index}`,
+                                    );
+                                  if (evidenceDetails) {
+                                    evidenceDetails.classList.toggle("hidden");
+                                  }
+                                }}
+                              >
+                                <div className="flex items-center gap-2">
+                                  {evidence.title}{" "}
+                                  <ChevronDown className="w-4 h-4" />
+                                </div>
+                              </Link>
                             </TableCell>
                           </TableRow>
-                        ),
-                      )}
+                          <TableRow
+                            className="bg-slate-50 hidden hidden-evidence-details"
+                            id={`evidence-${index}`}
+                          >
+                            <TableCell colSpan={4}>
+                              <ReactMarkdown>{evidence.details}</ReactMarkdown>
+                            </TableCell>
+                          </TableRow>
+                        </>
+                      ))}
                     </TableBody>
                   </Table>
                 </div>
