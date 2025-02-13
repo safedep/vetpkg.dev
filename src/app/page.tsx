@@ -2,9 +2,11 @@
 
 import { Form, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { PackageURL } from "packageurl-js";
 
 const verboseInputFormSchema = z.object({
   ecosystem: z.string().min(1),
@@ -18,6 +20,18 @@ const purlInputFormSchema = z.object({
 
 export default function Home() {
   const [usePurlBasedQuery, setUsePurlBasedQuery] = useState<boolean>(false);
+  const router = useRouter();
+  const redirectToPackageInfoPage = (
+    ecosystem: string,
+    name: string,
+    version: string,
+  ) => {
+    ecosystem = encodeURIComponent(ecosystem);
+    name = encodeURIComponent(name);
+    version = encodeURIComponent(version);
+
+    router.push(`/v/${ecosystem}/${name}/${version}`);
+  };
 
   const verboseInputForm = useForm<z.infer<typeof verboseInputFormSchema>>({
     resolver: zodResolver(verboseInputFormSchema),
@@ -38,11 +52,17 @@ export default function Home() {
   const onSubmitVerboseInputForm = (
     data: z.infer<typeof verboseInputFormSchema>,
   ) => {
-    console.log("Verbose input form data: ", data);
+    redirectToPackageInfoPage(data.ecosystem, data.name, data.version);
   };
 
   const onSubmitPurlInputForm = (data: z.infer<typeof purlInputFormSchema>) => {
-    console.log("PURL input form data: ", data);
+    const purl = PackageURL.fromString(data.purl);
+
+    const ecosystem = encodeURIComponent(purl.type);
+    const name = encodeURIComponent(purl.name);
+    const version = encodeURIComponent(purl.version ?? "0.0.0");
+
+    redirectToPackageInfoPage(ecosystem, name, version);
   };
 
   return (

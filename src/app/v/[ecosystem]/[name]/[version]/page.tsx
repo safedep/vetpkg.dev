@@ -8,6 +8,7 @@ import {
   ShieldCheck,
 } from "lucide-react";
 
+import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import {
   Card,
@@ -41,7 +42,10 @@ import ReactMarkdown from "react-markdown";
 import { useEffect, useState } from "react";
 import { PackageVersionInsight } from "@buf/safedep_api.bufbuild_es/safedep/messages/package/v1/package_version_insight_pb";
 import { getPackageVersionInfo, queryMalwareAnalysis } from "./actions";
-import { QueryPackageAnalysisResponse } from "@buf/safedep_api.bufbuild_es/safedep/services/malysis/v1/malysis_pb";
+import {
+  AnalysisStatus,
+  QueryPackageAnalysisResponse,
+} from "@buf/safedep_api.bufbuild_es/safedep/services/malysis/v1/malysis_pb";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Severity_Risk,
@@ -49,17 +53,33 @@ import {
 } from "@buf/safedep_api.bufbuild_es/safedep/messages/vulnerability/v1/severity_pb";
 import { VulnerabilityIdentifierType } from "@buf/safedep_api.bufbuild_es/safedep/messages/vulnerability/v1/vulnerability_pb";
 import { LicenseMeta } from "@buf/safedep_api.bufbuild_es/safedep/messages/package/v1/license_meta_pb";
+import {
+  Report_Evidence_Confidence,
+  Report_Evidence_ConfidenceSchema,
+} from "@buf/safedep_api.bufbuild_es/safedep/messages/malysis/v1/report_pb";
 
 enum MalwareStatus {
   Safe = "Safe",
   PossiblyMalicious = "Possibly Malicious",
   Malicious = "Malicious",
+  Unknown = "Unknown",
 }
 
 enum Confidence {
   High = "High",
   Medium = "Medium",
   Low = "Low",
+}
+
+enum PackageSafetyStatus {
+  Safe = "Safe",
+  PossiblyMalicious = "Possibly Malicious",
+  Malicious = "Malicious",
+  Vulnerable = "Vulnerable",
+  Unmaintained = "Unmaintained",
+  Unpopular = "Unpopular",
+  PoorSecurityHygiene = "Poor Security Hygiene",
+  Unknown = "Unknown",
 }
 
 interface Vulnerability {
@@ -139,6 +159,99 @@ function getLicense(licenses: LicenseMeta[]): string {
   return name.length > 0 ? name : "Unknown";
 }
 
+function getVersions(insights: PackageVersionInsight | null): Version[] {
+  return (
+    insights?.availableVersions.map((v) => ({
+      version: v.version,
+      published_at: "2024-03-15",
+      is_default: v.defaultVersion,
+    })) ?? []
+  );
+}
+
+function getMalwareAnalysisStatus(
+  malwareAnalysis: QueryPackageAnalysisResponse | null,
+): MalwareStatus {
+  if (malwareAnalysis?.status != AnalysisStatus.COMPLETED) {
+    return MalwareStatus.Unknown;
+  }
+
+  if (!malwareAnalysis?.report) {
+    return MalwareStatus.Unknown;
+  }
+
+  if (!malwareAnalysis?.report?.inference?.isMalware) {
+    return MalwareStatus.Safe;
+  }
+
+  if (malwareAnalysis.verificationRecord?.isMalware) {
+    return MalwareStatus.Malicious;
+  }
+
+  return MalwareStatus.PossiblyMalicious;
+}
+
+/**
+ * Get the safety status of the package based on the malware analysis and project insights
+ *
+ * @param insights - The package version insights
+ * @param malwareAnalysis - The malware analysis
+ * @returns The safety status of the package
+ */
+function getPackageSafetyStatus(
+  insights: PackageVersionInsight | null,
+  malwareAnalysis: QueryPackageAnalysisResponse | null,
+): PackageSafetyStatus {
+  const malwareStatus = getMalwareAnalysisStatus(malwareAnalysis);
+
+  if (malwareStatus === MalwareStatus.Malicious) {
+    return PackageSafetyStatus.Malicious;
+  }
+
+  if (malwareStatus === MalwareStatus.PossiblyMalicious) {
+    return PackageSafetyStatus.PossiblyMalicious;
+  }
+
+  if (getVulnerabilitiesCountBySeverity(insights, Severity_Risk.CRITICAL) > 0) {
+    return PackageSafetyStatus.Vulnerable;
+  }
+
+  if (getVulnerabilitiesCountBySeverity(insights, Severity_Risk.HIGH) > 0) {
+    return PackageSafetyStatus.Vulnerable;
+  }
+
+  const projectInsights = insights?.projectInsights[0];
+  const scorecard = projectInsights?.scorecard;
+
+  if (!scorecard) {
+    return PackageSafetyStatus.Unknown;
+  }
+
+  const maintenanceCheck = scorecard.checks.find(
+    (c) => c.name === "Maintained",
+  );
+  if (maintenanceCheck?.score && maintenanceCheck.score < 4.0) {
+    return PackageSafetyStatus.Unmaintained;
+  }
+
+  const codeReviewCheck = scorecard.checks.find(
+    (c) => c.name === "Code-Review",
+  );
+  if (codeReviewCheck?.score && codeReviewCheck.score < 4.0) {
+    return PackageSafetyStatus.PoorSecurityHygiene;
+  }
+
+  if (scorecard?.score && scorecard.score < 4.0) {
+    return PackageSafetyStatus.PoorSecurityHygiene;
+  }
+
+  if (projectInsights?.stars && projectInsights.stars < 10) {
+    return PackageSafetyStatus.Unpopular;
+  }
+
+  return PackageSafetyStatus.Safe;
+}
+
 function sortVersions(versions: Version[]): Version[] {
   return [...versions].sort((a, b) => {
     const aParts = a.version.split(".").map(Number);
@@ -155,6 +268,27 @@ function sortVersions(versions: Version[]): Version[] {
   });
 }
 
+function getOpenSSFCombinedScore(
+  insights: PackageVersionInsight | null,
+): number {
+  if (insights?.projectInsights.length === 0) {
+    console.error("No project insights found");
+    return 0;
+  }
+
+  const project = insights?.projectInsights[0];
+  return project?.scorecard?.score ?? 0;
+}
+
+function getConfidenceName(
+  confidence: Report_Evidence_Confidence | undefined,
+): string {
+  return Report_Evidence_ConfidenceSchema.values[confidence ?? 0].name.replace(
+    "CONFIDENCE_",
+    "",
+  );
+}
+
 export default function Page() {
   const params = useParams<{
     ecosystem: string;
@@ -164,27 +298,53 @@ export default function Page() {
 
   const [insights, setInsights] = useState<PackageVersionInsight | null>(null);
   const [insightsLoading, setInsightsLoading] = useState(true);
+  const [packageVersion, setPackageVersion] = useState<{
+    ecosystem?: string;
+    name?: string;
+    version?: string;
+  }>({});
 
   const [malwareAnalysis, setMalwareAnalysis] =
     useState<QueryPackageAnalysisResponse | null>(null);
   const [malwareAnalysisLoading, setMalwareAnalysisLoading] = useState(true);
+  const [malwareAnalysisStatus, setMalwareAnalysisStatus] =
+    useState<MalwareStatus>(MalwareStatus.Unknown);
+  const [packageSafetyStatus, setPackageSafetyStatus] =
+    useState<PackageSafetyStatus>(PackageSafetyStatus.Unknown);
 
   useEffect(() => {
     setInsightsLoading(true);
     setMalwareAnalysisLoading(true);
 
-    getPackageVersionInfo(params.ecosystem, params.name, params.version)
-      .then(setInsights)
-      .then(() => setInsightsLoading(false))
-      .catch(console.error);
+    const ecosystem = decodeURIComponent(params.ecosystem);
+    const name = decodeURIComponent(params.name);
+    const version = decodeURIComponent(params.version);
 
-    queryMalwareAnalysis(params.ecosystem, params.name, params.version)
+    setPackageVersion({ ecosystem, name, version });
+
+    getPackageVersionInfo(ecosystem, name, version)
+      .then(setInsights)
+      .catch(console.error)
+      .finally(() => setInsightsLoading(false));
+
+    queryMalwareAnalysis(ecosystem, name, version)
       .then(setMalwareAnalysis)
-      .then(() => setMalwareAnalysisLoading(false))
-      .catch(console.error);
+      .catch(console.error)
+      .finally(() => setMalwareAnalysisLoading(false));
   }, [params.ecosystem, params.name, params.version]);
 
-  if (insightsLoading) {
+  // Separately synchronize the malware analysis status when the malware analysis is updated
+  useEffect(() => {
+    if (malwareAnalysis) {
+      setMalwareAnalysisStatus(getMalwareAnalysisStatus(malwareAnalysis));
+    }
+  }, [malwareAnalysis]);
+
+  useEffect(() => {
+    setPackageSafetyStatus(getPackageSafetyStatus(insights, malwareAnalysis));
+  }, [insights, malwareAnalysis]);
+
+  if (insightsLoading || malwareAnalysisLoading) {
     return (
       <div className="flex min-h-screen w-full flex-col">
         <div className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8">
@@ -345,38 +505,66 @@ export default function Page() {
         {/* Package Header */}
         <Card
           className={`border-l-4 ${
-            securityMetrics.scanStatus === MalwareStatus.Safe
+            malwareAnalysisStatus === MalwareStatus.Safe
               ? "border-l-green-500"
-              : "border-l-red-500"
+              : malwareAnalysisStatus === MalwareStatus.Malicious
+                ? "border-l-red-500"
+                : malwareAnalysisStatus === MalwareStatus.PossiblyMalicious
+                  ? "border-l-orange-500"
+                  : "border-l-gray-500"
           }`}
         >
           <CardHeader>
             <div className="flex items-center justify-between">
               <div>
                 <CardTitle className="text-2xl">
-                  🧩 {params.name}@{params.version}
+                  🧩 {packageVersion.name}@{packageVersion.version}
                 </CardTitle>
-                <CardDescription>
+                <CardDescription className="space-y-2">
                   <span className="bg-slate-100 px-2 py-1 rounded-md">
-                    {getEcosystemIcon(params.ecosystem)} {params.ecosystem}{" "}
-                    Package
+                    {getEcosystemIcon(packageVersion.ecosystem!)}{" "}
+                    {packageVersion.ecosystem!} Package
                   </span>
+                  <div>
+                    <Link
+                      href="/"
+                      className="text-sm text-blue-500 hover:underline"
+                    >
+                      ← Scan another package
+                    </Link>
+                  </div>
                 </CardDescription>
               </div>
               <Badge
                 variant="default"
                 className={`text-md px-4 py-1 flex items-center gap-2 ${
-                  securityMetrics.scanStatus === MalwareStatus.Safe
+                  packageSafetyStatus === PackageSafetyStatus.Safe
                     ? "bg-green-100 text-green-800"
-                    : "bg-red-100 text-red-800"
+                    : packageSafetyStatus === PackageSafetyStatus.Malicious
+                      ? "bg-red-100 text-red-800"
+                      : packageSafetyStatus ===
+                          PackageSafetyStatus.PossiblyMalicious
+                        ? "bg-orange-100 text-orange-800"
+                        : packageSafetyStatus === PackageSafetyStatus.Vulnerable
+                          ? "bg-red-100 text-red-800"
+                          : packageSafetyStatus ===
+                              PackageSafetyStatus.Unmaintained
+                            ? "bg-yellow-100 text-yellow-800"
+                            : packageSafetyStatus ===
+                                PackageSafetyStatus.Unpopular
+                              ? "bg-yellow-100 text-yellow-800"
+                              : packageSafetyStatus ===
+                                  PackageSafetyStatus.PoorSecurityHygiene
+                                ? "bg-yellow-100 text-yellow-800"
+                                : "bg-gray-100 text-gray-800"
                 }`}
               >
-                {securityMetrics.scanStatus === MalwareStatus.Safe ? (
+                {packageSafetyStatus === PackageSafetyStatus.Safe ? (
                   <ShieldCheck className="h-4 w-4" />
                 ) : (
                   <ShieldAlert className="h-4 w-4" />
                 )}
-                {securityMetrics.scanStatus}
+                {packageSafetyStatus}
               </Badge>
             </div>
           </CardHeader>
@@ -433,37 +621,51 @@ export default function Page() {
                   <CardTitle className="text-sm font-medium">
                     Malware Analysis
                   </CardTitle>
-                  <div
-                    className={`h-4 w-4 ${
-                      securityMetrics.malwareScore.status === MalwareStatus.Safe
-                        ? "text-green-500"
-                        : securityMetrics.malwareScore.status ===
+                  {malwareAnalysisLoading ? (
+                    <Skeleton className="h-4 w-4 rounded-full" />
+                  ) : (
+                    <div
+                      className={`h-4 w-4 ${
+                        malwareAnalysisStatus === MalwareStatus.Safe
+                          ? "text-green-500"
+                          : malwareAnalysisStatus ===
+                              MalwareStatus.PossiblyMalicious
+                            ? "text-orange-500"
+                            : malwareAnalysisStatus === MalwareStatus.Unknown
+                              ? "text-gray-500"
+                              : "text-red-500"
+                      }`}
+                    >
+                      {malwareAnalysisStatus === MalwareStatus.Safe
+                        ? "✅"
+                        : malwareAnalysisStatus ===
                             MalwareStatus.PossiblyMalicious
-                          ? "text-orange-500"
-                          : "text-red-500"
-                    }`}
-                  >
-                    {securityMetrics.malwareScore.status === MalwareStatus.Safe
-                      ? "✅"
-                      : securityMetrics.malwareScore.status ===
-                          MalwareStatus.PossiblyMalicious
-                        ? "⚠️"
-                        : "❌"}
-                  </div>
+                          ? "⚠️"
+                          : malwareAnalysisStatus === MalwareStatus.Unknown
+                            ? "❓"
+                            : "❌"}
+                    </div>
+                  )}
                 </CardHeader>
                 <CardContent>
-                  <div
-                    className={`text-2xl font-bold ${
-                      securityMetrics.malwareScore.status === MalwareStatus.Safe
-                        ? "text-green-500"
-                        : securityMetrics.malwareScore.status ===
-                            MalwareStatus.PossiblyMalicious
-                          ? "text-orange-500"
-                          : "text-red-500"
-                    }`}
-                  >
-                    {securityMetrics.malwareScore.status}
-                  </div>
+                  {malwareAnalysisLoading ? (
+                    <Skeleton className="h-8 w-24" />
+                  ) : (
+                    <div
+                      className={`text-2xl font-bold ${
+                        malwareAnalysisStatus === MalwareStatus.Safe
+                          ? "text-green-500"
+                          : malwareAnalysisStatus ===
+                              MalwareStatus.PossiblyMalicious
+                            ? "text-orange-500"
+                            : malwareAnalysisStatus === MalwareStatus.Unknown
+                              ? "text-gray-500"
+                              : "text-red-500"
+                      }`}
+                    >
+                      {malwareAnalysisStatus}
+                    </div>
+                  )}
                 </CardContent>
               </Card>
 
@@ -475,8 +677,21 @@ export default function Page() {
                   <Shield className="h-4 w-4 text-blue-500" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold text-blue-500">
-                    {securityMetrics.openSSFScore}/10
+                  <div
+                    className={`text-2xl font-bold px-3 py-1 rounded-md inline-flex items-center gap-2 ${
+                      getOpenSSFCombinedScore(insights) > 7
+                        ? "bg-green-100 text-green-800"
+                        : getOpenSSFCombinedScore(insights) >= 5
+                          ? "bg-yellow-100 text-yellow-800"
+                          : "bg-red-100 text-red-800"
+                    }`}
+                  >
+                    {getOpenSSFCombinedScore(insights) > 7
+                      ? "🏆"
+                      : getOpenSSFCombinedScore(insights) >= 5
+                        ? "⚠️"
+                        : "❌"}{" "}
+                    {Math.round(getOpenSSFCombinedScore(insights))}/10
                   </div>
                 </CardContent>
               </Card>
@@ -596,20 +811,21 @@ export default function Page() {
 
               <Card>
                 <CardHeader>
-                  <CardTitle>Security Analysis</CardTitle>
+                  <CardTitle>Malicious Package Analysis</CardTitle>
                   <CardDescription>
-                    Malware detection results and evidences
+                    Code analysis to detect malicious behavior
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="rounded-lg bg-muted p-4">
-                    <h4 className="mb-2 font-medium">Summary</h4>
-                    <p className="text-sm text-muted-foreground">
-                      Package shows no signs of malicious behavior. Static
-                      analysis complete with 98% confidence score. All
-                      dependencies verified.
-                    </p>
-                  </div>
+                  {/* Summary section */}
+                  {malwareAnalysis?.report?.inference?.summary && (
+                    <div className="rounded-lg bg-muted">
+                      <h4 className="font-medium">Summary</h4>
+                      <p className="text-sm text-muted-foreground">
+                        {malwareAnalysis?.report?.inference?.summary}
+                      </p>
+                    </div>
+                  )}
                   <div>
                     <h4 className="mb-2 font-medium">Evidence</h4>
                     <ul className="space-y-2">
@@ -875,16 +1091,26 @@ export default function Page() {
                   <div className="flex items-center gap-2 mb-4">
                     <span
                       className={`text-lg font-semibold ${
-                        securityMetrics.code_analysis.is_malware
+                        malwareAnalysisStatus === MalwareStatus.Malicious
                           ? "text-red-600"
-                          : "text-green-600"
+                          : malwareAnalysisStatus ===
+                              MalwareStatus.PossiblyMalicious
+                            ? "text-orange-600"
+                            : malwareAnalysisStatus === MalwareStatus.Unknown
+                              ? "text-gray-600"
+                              : "text-green-600"
                       }`}
                     >
-                      {securityMetrics.code_analysis.is_malware
+                      {malwareAnalysisStatus === MalwareStatus.Malicious
                         ? "⚠️ Malware Detected"
-                        : "✅ Clean Package"}
+                        : malwareAnalysisStatus ===
+                            MalwareStatus.PossiblyMalicious
+                          ? "⚠️ Possibly Malicious"
+                          : malwareAnalysisStatus === MalwareStatus.Unknown
+                            ? "❓ Unknown"
+                            : "✅ Clean Package"}
                     </span>
-                    {securityMetrics.code_analysis.is_verified && (
+                    {malwareAnalysis?.verificationRecord && (
                       <Badge
                         variant="outline"
                         className="bg-blue-100 text-blue-800"
@@ -894,18 +1120,26 @@ export default function Page() {
                     )}
                   </div>
                   <div className="space-y-2">
-                    <p className="font-medium">Reason:</p>
-                    <p className="text-sm text-muted-foreground">
-                      <ReactMarkdown>
-                        {securityMetrics.code_analysis.reason}
-                      </ReactMarkdown>
-                    </p>
-                    <p className="font-medium mt-4">Details:</p>
-                    <div className="text-sm text-muted-foreground prose prose-sm max-w-none">
-                      <ReactMarkdown>
-                        {securityMetrics.code_analysis.details}
-                      </ReactMarkdown>
-                    </div>
+                    {malwareAnalysis?.report?.inference?.summary && (
+                      <>
+                        <p className="font-medium">Reason</p>
+                        <p className="text-sm text-muted-foreground">
+                          <ReactMarkdown>
+                            {malwareAnalysis?.report?.inference?.summary}
+                          </ReactMarkdown>
+                        </p>
+                      </>
+                    )}
+                    {malwareAnalysis?.report?.inference?.details && (
+                      <>
+                        <p className="font-medium mt-4 leading-2">Details</p>
+                        <div className="text-sm text-muted-foreground prose prose-sm max-w-none">
+                          <ReactMarkdown>
+                            {malwareAnalysis?.report?.inference?.details}
+                          </ReactMarkdown>
+                        </div>
+                      </>
+                    )}
                   </div>
                 </div>
 
@@ -923,30 +1157,34 @@ export default function Page() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {securityMetrics.code_analysis.evidences.map(
+                      {malwareAnalysis?.report?.fileEvidences.map(
                         (evidence, index) => (
                           <TableRow key={index}>
                             <TableCell className="font-medium">
-                              {evidence.source}
+                              {evidence.evidence?.source}
                             </TableCell>
                             <TableCell>
                               <Badge
                                 variant="outline"
                                 className={`
                               ${
-                                evidence.confidence === Confidence.High
+                                evidence.evidence?.confidence ===
+                                Report_Evidence_Confidence.HIGH
                                   ? "bg-red-100 text-red-800"
-                                  : evidence.confidence === Confidence.Medium
+                                  : evidence.evidence?.confidence ===
+                                      Report_Evidence_Confidence.MEDIUM
                                     ? "bg-yellow-100 text-yellow-800"
                                     : "bg-blue-100 text-blue-800"
                               }
                             `}
                               >
-                                {evidence.confidence}
+                                {getConfidenceName(
+                                  evidence.evidence?.confidence,
+                                )}
                               </Badge>
                             </TableCell>
                             <TableCell className="max-w-xl">
-                              {evidence.description}
+                              {evidence.evidence?.details}
                             </TableCell>
                           </TableRow>
                         ),
@@ -985,7 +1223,7 @@ export default function Page() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {sortVersions(securityMetrics.versions).map((version) => (
+                    {sortVersions(getVersions(insights)).map((version) => (
                       <TableRow
                         key={version.version}
                         className={version.is_default ? "bg-blue-50" : ""}
