@@ -120,6 +120,14 @@ interface MalwareEvidence {
   details: string;
 }
 
+interface MalwareAnalysisBehavior {
+  network_calls?: boolean;
+  file_access?: boolean;
+  process_creation?: boolean;
+  suspicious_project?: boolean;
+  package_signature_missing?: boolean;
+}
+
 function getEcosystemIcon(ecosystem: string) {
   switch (ecosystem.toLowerCase()) {
     case "npm":
@@ -270,6 +278,52 @@ function getMalwareEvidences(
   });
 
   return evidences ?? [];
+}
+
+function getInferredBehavior(
+  malwareAnalysis: QueryPackageAnalysisResponse | null,
+  insights: PackageVersionInsight | null,
+): MalwareAnalysisBehavior {
+  const evidences = getMalwareEvidences(malwareAnalysis);
+  const behavior: MalwareAnalysisBehavior = {};
+
+  evidences.forEach((evidence) => {
+    // We are using a lame rule matching to infer the behavior.
+    // This is temporary till our code analysis based behavior detection is ready.
+
+    const source = evidence.source.toLowerCase();
+    const title = evidence.title.toLowerCase();
+    const details = evidence.details.toLowerCase();
+
+    if (source.includes("yara")) {
+      if (title.includes("exotic") || title.includes("url")) {
+        behavior.network_calls = true;
+      }
+
+      if (title.includes("exec")) {
+        behavior.process_creation = true;
+      }
+
+      if (title.includes("pe_packed")) {
+        behavior.process_creation = true;
+      }
+    }
+
+    if (source.includes("package project")) {
+      if (title.includes("untrustworthy source project")) {
+        behavior.suspicious_project = true;
+      }
+    }
+  });
+
+  const provenances = insights?.slsaProvenances ?? [];
+  if (provenances.length > 0) {
+    behavior.package_signature_missing = false;
+  } else {
+    behavior.package_signature_missing = true;
+  }
+
+  return behavior;
 }
 
 /**
@@ -430,6 +484,8 @@ export default function Page() {
   const [malwareEvidences, setMalwareEvidences] = useState<MalwareEvidence[]>(
     [],
   );
+  const [malwareAnalysisBehavior, setMalwareAnalysisBehavior] =
+    useState<MalwareAnalysisBehavior>({});
 
   useEffect(() => {
     setInsightsLoading(true);
@@ -474,6 +530,10 @@ export default function Page() {
   useEffect(() => {
     setMalwareEvidences(getMalwareEvidences(malwareAnalysis));
   }, [malwareAnalysis]);
+
+  useEffect(() => {
+    setMalwareAnalysisBehavior(getInferredBehavior(malwareAnalysis, insights));
+  }, [malwareAnalysis, insights]);
 
   if (insightsLoading || malwareAnalysisLoading) {
     return (
@@ -964,19 +1024,27 @@ export default function Page() {
                     <ul className="space-y-2">
                       <li className="flex items-center text-sm">
                         <ShieldCheck className="mr-2 h-4 w-4 text-green-500" />
-                        No suspicious network calls detected
+                        {malwareAnalysisBehavior.network_calls
+                          ? "❌ Suspicious network calls detected"
+                          : "✅ No suspicious network calls detected"}
                       </li>
                       <li className="flex items-center text-sm">
                         <ShieldCheck className="mr-2 h-4 w-4 text-green-500" />
-                        Clean dependency tree
+                        {malwareAnalysisBehavior.suspicious_project
+                          ? "❌ Suspicious project detected"
+                          : "✅ Clean dependency tree"}
                       </li>
                       <li className="flex items-center text-sm">
                         <ShieldCheck className="mr-2 h-4 w-4 text-green-500" />
-                        No obfuscated code found
+                        {malwareAnalysisBehavior.process_creation
+                          ? "❌ Suspicious process creation detected"
+                          : "✅ No suspicious process creation detected"}
                       </li>
                       <li className="flex items-center text-sm">
                         <ShieldCheck className="mr-2 h-4 w-4 text-green-500" />
-                        Package signature verified
+                        {malwareAnalysisBehavior.package_signature_missing
+                          ? "❌ Package signature missing"
+                          : "✅ Package signature verified"}
                       </li>
                     </ul>
                   </div>
@@ -1268,9 +1336,9 @@ export default function Page() {
                     <TableHeader>
                       <TableRow>
                         <TableHead>Source</TableHead>
+                        <TableHead>File Name</TableHead>
                         <TableHead>Confidence</TableHead>
                         <TableHead>Description</TableHead>
-                        <TableHead>File Name</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
