@@ -11,6 +11,9 @@ importers:
       '@buf/safedep_api.bufbuild_es':
         specifier: 2.2.3-20250212070940-a267494d7b0b.1
         version: 2.2.3-20250212070940-a267494d7b0b.1(@bufbuild/protobuf@2.2.3)
+      '@bufbuild/protobuf':
+        specifier: ^2.2.3
+        version: 2.2.3
       '@codemirror/lang-sql':
         specifier: ^6.8.0
         version: 6.8.0

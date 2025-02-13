@@ -40,11 +40,15 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ReactMarkdown from "react-markdown";
 import { useEffect, useState } from "react";
-import { PackageVersionInsight } from "@buf/safedep_api.bufbuild_es/safedep/messages/package/v1/package_version_insight_pb";
+import {
+  PackageVersionInsight,
+  PackageVersionInsightSchema,
+} from "@buf/safedep_api.bufbuild_es/safedep/messages/package/v1/package_version_insight_pb";
 import { getPackageVersionInfo, queryMalwareAnalysis } from "./actions";
 import {
   AnalysisStatus,
   QueryPackageAnalysisResponse,
+  QueryPackageAnalysisResponseSchema,
 } from "@buf/safedep_api.bufbuild_es/safedep/services/malysis/v1/malysis_pb";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -57,6 +61,7 @@ import {
   Report_Evidence_Confidence,
   Report_Evidence_ConfidenceSchema,
 } from "@buf/safedep_api.bufbuild_es/safedep/messages/malysis/v1/report_pb";
+import { toJson } from "@bufbuild/protobuf";
 
 enum MalwareStatus {
   Safe = "Safe",
@@ -80,6 +85,15 @@ enum PackageSafetyStatus {
   Unpopular = "Unpopular",
   PoorSecurityHygiene = "Poor Security Hygiene",
   Unknown = "Unknown",
+}
+
+enum SecurityScorecardCheck {
+  Vulnerability = "Vulnerability",
+  Maintenance = "Maintenance",
+  SAST = "SAST",
+  CodeReview = "Code Review",
+  Contributors = "Contributors",
+  SignedReleases = "Signed Releases",
 }
 
 interface Vulnerability {
@@ -146,6 +160,7 @@ function getVulnerabilities(
       severity: v.severities[0]?.risk,
       cve: v.aliases.find((a) => a.type === VulnerabilityIdentifierType.CVE)
         ?.value,
+      reference_url: `https://osv.dev/vulnerability/${v.id?.value}`,
     })) ?? []
   );
 }
@@ -167,6 +182,37 @@ function getVersions(insights: PackageVersionInsight | null): Version[] {
       is_default: v.defaultVersion,
     })) ?? []
   );
+}
+
+function getSecurityScorecardScore(
+  insights: PackageVersionInsight | null,
+): Record<SecurityScorecardCheck, number> {
+  const scorecard = insights?.projectInsights[0]?.scorecard;
+  if (!scorecard) {
+    return {
+      [SecurityScorecardCheck.Vulnerability]: 0,
+      [SecurityScorecardCheck.Maintenance]: 0,
+      [SecurityScorecardCheck.SAST]: 0,
+      [SecurityScorecardCheck.CodeReview]: 0,
+      [SecurityScorecardCheck.Contributors]: 0,
+      [SecurityScorecardCheck.SignedReleases]: 0,
+    };
+  }
+
+  return {
+    [SecurityScorecardCheck.Vulnerability]:
+      scorecard.checks.find((c) => c.name === "Vulnerabilities")?.score ?? 0,
+    [SecurityScorecardCheck.Maintenance]:
+      scorecard.checks.find((c) => c.name === "Maintained")?.score ?? 0,
+    [SecurityScorecardCheck.SAST]:
+      scorecard.checks.find((c) => c.name === "SAST")?.score ?? 0,
+    [SecurityScorecardCheck.CodeReview]:
+      scorecard.checks.find((c) => c.name === "Code-Review")?.score ?? 0,
+    [SecurityScorecardCheck.Contributors]:
+      scorecard.checks.find((c) => c.name === "Contributors")?.score ?? 0,
+    [SecurityScorecardCheck.SignedReleases]:
+      scorecard.checks.find((c) => c.name === "Signed-Releases")?.score ?? 0,
+  };
 }
 
 function getMalwareAnalysisStatus(
@@ -289,6 +335,29 @@ function getConfidenceName(
   );
 }
 
+function getProjectRepositoryInformation(
+  insights: PackageVersionInsight | null,
+): {
+  url?: string;
+  stars?: number;
+  forks?: number;
+  openIssues?: number;
+  pullRequests?: number;
+} {
+  if (insights?.projectInsights.length === 0) {
+    return {};
+  }
+
+  const project = insights?.projectInsights[0];
+  return {
+    url: project?.project?.url,
+    stars: Number(project?.stars ?? 0),
+    forks: Number(project?.forks ?? 0),
+    openIssues: Number(project?.issues?.open ?? 0),
+    pullRequests: Number(project?.pullRequests?.open ?? 0),
+  };
+}
+
 export default function Page() {
   const params = useParams<{
     ecosystem: string;
@@ -296,6 +365,7 @@ export default function Page() {
     version: string;
   }>();
 
+  const [showRawJSON, setShowRawJSON] = useState(false);
   const [insights, setInsights] = useState<PackageVersionInsight | null>(null);
   const [insightsLoading, setInsightsLoading] = useState(true);
   const [packageVersion, setPackageVersion] = useState<{
@@ -311,6 +381,17 @@ export default function Page() {
     useState<MalwareStatus>(MalwareStatus.Unknown);
   const [packageSafetyStatus, setPackageSafetyStatus] =
     useState<PackageSafetyStatus>(PackageSafetyStatus.Unknown);
+  const [securityScorecardScores, setSecurityScorecardScores] = useState<
+    Record<SecurityScorecardCheck, number>
+  >(getSecurityScorecardScore(null));
+  const [projectRepositoryInformation, setProjectRepositoryInformation] =
+    useState<{
+      url?: string;
+      stars?: number;
+      forks?: number;
+      openIssues?: number;
+      pullRequests?: number;
+    }>({});
 
   useEffect(() => {
     setInsightsLoading(true);
@@ -343,6 +424,14 @@ export default function Page() {
   useEffect(() => {
     setPackageSafetyStatus(getPackageSafetyStatus(insights, malwareAnalysis));
   }, [insights, malwareAnalysis]);
+
+  useEffect(() => {
+    setSecurityScorecardScores(getSecurityScorecardScore(insights));
+  }, [insights]);
+
+  useEffect(() => {
+    setProjectRepositoryInformation(getProjectRepositoryInformation(insights));
+  }, [insights]);
 
   if (insightsLoading || malwareAnalysisLoading) {
     return (
@@ -499,17 +588,103 @@ export default function Page() {
     ],
   };
 
+  if (showRawJSON) {
+    return (
+      <Tabs defaultValue="insights" className="w-full p-4 md:p-8">
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger
+            value="insights"
+            className="bg-blue-100 hover:bg-blue-200 px-4 py-2 flex items-center gap-2"
+          >
+            📊 Package Insights
+          </TabsTrigger>
+          <TabsTrigger
+            value="malware"
+            className="bg-blue-100 hover:bg-blue-200 px-4 py-2 flex items-center gap-2"
+          >
+            🔍 Malware Analysis
+          </TabsTrigger>
+          <TabsTrigger
+            value="back"
+            onClick={() => setShowRawJSON(false)}
+            className="bg-blue-100 hover:bg-blue-200 px-4 py-2 flex items-center gap-2"
+          >
+            ↩️ Back to UI
+          </TabsTrigger>
+        </TabsList>
+        <TabsContent value="insights">
+          <Card>
+            <CardHeader>
+              <CardTitle>Package Insights</CardTitle>
+              <CardDescription>
+                JSON response from the SafeDep Insights API.{" "}
+                <Link
+                  href="https://platform.safedep.io"
+                  target="_blank"
+                  className="text-sm text-blue-500 hover:underline"
+                >
+                  ↗️ Get API Access
+                </Link>
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <pre className="bg-slate-950 text-slate-50 p-4 rounded-lg overflow-auto max-h-[80vh]">
+                {JSON.stringify(
+                  toJson(PackageVersionInsightSchema, insights!),
+                  null,
+                  2,
+                )}
+              </pre>
+            </CardContent>
+          </Card>
+        </TabsContent>
+        <TabsContent value="malware">
+          <Card>
+            <CardHeader>
+              <CardTitle>Malware Analysis</CardTitle>
+              <CardDescription>
+                JSON response from the SafeDep Malware Analysis API.{" "}
+                <Link
+                  href="https://platform.safedep.io"
+                  target="_blank"
+                  className="text-sm text-blue-500 hover:underline"
+                >
+                  ↗️ Get API Access
+                </Link>
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <pre className="bg-slate-950 text-slate-50 p-4 rounded-lg overflow-auto max-h-[80vh]">
+                {JSON.stringify(
+                  toJson(QueryPackageAnalysisResponseSchema, malwareAnalysis!),
+                  null,
+                  2,
+                )}
+              </pre>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+    );
+  }
+
   return (
     <div className="flex min-h-screen w-full flex-col">
       <div className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8">
         {/* Package Header */}
         <Card
           className={`border-l-4 ${
-            malwareAnalysisStatus === MalwareStatus.Safe
+            packageSafetyStatus === PackageSafetyStatus.Safe
               ? "border-l-green-500"
-              : malwareAnalysisStatus === MalwareStatus.Malicious
+              : packageSafetyStatus === PackageSafetyStatus.Malicious ||
+                  packageSafetyStatus === PackageSafetyStatus.Vulnerable
                 ? "border-l-red-500"
-                : malwareAnalysisStatus === MalwareStatus.PossiblyMalicious
+                : packageSafetyStatus ===
+                      PackageSafetyStatus.PossiblyMalicious ||
+                    packageSafetyStatus === PackageSafetyStatus.Unmaintained ||
+                    packageSafetyStatus === PackageSafetyStatus.Unpopular ||
+                    packageSafetyStatus ===
+                      PackageSafetyStatus.PoorSecurityHygiene
                   ? "border-l-orange-500"
                   : "border-l-gray-500"
           }`}
@@ -525,13 +700,21 @@ export default function Page() {
                     {getEcosystemIcon(packageVersion.ecosystem!)}{" "}
                     {packageVersion.ecosystem!} Package
                   </span>
-                  <div>
+                  <div className="flex items-center gap-2">
                     <Link
                       href="/"
                       className="text-sm text-blue-500 hover:underline"
                     >
                       ← Scan another package
                     </Link>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => setShowRawJSON(true)}
+                      className="text-sm text-gray-500 hover:text-gray-700"
+                    >
+                      View JSON
+                    </button>
                   </div>
                 </CardDescription>
               </div>
@@ -589,7 +772,7 @@ export default function Page() {
               value="code"
               className="flex items-center gap-2 data-[state=active]:bg-green-100"
             >
-              💻 Code Analysis
+              🐛 Malicious Package Analysis
             </TabsTrigger>
             <TabsTrigger
               value="versions"
@@ -873,11 +1056,23 @@ export default function Page() {
                         cx="50%"
                         cy="50%"
                         outerRadius="80%"
-                        data={securityMetrics.openSSFMetrics}
+                        data={Object.entries(securityScorecardScores).map(
+                          ([key, value]) => ({
+                            category: key,
+                            score: value,
+                          }),
+                        )}
                       >
                         <PolarGrid />
-                        <PolarAngleAxis dataKey="category" />
-                        <PolarRadiusAxis angle={30} domain={[0, 10]} />
+                        <PolarAngleAxis
+                          dataKey="category"
+                          tick={{ fontSize: 12 }}
+                        />
+                        <PolarRadiusAxis
+                          angle={30}
+                          domain={[0, 10]}
+                          tick={{ fontSize: 10 }}
+                        />
                         <Radar
                           name="Score"
                           dataKey="score"
@@ -904,12 +1099,12 @@ export default function Page() {
                     <div>
                       <h4 className="mb-2 font-medium">Repository</h4>
                       <a
-                        href={securityMetrics.repository.url}
+                        href={projectRepositoryInformation.url}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-blue-500 hover:underline"
                       >
-                        {securityMetrics.repository.url}
+                        {projectRepositoryInformation.url}
                       </a>
                     </div>
 
@@ -919,7 +1114,7 @@ export default function Page() {
                           Stars
                         </h4>
                         <p className="text-2xl font-bold">
-                          {securityMetrics.repository.stars.toLocaleString()}
+                          {projectRepositoryInformation.stars?.toLocaleString()}
                         </p>
                       </div>
                       <div>
@@ -927,7 +1122,7 @@ export default function Page() {
                           Forks
                         </h4>
                         <p className="text-2xl font-bold">
-                          {securityMetrics.repository.forks.toLocaleString()}
+                          {projectRepositoryInformation.forks?.toLocaleString()}
                         </p>
                       </div>
                       <div>
@@ -935,7 +1130,7 @@ export default function Page() {
                           Open Issues
                         </h4>
                         <p className="text-2xl font-bold">
-                          {securityMetrics.repository.openIssues.toLocaleString()}
+                          {projectRepositoryInformation.openIssues?.toLocaleString()}
                         </p>
                       </div>
                       <div>
@@ -943,37 +1138,8 @@ export default function Page() {
                           Pull Requests
                         </h4>
                         <p className="text-2xl font-bold">
-                          {securityMetrics.repository.pullRequests.toLocaleString()}
+                          {projectRepositoryInformation.pullRequests?.toLocaleString()}
                         </p>
-                      </div>
-                    </div>
-
-                    <div className="space-y-2">
-                      <div className="flex justify-between">
-                        <span className="text-sm text-muted-foreground">
-                          Contributors
-                        </span>
-                        <span className="font-medium">
-                          {securityMetrics.repository.contributors.toLocaleString()}
-                        </span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-sm text-muted-foreground">
-                          Last Commit
-                        </span>
-                        <span className="font-medium">
-                          {new Date(
-                            securityMetrics.repository.lastCommit,
-                          ).toLocaleDateString()}
-                        </span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-sm text-muted-foreground">
-                          Weekly Downloads
-                        </span>
-                        <span className="font-medium">
-                          {securityMetrics.repository.weeklyDownloads.toLocaleString()}
-                        </span>
                       </div>
                     </div>
                   </div>
@@ -1122,7 +1288,7 @@ export default function Page() {
                   <div className="space-y-2">
                     {malwareAnalysis?.report?.inference?.summary && (
                       <>
-                        <p className="font-medium">Reason</p>
+                        <p className="font-medium leading-2">Reason</p>
                         <p className="text-sm text-muted-foreground">
                           <ReactMarkdown>
                             {malwareAnalysis?.report?.inference?.summary}
