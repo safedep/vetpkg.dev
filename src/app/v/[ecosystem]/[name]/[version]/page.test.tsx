@@ -1,7 +1,7 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
-import Page from "./page";
+import { render } from "@testing-library/react";
+import { beforeEach, describe, it, vi } from "vitest";
 import { getPackageVersionInfo, queryMalwareAnalysis } from "./actions";
+import Page from "./page";
 
 vi.mock("next/navigation", () => ({
   useParams: () => ({
@@ -20,6 +20,7 @@ describe("Package Version Info Page", () => {
   beforeEach(() => {
     vi.clearAllMocks();
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (getPackageVersionInfo as any).mockResolvedValue({
       vulnerabilities: [],
       licenses: { licenses: [{ licenseId: "MIT" }] },
@@ -49,6 +50,7 @@ describe("Package Version Info Page", () => {
       ],
     });
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (queryMalwareAnalysis as any).mockResolvedValue({
       status: 2, // COMPLETED
       report: {
