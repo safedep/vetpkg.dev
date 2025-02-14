@@ -717,37 +717,45 @@ export default function Page() {
                   </div>
                 </CardDescription>
               </div>
-              <Badge
-                variant="default"
-                className={`text-md px-4 py-1 flex items-center gap-2 ${
-                  packageSafetyStatus === PackageSafetyStatus.Safe
-                    ? "bg-green-100 text-green-800"
-                    : packageSafetyStatus === PackageSafetyStatus.Malicious
-                      ? "bg-red-100 text-red-800"
-                      : packageSafetyStatus ===
-                          PackageSafetyStatus.PossiblyMalicious
-                        ? "bg-orange-100 text-orange-800"
-                        : packageSafetyStatus === PackageSafetyStatus.Vulnerable
-                          ? "bg-red-100 text-red-800"
+              <div>
+                {packageSafetyStatus === PackageSafetyStatus.Unknown && (
+                  <div className="text-sm text-yellow-600 bg-yellow-50 p-2 rounded-md mb-2">
+                    ⚠️ Package name or version may be invalid
+                  </div>
+                )}
+                <Badge
+                  variant="default"
+                  className={`text-md px-4 py-1 flex items-center gap-2 ${
+                    packageSafetyStatus === PackageSafetyStatus.Safe
+                      ? "bg-green-100 text-green-800"
+                      : packageSafetyStatus === PackageSafetyStatus.Malicious
+                        ? "bg-red-100 text-red-800"
+                        : packageSafetyStatus ===
+                            PackageSafetyStatus.PossiblyMalicious
+                          ? "bg-orange-100 text-orange-800"
                           : packageSafetyStatus ===
-                              PackageSafetyStatus.Unmaintained
-                            ? "bg-yellow-100 text-yellow-800"
+                              PackageSafetyStatus.Vulnerable
+                            ? "bg-red-100 text-red-800"
                             : packageSafetyStatus ===
-                                PackageSafetyStatus.Unpopular
+                                PackageSafetyStatus.Unmaintained
                               ? "bg-yellow-100 text-yellow-800"
                               : packageSafetyStatus ===
-                                  PackageSafetyStatus.PoorSecurityHygiene
+                                  PackageSafetyStatus.Unpopular
                                 ? "bg-yellow-100 text-yellow-800"
-                                : "bg-gray-100 text-gray-800"
-                }`}
-              >
-                {packageSafetyStatus === PackageSafetyStatus.Safe ? (
-                  <ShieldCheck className="h-4 w-4" />
-                ) : (
-                  <ShieldAlert className="h-4 w-4" />
-                )}
-                {packageSafetyStatus}
-              </Badge>
+                                : packageSafetyStatus ===
+                                    PackageSafetyStatus.PoorSecurityHygiene
+                                  ? "bg-yellow-100 text-yellow-800"
+                                  : "bg-gray-100 text-gray-800"
+                  }`}
+                >
+                  {packageSafetyStatus === PackageSafetyStatus.Safe ? (
+                    <ShieldCheck className="h-4 w-4" />
+                  ) : (
+                    <ShieldAlert className="h-4 w-4" />
+                  )}
+                  {packageSafetyStatus}
+                </Badge>
+              </div>
             </div>
           </CardHeader>
         </Card>
