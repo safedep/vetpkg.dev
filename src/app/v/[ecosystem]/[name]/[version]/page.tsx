@@ -178,7 +178,7 @@ function getVulnerabilities(
 }
 
 function getRiskName(risk: Severity_Risk): string {
-  return Severity_RiskSchema.values[risk].name.replace("RISK_", "");
+  return Severity_RiskSchema.values[risk ?? 0].name.replace("RISK_", "");
 }
 
 function getLicense(licenses: LicenseMeta[]): string {
@@ -488,12 +488,18 @@ export default function Page() {
 
     getPackageVersionInfo(ecosystem, name, version)
       .then(setInsights)
-      .catch(() => console.error("Failed to fetch package insights"))
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .catch((error: any) =>
+        console.warn("Failed to fetch package insights: ", error),
+      )
       .finally(() => setInsightsLoading(false));
 
     queryMalwareAnalysis(ecosystem, name, version)
       .then(setMalwareAnalysis)
-      .catch(() => console.error("Failed to fetch malware analysis"))
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .catch((error: any) =>
+        console.warn("Failed to fetch malware analysis: ", error),
+      )
       .finally(() => setMalwareAnalysisLoading(false));
   }, [params.ecosystem, params.name, params.version]);
 
@@ -590,7 +596,7 @@ export default function Page() {
   if (showRawJSON) {
     return (
       <Tabs defaultValue="insights" className="w-full p-4 md:p-8">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full md:grid-cols-3 min-h-max">
           <TabsTrigger
             value="insights"
             className="bg-blue-100 hover:bg-blue-200 px-4 py-2 flex items-center gap-2"
@@ -717,44 +723,52 @@ export default function Page() {
                   </div>
                 </CardDescription>
               </div>
-              <Badge
-                variant="default"
-                className={`text-md px-4 py-1 flex items-center gap-2 ${
-                  packageSafetyStatus === PackageSafetyStatus.Safe
-                    ? "bg-green-100 text-green-800"
-                    : packageSafetyStatus === PackageSafetyStatus.Malicious
-                      ? "bg-red-100 text-red-800"
-                      : packageSafetyStatus ===
-                          PackageSafetyStatus.PossiblyMalicious
-                        ? "bg-orange-100 text-orange-800"
-                        : packageSafetyStatus === PackageSafetyStatus.Vulnerable
-                          ? "bg-red-100 text-red-800"
+              <div>
+                {packageSafetyStatus === PackageSafetyStatus.Unknown && (
+                  <div className="text-sm text-yellow-600 bg-yellow-50 p-2 rounded-md mb-2">
+                    ⚠️ Package name or version may be invalid
+                  </div>
+                )}
+                <Badge
+                  variant="default"
+                  className={`text-md px-4 py-1 flex items-center gap-2 ${
+                    packageSafetyStatus === PackageSafetyStatus.Safe
+                      ? "bg-green-100 text-green-800"
+                      : packageSafetyStatus === PackageSafetyStatus.Malicious
+                        ? "bg-red-100 text-red-800"
+                        : packageSafetyStatus ===
+                            PackageSafetyStatus.PossiblyMalicious
+                          ? "bg-orange-100 text-orange-800"
                           : packageSafetyStatus ===
-                              PackageSafetyStatus.Unmaintained
-                            ? "bg-yellow-100 text-yellow-800"
+                              PackageSafetyStatus.Vulnerable
+                            ? "bg-red-100 text-red-800"
                             : packageSafetyStatus ===
-                                PackageSafetyStatus.Unpopular
+                                PackageSafetyStatus.Unmaintained
                               ? "bg-yellow-100 text-yellow-800"
                               : packageSafetyStatus ===
-                                  PackageSafetyStatus.PoorSecurityHygiene
+                                  PackageSafetyStatus.Unpopular
                                 ? "bg-yellow-100 text-yellow-800"
-                                : "bg-gray-100 text-gray-800"
-                }`}
-              >
-                {packageSafetyStatus === PackageSafetyStatus.Safe ? (
-                  <ShieldCheck className="h-4 w-4" />
-                ) : (
-                  <ShieldAlert className="h-4 w-4" />
-                )}
-                {packageSafetyStatus}
-              </Badge>
+                                : packageSafetyStatus ===
+                                    PackageSafetyStatus.PoorSecurityHygiene
+                                  ? "bg-yellow-100 text-yellow-800"
+                                  : "bg-gray-100 text-gray-800"
+                  }`}
+                >
+                  {packageSafetyStatus === PackageSafetyStatus.Safe ? (
+                    <ShieldCheck className="h-4 w-4" />
+                  ) : (
+                    <ShieldAlert className="h-4 w-4" />
+                  )}
+                  {packageSafetyStatus}
+                </Badge>
+              </div>
             </div>
           </CardHeader>
         </Card>
 
         {/* Replace the grid div with Tabs */}
         <Tabs defaultValue="security" className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="w-full grid grid-cols-1 md:grid-cols-4 min-h-max">
             <TabsTrigger
               value="security"
               className="flex items-center gap-2 data-[state=active]:bg-blue-100"

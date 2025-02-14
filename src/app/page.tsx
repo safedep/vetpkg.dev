@@ -67,14 +67,14 @@ export default function Home() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen py-2 max-w-4xl mx-auto p-4">
-      <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl mb-4">
-        <span className="text-indigo-500">vet</span> an Open Source Package
+      <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl mb-4 font-mono">
         <span className="ml-2" role="img" aria-label="magnifying glass">
           🔍
-        </span>
+        </span>{" "}
+        <span className="text-indigo-500">vet</span> an Open Source Package
       </h1>
 
-      <p className="text-lg text-gray-600 mb-8 text-justify max-w-2xl font-mono">
+      <p className="text-lg text-gray-600 mb-8 max-w-2xl font-mono">
         Analyze OSS dependencies for security vulnerabilities, malicious code,
         maintainability issues, and other supply chain risks to protect your
         application.
