@@ -488,16 +488,18 @@ export default function Page() {
 
     getPackageVersionInfo(ecosystem, name, version)
       .then(setInsights)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       .catch((error: any) =>
         console.warn("Failed to fetch package insights: ", error),
-      ) // eslint-disable-line @typescript-eslint/no-explicit-any
+      )
       .finally(() => setInsightsLoading(false));
 
     queryMalwareAnalysis(ecosystem, name, version)
       .then(setMalwareAnalysis)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       .catch((error: any) =>
         console.warn("Failed to fetch malware analysis: ", error),
-      ) // eslint-disable-line @typescript-eslint/no-explicit-any
+      )
       .finally(() => setMalwareAnalysisLoading(false));
   }, [params.ecosystem, params.name, params.version]);
 
