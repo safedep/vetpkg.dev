@@ -178,7 +178,7 @@ function getVulnerabilities(
 }
 
 function getRiskName(risk: Severity_Risk): string {
-  return Severity_RiskSchema.values[risk].name.replace("RISK_", "");
+  return Severity_RiskSchema.values[risk ?? 0].name.replace("RISK_", "");
 }
 
 function getLicense(licenses: LicenseMeta[]): string {
@@ -488,12 +488,16 @@ export default function Page() {
 
     getPackageVersionInfo(ecosystem, name, version)
       .then(setInsights)
-      .catch(() => console.error("Failed to fetch package insights"))
+      .catch((error: any) =>
+        console.warn("Failed to fetch package insights: ", error),
+      ) // eslint-disable-line @typescript-eslint/no-explicit-any
       .finally(() => setInsightsLoading(false));
 
     queryMalwareAnalysis(ecosystem, name, version)
       .then(setMalwareAnalysis)
-      .catch(() => console.error("Failed to fetch malware analysis"))
+      .catch((error: any) =>
+        console.warn("Failed to fetch malware analysis: ", error),
+      ) // eslint-disable-line @typescript-eslint/no-explicit-any
       .finally(() => setMalwareAnalysisLoading(false));
   }, [params.ecosystem, params.name, params.version]);
 
