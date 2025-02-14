@@ -590,7 +590,7 @@ export default function Page() {
   if (showRawJSON) {
     return (
       <Tabs defaultValue="insights" className="w-full p-4 md:p-8">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full md:grid-cols-3 min-h-max">
           <TabsTrigger
             value="insights"
             className="bg-blue-100 hover:bg-blue-200 px-4 py-2 flex items-center gap-2"
@@ -762,7 +762,7 @@ export default function Page() {
 
         {/* Replace the grid div with Tabs */}
         <Tabs defaultValue="security" className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="w-full grid grid-cols-1 md:grid-cols-4 min-h-max">
             <TabsTrigger
               value="security"
               className="flex items-center gap-2 data-[state=active]:bg-blue-100"
