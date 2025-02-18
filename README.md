@@ -14,15 +14,13 @@ This application is live at [https://vetpkg.dev](https://vetpkg.dev)
 - Install the required version of `nodejs` using `asdf`:```shell
   asdf install
 
-````
-
 ### Setup
 
 - Configure `buf` schema registry
 
 ```shell
 pnpm config set @buf:registry https://buf.build/gen/npm/v1/
-````
+```
 
 - Install `npm` dependencies:
 
