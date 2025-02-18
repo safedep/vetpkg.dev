@@ -180,6 +180,10 @@ export function DiffViewer({
                   <h3 className="text-lg font-semibold mb-2">
                     New Malware Evidence in {currentVersion}
                   </h3>
+                  <p className="text-sm text-muted-foreground">
+                    Malicious code patterns and behaviors detected in this
+                    version that were not present before
+                  </p>
                   <Table>
                     <TableHeader>
                       <TableRow>
@@ -220,6 +224,10 @@ export function DiffViewer({
                   <h3 className="text-lg font-semibold mb-2">
                     Resolved Malware Evidence from {compareVersion}
                   </h3>
+                  <p className="text-sm text-muted-foreground">
+                    Malicious code patterns and behaviors that were present in
+                    the previous version but have been removed
+                  </p>
                   <Table>
                     <TableHeader>
                       <TableRow>
