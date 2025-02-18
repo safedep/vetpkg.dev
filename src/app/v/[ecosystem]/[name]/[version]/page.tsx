@@ -9,7 +9,6 @@ import {
   ShieldCheck,
 } from "lucide-react";
 
-import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import {
   Card,
@@ -26,43 +25,53 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import Link from "next/link";
 
 import { useParams } from "next/navigation";
 
 import {
+  PolarAngleAxis,
+  PolarGrid,
+  PolarRadiusAxis,
   Radar,
   RadarChart,
-  PolarGrid,
-  PolarAngleAxis,
-  PolarRadiusAxis,
   ResponsiveContainer,
 } from "recharts";
 
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import ReactMarkdown from "react-markdown";
-import { useEffect, useState } from "react";
+import { Report_Evidence_Confidence } from "@buf/safedep_api.bufbuild_es/safedep/messages/malysis/v1/report_pb";
+import { LicenseMeta } from "@buf/safedep_api.bufbuild_es/safedep/messages/package/v1/license_meta_pb";
 import {
   PackageVersionInsight,
   PackageVersionInsightSchema,
 } from "@buf/safedep_api.bufbuild_es/safedep/messages/package/v1/package_version_insight_pb";
-import { getPackageVersionInfo, queryMalwareAnalysis } from "./actions";
+import { Severity_Risk } from "@buf/safedep_api.bufbuild_es/safedep/messages/vulnerability/v1/severity_pb";
+import { VulnerabilityIdentifierType } from "@buf/safedep_api.bufbuild_es/safedep/messages/vulnerability/v1/vulnerability_pb";
 import {
   AnalysisStatus,
   QueryPackageAnalysisResponse,
   QueryPackageAnalysisResponseSchema,
 } from "@buf/safedep_api.bufbuild_es/safedep/services/malysis/v1/malysis_pb";
-import { Skeleton } from "@/components/ui/skeleton";
-import {
-  Severity_Risk,
-  Severity_RiskSchema,
-} from "@buf/safedep_api.bufbuild_es/safedep/messages/vulnerability/v1/severity_pb";
-import { VulnerabilityIdentifierType } from "@buf/safedep_api.bufbuild_es/safedep/messages/vulnerability/v1/vulnerability_pb";
-import { LicenseMeta } from "@buf/safedep_api.bufbuild_es/safedep/messages/package/v1/license_meta_pb";
-import {
-  Report_Evidence_Confidence,
-  Report_Evidence_ConfidenceSchema,
-} from "@buf/safedep_api.bufbuild_es/safedep/messages/malysis/v1/report_pb";
 import { toJson } from "@bufbuild/protobuf";
+import {
+  DialogDescription,
+  DialogOverlay,
+  DialogPortal,
+} from "@radix-ui/react-dialog";
+import { Spinner } from "@radix-ui/themes";
+import { useEffect, useState } from "react";
+import ReactMarkdown from "react-markdown";
+import { getPackageVersionInfo, queryMalwareAnalysis } from "./actions";
+import { DiffViewer } from "./DiffViewer";
+import { getConfidenceName, getRiskName } from "./utils";
 
 enum MalwareStatus {
   Safe = "Safe",
@@ -175,10 +184,6 @@ function getVulnerabilities(
       reference_url: `https://osv.dev/vulnerability/${v.id?.value}`,
     })) ?? []
   );
-}
-
-function getRiskName(risk: Severity_Risk): string {
-  return Severity_RiskSchema.values[risk ?? 0].name.replace("RISK_", "");
 }
 
 function getLicense(licenses: LicenseMeta[]): string {
@@ -404,15 +409,6 @@ function getOpenSSFCombinedScore(
   return project?.scorecard?.score ?? 0;
 }
 
-function getConfidenceName(
-  confidence: Report_Evidence_Confidence | undefined,
-): string {
-  return Report_Evidence_ConfidenceSchema.values[confidence ?? 0].name.replace(
-    "CONFIDENCE_",
-    "",
-  );
-}
-
 function getProjectRepositoryInformation(
   insights: PackageVersionInsight | null,
 ): {
@@ -476,6 +472,14 @@ export default function Page() {
   const [malwareAnalysisBehavior, setMalwareAnalysisBehavior] =
     useState<MalwareAnalysisBehavior>({});
 
+  const [showDiffViewer, setShowDiffViewer] = useState(false);
+  const [compareInsightsLoading, setCompareInsightsLoading] = useState(false);
+  const [compareVersion, setCompareVersion] = useState<string>("");
+  const [compareInsights, setCompareInsights] =
+    useState<PackageVersionInsight | null>(null);
+  const [compareMalwareAnalysis, setCompareMalwareAnalysis] =
+    useState<QueryPackageAnalysisResponse | null>(null);
+
   useEffect(() => {
     setInsightsLoading(true);
     setMalwareAnalysisLoading(true);
@@ -529,6 +533,34 @@ export default function Page() {
   useEffect(() => {
     setMalwareAnalysisBehavior(getInferredBehavior(malwareAnalysis, insights));
   }, [malwareAnalysis, insights]);
+
+  const handleCompare = async (version: string) => {
+    setCompareVersion(version);
+    setCompareInsightsLoading(true);
+    setShowDiffViewer(true);
+
+    try {
+      const [compareInsightsData, compareMalwareData] = await Promise.all([
+        getPackageVersionInfo(
+          packageVersion.ecosystem!,
+          packageVersion.name!,
+          version,
+        ),
+        queryMalwareAnalysis(
+          packageVersion.ecosystem!,
+          packageVersion.name!,
+          version,
+        ),
+      ]).finally(() => {
+        setCompareInsightsLoading(false);
+      });
+
+      setCompareInsights(compareInsightsData);
+      setCompareMalwareAnalysis(compareMalwareData);
+    } catch (error) {
+      console.warn("Failed to fetch comparison data:", error);
+    }
+  };
 
   if (insightsLoading || malwareAnalysisLoading) {
     return (
@@ -1443,6 +1475,7 @@ export default function Page() {
                       <TableHead>Version</TableHead>
                       <TableHead>Published At</TableHead>
                       <TableHead>Status</TableHead>
+                      <TableHead>Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -1467,6 +1500,29 @@ export default function Page() {
                             </Badge>
                           )}
                         </TableCell>
+                        <TableCell>
+                          {version.version === packageVersion.version ? (
+                            <div className="text-gray-400 text-sm">
+                              Current version
+                            </div>
+                          ) : (
+                            <div className="flex items-center gap-2">
+                              <Link
+                                href={`/v/${packageVersion.ecosystem}/${packageVersion.name}/${version.version}`}
+                                className="text-blue-500 hover:text-blue-700 text-sm"
+                              >
+                                View
+                              </Link>
+                              <span className="text-gray-300">|</span>
+                              <button
+                                onClick={() => handleCompare(version.version)}
+                                className="text-blue-500 hover:text-blue-700 text-sm"
+                              >
+                                Compare
+                              </button>
+                            </div>
+                          )}
+                        </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
@@ -1476,6 +1532,37 @@ export default function Page() {
           </TabsContent>
         </Tabs>
       </div>
+      <Dialog open={showDiffViewer} onOpenChange={setShowDiffViewer}>
+        <DialogTrigger></DialogTrigger>
+        <DialogPortal>
+          <DialogOverlay className="fixed inset-0 bg-black/50 dark:bg-black/50 data-[state=open]:animate-fadeIn" />
+          <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto z-50 bg-white dark:bg-gray-900 dark:text-white">
+            <DialogHeader>
+              <DialogTitle className="dark:text-gray-300 text-gray-500">
+                Diff Viewer
+              </DialogTitle>
+              <DialogDescription className="dark:text-gray-300 text-gray-500">
+                Comparing {packageVersion.version} with {compareVersion}
+              </DialogDescription>
+            </DialogHeader>
+            {!compareInsightsLoading ? (
+              <DiffViewer
+                currentInsights={insights!}
+                currentMalwareAnalysis={malwareAnalysis!}
+                compareInsights={compareInsights!}
+                compareMalwareAnalysis={compareMalwareAnalysis!}
+                currentVersion={packageVersion.version!}
+                compareVersion={compareVersion}
+              />
+            ) : (
+              <div className="flex flex-col items-center justify-center p-8 text-gray-500 dark:text-gray-400">
+                <Spinner />
+                <p className="mt-2 text-sm">Loading comparison data...</p>
+              </div>
+            )}
+          </DialogContent>
+        </DialogPortal>
+      </Dialog>
     </div>
   );
 }
