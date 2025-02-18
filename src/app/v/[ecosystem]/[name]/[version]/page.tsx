@@ -9,7 +9,6 @@ import {
   ShieldCheck,
 } from "lucide-react";
 
-import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import {
   Card,
@@ -26,44 +25,19 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import Link from "next/link";
 
 import { useParams } from "next/navigation";
 
 import {
+  PolarAngleAxis,
+  PolarGrid,
+  PolarRadiusAxis,
   Radar,
   RadarChart,
-  PolarGrid,
-  PolarAngleAxis,
-  PolarRadiusAxis,
   ResponsiveContainer,
 } from "recharts";
 
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import ReactMarkdown from "react-markdown";
-import { useEffect, useState } from "react";
-import {
-  PackageVersionInsight,
-  PackageVersionInsightSchema,
-} from "@buf/safedep_api.bufbuild_es/safedep/messages/package/v1/package_version_insight_pb";
-import { getPackageVersionInfo, queryMalwareAnalysis } from "./actions";
-import {
-  AnalysisStatus,
-  QueryPackageAnalysisResponse,
-  QueryPackageAnalysisResponseSchema,
-} from "@buf/safedep_api.bufbuild_es/safedep/services/malysis/v1/malysis_pb";
-import { Skeleton } from "@/components/ui/skeleton";
-import {
-  Severity_Risk,
-  Severity_RiskSchema,
-} from "@buf/safedep_api.bufbuild_es/safedep/messages/vulnerability/v1/severity_pb";
-import { VulnerabilityIdentifierType } from "@buf/safedep_api.bufbuild_es/safedep/messages/vulnerability/v1/vulnerability_pb";
-import { LicenseMeta } from "@buf/safedep_api.bufbuild_es/safedep/messages/package/v1/license_meta_pb";
-import {
-  Report_Evidence_Confidence,
-  Report_Evidence_ConfidenceSchema,
-} from "@buf/safedep_api.bufbuild_es/safedep/messages/malysis/v1/report_pb";
-import { toJson } from "@bufbuild/protobuf";
-import { DiffViewer } from "./DiffViewer";
 import {
   Dialog,
   DialogContent,
@@ -71,12 +45,32 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Report_Evidence_Confidence } from "@buf/safedep_api.bufbuild_es/safedep/messages/malysis/v1/report_pb";
+import { LicenseMeta } from "@buf/safedep_api.bufbuild_es/safedep/messages/package/v1/license_meta_pb";
+import {
+  PackageVersionInsight,
+  PackageVersionInsightSchema,
+} from "@buf/safedep_api.bufbuild_es/safedep/messages/package/v1/package_version_insight_pb";
+import { Severity_Risk } from "@buf/safedep_api.bufbuild_es/safedep/messages/vulnerability/v1/severity_pb";
+import { VulnerabilityIdentifierType } from "@buf/safedep_api.bufbuild_es/safedep/messages/vulnerability/v1/vulnerability_pb";
+import {
+  AnalysisStatus,
+  QueryPackageAnalysisResponse,
+  QueryPackageAnalysisResponseSchema,
+} from "@buf/safedep_api.bufbuild_es/safedep/services/malysis/v1/malysis_pb";
+import { toJson } from "@bufbuild/protobuf";
 import {
   DialogDescription,
   DialogOverlay,
   DialogPortal,
 } from "@radix-ui/react-dialog";
 import { Spinner } from "@radix-ui/themes";
+import { useEffect, useState } from "react";
+import ReactMarkdown from "react-markdown";
+import { getPackageVersionInfo, queryMalwareAnalysis } from "./actions";
+import { DiffViewer } from "./DiffViewer";
 import { getConfidenceName, getRiskName } from "./utils";
 
 enum MalwareStatus {
