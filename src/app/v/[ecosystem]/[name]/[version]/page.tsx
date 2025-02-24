@@ -80,6 +80,7 @@ import {
   MalwareAnalysisBehavior,
   PackageSafetyStatus,
 } from "./types";
+import ReactMarkdown from "react-markdown";
 
 function getEcosystemIcon(ecosystem: string) {
   switch (ecosystem.toLowerCase()) {
@@ -1006,14 +1007,17 @@ export default function Page() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   {/* Summary section */}
-                  {malwareAnalysis?.report?.inference?.summary && (
-                    <div className="rounded-lg bg-muted">
-                      <h4 className="font-medium">Summary</h4>
-                      <p className="text-sm text-muted-foreground">
-                        {malwareAnalysis?.report?.inference?.summary}
-                      </p>
-                    </div>
-                  )}
+                  <div className="rounded-lg bg-muted">
+                    <h4 className="font-medium">Summary</h4>
+                    <ReactMarkdown>
+                      {(
+                        malwareAnalysis?.verificationRecord?.reason ||
+                        malwareAnalysis?.report?.inference?.summary ||
+                        ""
+                      ).toString()}
+                    </ReactMarkdown>
+                  </div>
+                  {/* Evidence section */}
                   <div>
                     <h4 className="mb-2 font-medium">Evidence</h4>
                     <ul className="space-y-2">
