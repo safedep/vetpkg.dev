@@ -189,16 +189,20 @@ function getMalwareAnalysisStatus(
     return MalwareStatus.Unknown;
   }
 
+  if (malwareAnalysis.verificationRecord?.isMalware) {
+    return MalwareStatus.Malicious;
+  }
+
+  if (malwareAnalysis.verificationRecord?.isSafe) {
+    return MalwareStatus.Safe;
+  }
+
   if (!malwareAnalysis?.report) {
     return MalwareStatus.Unknown;
   }
 
   if (!malwareAnalysis?.report?.inference?.isMalware) {
     return MalwareStatus.Safe;
-  }
-
-  if (malwareAnalysis.verificationRecord?.isMalware) {
-    return MalwareStatus.Malicious;
   }
 
   return MalwareStatus.PossiblyMalicious;
