@@ -71,7 +71,8 @@ import { useEffect, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import { getPackageVersionInfo, queryMalwareAnalysis } from "./actions";
 import { DiffViewer } from "./DiffViewer";
-import { getConfidenceName, getRiskName } from "./utils";
+import { getConfidenceName, getRiskName, getRiskColor } from "./utils";
+import DependencyGraph from "./DependencyGraph";
 
 enum MalwareStatus {
   Safe = "Safe",
@@ -800,7 +801,7 @@ export default function Page() {
 
         {/* Replace the grid div with Tabs */}
         <Tabs defaultValue="security" className="w-full">
-          <TabsList className="w-full grid grid-cols-1 md:grid-cols-4 min-h-max">
+          <TabsList className="w-full grid grid-cols-1 md:grid-cols-5 min-h-max">
             <TabsTrigger
               value="security"
               className="flex items-center gap-2 data-[state=active]:bg-blue-100"
@@ -824,6 +825,12 @@ export default function Page() {
               className="flex items-center gap-2 data-[state=active]:bg-purple-100"
             >
               📦 Available Versions
+            </TabsTrigger>
+            <TabsTrigger
+              value="dependency-graph"
+              className="flex items-center gap-2 data-[state=active]:bg-yellow-100"
+            >
+              📈 Dependency Graph
             </TabsTrigger>
           </TabsList>
 
@@ -1240,17 +1247,7 @@ export default function Page() {
                         <TableCell>
                           <Badge
                             variant="outline"
-                            className={`
-                              ${
-                                vuln.severity === Severity_Risk.CRITICAL
-                                  ? "bg-red-100 text-red-800"
-                                  : vuln.severity === Severity_Risk.HIGH
-                                    ? "bg-orange-100 text-orange-800"
-                                    : vuln.severity === Severity_Risk.MEDIUM
-                                      ? "bg-yellow-100 text-yellow-800"
-                                      : "bg-green-100 text-green-800"
-                              }
-                            `}
+                            className={`${getRiskColor(getRiskName(vuln.severity)).bg} ${getRiskColor(getRiskName(vuln.severity)).text}`}
                           >
                             {getRiskName(vuln.severity)}
                           </Badge>
@@ -1527,6 +1524,24 @@ export default function Page() {
                     ))}
                   </TableBody>
                 </Table>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="dependency-graph">
+            <Card>
+              <CardHeader>
+                <CardTitle>Dependency Graph</CardTitle>
+                <CardDescription>
+                  Network of direct and transitive dependencies.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <DependencyGraph
+                  insights={insights}
+                  packageName={packageVersion.name ?? ""}
+                  packageVersion={packageVersion.version ?? ""}
+                />
               </CardContent>
             </Card>
           </TabsContent>

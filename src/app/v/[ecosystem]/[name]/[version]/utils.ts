@@ -62,3 +62,23 @@ export function getMalwareEvidences(
 
   return evidences;
 }
+
+/**
+ * Get Tailwind CSS color classes for risk levels
+ * @param risk Risk level name (CRITICAL, HIGH, MEDIUM, LOW)
+ * @returns Tailwind CSS color classes for background and text
+ */
+export function getRiskColor(risk: string): { bg: string; text: string } {
+  switch (risk?.toUpperCase()) {
+    case "CRITICAL":
+      return { bg: "bg-red-100", text: "text-red-800" };
+    case "HIGH":
+      return { bg: "bg-orange-100", text: "text-orange-800" };
+    case "MEDIUM":
+      return { bg: "bg-yellow-100", text: "text-yellow-800" };
+    case "LOW":
+      return { bg: "bg-green-100", text: "text-green-800" };
+    default:
+      return { bg: "bg-gray-100", text: "text-gray-800" };
+  }
+}
