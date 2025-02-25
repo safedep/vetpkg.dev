@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  ChevronDown,
   ExternalLink,
   Scale,
   Shield,
@@ -68,68 +67,20 @@ import {
 } from "@radix-ui/react-dialog";
 import { Spinner } from "@radix-ui/themes";
 import { useEffect, useState } from "react";
-import ReactMarkdown from "react-markdown";
 import { getPackageVersionInfo, queryMalwareAnalysis } from "./actions";
 import { DiffViewer } from "./DiffViewer";
-import { getConfidenceName, getRiskName } from "./utils";
-
-enum MalwareStatus {
-  Safe = "Safe",
-  PossiblyMalicious = "Possibly Malicious",
-  Malicious = "Malicious",
-  Unknown = "Unknown",
-}
-
-enum PackageSafetyStatus {
-  Safe = "Safe",
-  PossiblyMalicious = "Possibly Malicious",
-  Malicious = "Malicious",
-  Vulnerable = "Vulnerable",
-  Unmaintained = "Unmaintained",
-  Unpopular = "Unpopular",
-  PoorSecurityHygiene = "Poor Security Hygiene",
-  Unknown = "Unknown",
-}
-
-enum SecurityScorecardCheck {
-  Vulnerability = "Vulnerability",
-  Maintenance = "Maintenance",
-  SAST = "SAST",
-  CodeReview = "Code Review",
-  Contributors = "Contributors",
-  SignedReleases = "Signed Releases",
-}
-
-interface Vulnerability {
-  id: string;
-  title: string;
-  severity: Severity_Risk;
-  reference_url?: string;
-  cve?: string;
-}
-
-interface Version {
-  version: string;
-  published_at: string;
-  is_default: boolean;
-}
-
-interface MalwareEvidence {
-  source: string;
-  fileKey?: string;
-  projectSource?: string;
-  confidence: Report_Evidence_Confidence;
-  title: string;
-  details: string;
-}
-
-interface MalwareAnalysisBehavior {
-  network_calls?: boolean;
-  file_access?: boolean;
-  process_creation?: boolean;
-  suspicious_project?: boolean;
-  package_signature_missing?: boolean;
-}
+import { getRiskName, getRiskColor } from "./utils";
+import DependencyGraph from "./DependencyGraph";
+import MalwareAnalysis, { MalwareStatus } from "./MalwareAnalysis";
+import {
+  Vulnerability,
+  Version,
+  SecurityScorecardCheck,
+  MalwareEvidence,
+  MalwareAnalysisBehavior,
+  PackageSafetyStatus,
+} from "./types";
+import ReactMarkdown from "react-markdown";
 
 function getEcosystemIcon(ecosystem: string) {
   switch (ecosystem.toLowerCase()) {
@@ -239,16 +190,20 @@ function getMalwareAnalysisStatus(
     return MalwareStatus.Unknown;
   }
 
+  if (malwareAnalysis.verificationRecord?.isMalware) {
+    return MalwareStatus.Malicious;
+  }
+
+  if (malwareAnalysis.verificationRecord?.isSafe) {
+    return MalwareStatus.Safe;
+  }
+
   if (!malwareAnalysis?.report) {
     return MalwareStatus.Unknown;
   }
 
   if (!malwareAnalysis?.report?.inference?.isMalware) {
     return MalwareStatus.Safe;
-  }
-
-  if (malwareAnalysis.verificationRecord?.isMalware) {
-    return MalwareStatus.Malicious;
   }
 
   return MalwareStatus.PossiblyMalicious;
@@ -800,7 +755,7 @@ export default function Page() {
 
         {/* Replace the grid div with Tabs */}
         <Tabs defaultValue="security" className="w-full">
-          <TabsList className="w-full grid grid-cols-1 md:grid-cols-4 min-h-max">
+          <TabsList className="w-full grid grid-cols-1 md:grid-cols-5 min-h-max">
             <TabsTrigger
               value="security"
               className="flex items-center gap-2 data-[state=active]:bg-blue-100"
@@ -824,6 +779,12 @@ export default function Page() {
               className="flex items-center gap-2 data-[state=active]:bg-purple-100"
             >
               📦 Available Versions
+            </TabsTrigger>
+            <TabsTrigger
+              value="dependency-graph"
+              className="flex items-center gap-2 data-[state=active]:bg-yellow-100"
+            >
+              📈 Dependency Graph
             </TabsTrigger>
           </TabsList>
 
@@ -1046,14 +1007,17 @@ export default function Page() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   {/* Summary section */}
-                  {malwareAnalysis?.report?.inference?.summary && (
-                    <div className="rounded-lg bg-muted">
-                      <h4 className="font-medium">Summary</h4>
-                      <p className="text-sm text-muted-foreground">
-                        {malwareAnalysis?.report?.inference?.summary}
-                      </p>
-                    </div>
-                  )}
+                  <div className="rounded-lg bg-muted">
+                    <h4 className="font-medium">Summary</h4>
+                    <ReactMarkdown>
+                      {(
+                        malwareAnalysis?.verificationRecord?.reason ||
+                        malwareAnalysis?.report?.inference?.summary ||
+                        ""
+                      ).toString()}
+                    </ReactMarkdown>
+                  </div>
+                  {/* Evidence section */}
                   <div>
                     <h4 className="mb-2 font-medium">Evidence</h4>
                     <ul className="space-y-2">
@@ -1240,17 +1204,7 @@ export default function Page() {
                         <TableCell>
                           <Badge
                             variant="outline"
-                            className={`
-                              ${
-                                vuln.severity === Severity_Risk.CRITICAL
-                                  ? "bg-red-100 text-red-800"
-                                  : vuln.severity === Severity_Risk.HIGH
-                                    ? "bg-orange-100 text-orange-800"
-                                    : vuln.severity === Severity_Risk.MEDIUM
-                                      ? "bg-yellow-100 text-yellow-800"
-                                      : "bg-green-100 text-green-800"
-                              }
-                            `}
+                            className={`${getRiskColor(getRiskName(vuln.severity)).bg} ${getRiskColor(getRiskName(vuln.severity)).text}`}
                           >
                             {getRiskName(vuln.severity)}
                           </Badge>
@@ -1287,168 +1241,11 @@ export default function Page() {
           </TabsContent>
 
           <TabsContent value="code">
-            <Card>
-              <CardHeader>
-                <CardDescription>
-                  <p className="text-sm text-muted-foreground justify-left flex items-center gap-1 bg-slate-100 p-2 rounded-md">
-                    Malicious code scanning is performed using
-                    <a
-                      href="https://docs.safedep.io/cloud/malware-analysis"
-                      className="text-blue-500 hover:underline flex items-center gap-1"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      <ExternalLink className="h-4 w-4" /> SafeDep Malicious
-                      Package Scanning API
-                    </a>
-                  </p>
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                {/* Status Summary */}
-                <div className="rounded-lg border p-4">
-                  <div className="flex items-center gap-2 mb-4">
-                    <span
-                      className={`text-lg font-semibold ${
-                        malwareAnalysisStatus === MalwareStatus.Malicious
-                          ? "text-red-600"
-                          : malwareAnalysisStatus ===
-                              MalwareStatus.PossiblyMalicious
-                            ? "text-orange-600"
-                            : malwareAnalysisStatus === MalwareStatus.Unknown
-                              ? "text-gray-600"
-                              : "text-green-600"
-                      }`}
-                    >
-                      {malwareAnalysisStatus === MalwareStatus.Malicious
-                        ? "⚠️ Malware Detected"
-                        : malwareAnalysisStatus ===
-                            MalwareStatus.PossiblyMalicious
-                          ? "⚠️ Possibly Malicious"
-                          : malwareAnalysisStatus === MalwareStatus.Unknown
-                            ? "❓ Unknown"
-                            : "✅ Clean Package"}
-                    </span>
-                    {malwareAnalysis?.verificationRecord && (
-                      <Badge
-                        variant="outline"
-                        className="bg-blue-100 text-blue-800"
-                      >
-                        Verified
-                      </Badge>
-                    )}
-                  </div>
-                  <div className="space-y-2">
-                    {malwareAnalysis?.report?.inference?.summary && (
-                      <>
-                        <p className="font-medium leading-2">Reason</p>
-                        <p className="text-sm text-muted-foreground">
-                          <ReactMarkdown>
-                            {malwareAnalysis?.report?.inference?.summary}
-                          </ReactMarkdown>
-                        </p>
-                      </>
-                    )}
-                    {malwareAnalysis?.report?.inference?.details && (
-                      <>
-                        <p className="font-medium mt-4 leading-2">Details</p>
-                        <div className="text-sm text-muted-foreground prose prose-sm max-w-none">
-                          <ReactMarkdown>
-                            {malwareAnalysis?.report?.inference?.details}
-                          </ReactMarkdown>
-                        </div>
-                      </>
-                    )}
-                  </div>
-                </div>
-
-                {/* Evidence Table */}
-                <div>
-                  <h3 className="text-lg font-semibold mb-4">
-                    Analysis Evidence
-                  </h3>
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Source</TableHead>
-                        <TableHead>File Name</TableHead>
-                        <TableHead>Confidence</TableHead>
-                        <TableHead>Description</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {malwareEvidences.map((evidence, index) => (
-                        <>
-                          <TableRow key={index}>
-                            <TableCell className="font-medium">
-                              {evidence.source}
-                            </TableCell>
-                            <TableCell className="text-sm">
-                              {evidence.fileKey}
-                            </TableCell>
-                            <TableCell>
-                              <Badge
-                                variant="outline"
-                                className={`
-                                  ${
-                                    evidence.confidence ===
-                                    Report_Evidence_Confidence.HIGH
-                                      ? "bg-red-100 text-red-800"
-                                      : evidence.confidence ===
-                                          Report_Evidence_Confidence.MEDIUM
-                                        ? "bg-yellow-100 text-yellow-800"
-                                        : "bg-blue-100 text-blue-800"
-                                  }`}
-                              >
-                                {getConfidenceName(evidence.confidence)}
-                              </Badge>
-                            </TableCell>
-                            <TableCell className="max-w-xl">
-                              <Link
-                                href="#"
-                                className="hover:underline"
-                                onClick={() => {
-                                  const allEvidenceDetails =
-                                    document.querySelectorAll(
-                                      ".hidden-evidence-details",
-                                    );
-                                  allEvidenceDetails.forEach(
-                                    (evidenceDetails) => {
-                                      evidenceDetails.classList.add("hidden");
-                                    },
-                                  );
-
-                                  const evidenceDetails =
-                                    document.getElementById(
-                                      `evidence-${index}`,
-                                    );
-                                  if (evidenceDetails) {
-                                    evidenceDetails.classList.toggle("hidden");
-                                  }
-                                }}
-                              >
-                                <div className="flex items-center gap-2">
-                                  {evidence.title}{" "}
-                                  <ChevronDown className="w-4 h-4" />
-                                </div>
-                              </Link>
-                            </TableCell>
-                          </TableRow>
-                          <TableRow
-                            className="bg-slate-50 hidden hidden-evidence-details"
-                            id={`evidence-${index}`}
-                          >
-                            <TableCell colSpan={4}>
-                              <ReactMarkdown>{evidence.details}</ReactMarkdown>
-                            </TableCell>
-                          </TableRow>
-                        </>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
-              </CardContent>
-            </Card>
+            <MalwareAnalysis
+              malwareAnalysis={malwareAnalysis}
+              malwareAnalysisStatus={malwareAnalysisStatus}
+              malwareEvidences={malwareEvidences}
+            />
           </TabsContent>
 
           <TabsContent value="versions">
@@ -1527,6 +1324,24 @@ export default function Page() {
                     ))}
                   </TableBody>
                 </Table>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="dependency-graph">
+            <Card>
+              <CardHeader>
+                <CardTitle>Dependency Graph</CardTitle>
+                <CardDescription>
+                  Network of direct and transitive dependencies.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <DependencyGraph
+                  insights={insights}
+                  packageName={packageVersion.name ?? ""}
+                  packageVersion={packageVersion.version ?? ""}
+                />
               </CardContent>
             </Card>
           </TabsContent>

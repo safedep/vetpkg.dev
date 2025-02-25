@@ -11,7 +11,12 @@ import {
 } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { getConfidenceName, getRiskName, getVulnerabilities } from "./utils";
+import {
+  getConfidenceName,
+  getRiskColor,
+  getRiskName,
+  getVulnerabilities,
+} from "./utils";
 import { getMalwareEvidences } from "./utils";
 
 interface DiffViewerProps {
@@ -105,7 +110,10 @@ export function DiffViewer({
                           <TableCell>{vuln.cve}</TableCell>
                           <TableCell>{vuln.title}</TableCell>
                           <TableCell>
-                            <Badge variant="destructive">
+                            <Badge
+                              variant="destructive"
+                              className={`${getRiskColor(getRiskName(vuln.severity)).bg} ${getRiskColor(getRiskName(vuln.severity)).text}`}
+                            >
                               {getRiskName(vuln.severity)}
                             </Badge>
                           </TableCell>
