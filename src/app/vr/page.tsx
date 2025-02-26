@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { AlertCircle, Shield, Book, Star } from "lucide-react";
+import { AlertCircle, Shield, Book, Star, ArrowLeft } from "lucide-react";
 import { FileUpload } from "./FileUpload";
 import { VetData } from "./types";
 import sampleData from "./sample.json";
@@ -16,6 +16,11 @@ import { Card, CardContent } from "@/components/ui/card";
 export default function Page() {
   const [data, setData] = useState<VetData | null>(null);
   const [showTabs, setShowTabs] = useState(false);
+
+  const handleBack = () => {
+    setData(null);
+    setShowTabs(false);
+  };
 
   const handleDataUpdate = (newData: VetData) => {
     setData(newData);
@@ -66,6 +71,16 @@ export default function Page() {
       ) : (
         <>
           <div className="flex flex-col items-center p-4 rounded-lg shadow-md">
+            <div className="w-full flex justify-end">
+              <Button
+                variant="outline"
+                onClick={handleBack}
+                className="text-indigo-800"
+              >
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back to upload
+              </Button>
+            </div>
             <Tabs defaultValue="violations" className="w-full">
               <TabsList className="grid w-full grid-cols-4 gap-2">
                 <TabsTrigger
