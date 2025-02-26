@@ -1,0 +1,944 @@
+{
+  "meta": {
+    "tool_name": "vet",
+    "tool_version": "latest",
+    "created_at": "2025-02-26T06:40:48Z"
+  },
+  "manifests": [
+    {
+      "id": "1cfebbdd71379ef6",
+      "ecosystem": "PyPI",
+      "path": "requirements.txt",
+      "display_path": "/Users/dev/Work/dev/safedep/demo-client-python/requirements.txt",
+      "source_type": "local",
+      "namespace": "/Users/dev/Work/dev/safedep/demo-client-python"
+    }
+  ],
+  "packages": [
+    {
+      "package": {
+        "ecosystem": "PyPI",
+        "name": "requests",
+        "version": "2.19.1"
+      },
+      "manifests": ["1cfebbdd71379ef6"],
+      "violations": [
+        {
+          "check_type": "CheckTypeVulnerability",
+          "filter": {
+            "name": "critical-or-high-vulns",
+            "value": "vulns.critical.exists(p, true) || vulns.high.exists(p, true)\n",
+            "check_type": "CheckTypeVulnerability",
+            "summary": "Critical or high risk vulnerabilities were found"
+          }
+        }
+      ],
+      "advices": [
+        {
+          "type": "UpgradePackage",
+          "target_alternate_package_version": "2.32.3"
+        },
+        {
+          "type": "UpgradePackage",
+          "target_package_name": "requests",
+          "target_package_version": "2.32.3"
+        }
+      ],
+      "vulnerabilities": [
+        {
+          "id": "GHSA-9wx4-h78v-vm56",
+          "title": "Requests `Session` object does not verify requests after making first request with verify=False",
+          "aliases": ["CVE-2024-35195"],
+          "severities": [
+            {
+              "type": "CVSSV3",
+              "score": "CVSS:3.1/AV:L/AC:H/PR:H/UI:R/S:U/C:H/I:H/A:N",
+              "risk": "MEDIUM"
+            }
+          ]
+        },
+        {
+          "id": "GHSA-j8r2-6x86-q33q",
+          "title": "Unintended leak of Proxy-Authorization header in requests",
+          "aliases": ["CVE-2023-32681", "PYSEC-2023-74"],
+          "severities": [
+            {
+              "type": "CVSSV3",
+              "score": "CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:C/C:H/I:N/A:N",
+              "risk": "MEDIUM"
+            }
+          ]
+        },
+        {
+          "id": "GHSA-x84v-xcm2-53pg",
+          "title": "Insufficiently Protected Credentials in Requests",
+          "aliases": ["CVE-2018-18074", "PYSEC-2018-28"],
+          "severities": [
+            {
+              "type": "CVSSV3",
+              "score": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N",
+              "risk": "HIGH"
+            }
+          ]
+        },
+        {
+          "id": "PYSEC-2018-28",
+          "aliases": ["CVE-2018-18074", "GHSA-x84v-xcm2-53pg"]
+        },
+        {
+          "id": "PYSEC-2023-74",
+          "aliases": ["CVE-2023-32681", "GHSA-j8r2-6x86-q33q"]
+        }
+      ],
+      "licenses": [
+        {
+          "id": "Apache-2.0"
+        }
+      ]
+    },
+    {
+      "package": {
+        "ecosystem": "PyPI",
+        "name": "pyyaml",
+        "version": "3.13"
+      },
+      "manifests": ["1cfebbdd71379ef6"],
+      "violations": [
+        {
+          "check_type": "CheckTypeVulnerability",
+          "filter": {
+            "name": "critical-or-high-vulns",
+            "value": "vulns.critical.exists(p, true) || vulns.high.exists(p, true)\n",
+            "check_type": "CheckTypeVulnerability",
+            "summary": "Critical or high risk vulnerabilities were found"
+          }
+        }
+      ],
+      "advices": [
+        {
+          "type": "UpgradePackage",
+          "target_alternate_package_version": "6.0.2"
+        },
+        {
+          "type": "UpgradePackage",
+          "target_package_name": "pyyaml",
+          "target_package_version": "6.0.2"
+        }
+      ],
+      "vulnerabilities": [
+        {
+          "id": "GHSA-8q59-q68h-6hv4",
+          "title": "Improper Input Validation in PyYAML",
+          "aliases": ["CVE-2020-14343", "PYSEC-2021-142"],
+          "severities": [
+            {
+              "type": "CVSSV3",
+              "score": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H",
+              "risk": "CRITICAL"
+            },
+            {
+              "score": "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N"
+            }
+          ]
+        },
+        {
+          "id": "GHSA-rprw-h62v-c2w7",
+          "title": "PyYAML insecurely deserializes YAML strings leading to arbitrary code execution",
+          "aliases": ["CVE-2017-18342", "PYSEC-2018-49"],
+          "severities": [
+            {
+              "type": "CVSSV3",
+              "score": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H",
+              "risk": "CRITICAL"
+            }
+          ]
+        },
+        {
+          "id": "PYSEC-2018-49",
+          "aliases": ["CVE-2017-18342", "GHSA-rprw-h62v-c2w7"]
+        },
+        {
+          "id": "PYSEC-2021-142",
+          "aliases": ["CVE-2020-14343", "GHSA-8q59-q68h-6hv4"]
+        }
+      ]
+    },
+    {
+      "package": {
+        "ecosystem": "PyPI",
+        "name": "typing-extensions",
+        "version": "4.12.2"
+      },
+      "manifests": ["1cfebbdd71379ef6"],
+      "projects": [
+        {
+          "name": "python/typing_extensions",
+          "stars": 471,
+          "url": "https://github.com/python/typing_extensions"
+        }
+      ]
+    },
+    {
+      "package": {
+        "ecosystem": "PyPI",
+        "name": "h11",
+        "version": "0.9.0"
+      },
+      "manifests": ["1cfebbdd71379ef6"],
+      "licenses": [
+        {
+          "id": "MIT"
+        }
+      ],
+      "projects": [
+        {
+          "name": "python-hyper/h11",
+          "stars": 499,
+          "url": "https://github.com/python-hyper/h11"
+        }
+      ]
+    },
+    {
+      "package": {
+        "ecosystem": "PyPI",
+        "name": "idna",
+        "version": "2.7.0"
+      },
+      "manifests": ["1cfebbdd71379ef6"],
+      "violations": [
+        {
+          "check_type": "CheckTypeVulnerability",
+          "filter": {
+            "name": "critical-or-high-vulns",
+            "value": "vulns.critical.exists(p, true) || vulns.high.exists(p, true)\n",
+            "check_type": "CheckTypeVulnerability",
+            "summary": "Critical or high risk vulnerabilities were found"
+          }
+        }
+      ],
+      "advices": [
+        {
+          "type": "UpgradePackage",
+          "target_alternate_package_version": "3.10.0"
+        },
+        {
+          "type": "UpgradePackage",
+          "target_package_name": "idna",
+          "target_package_version": "3.10.0"
+        }
+      ],
+      "vulnerabilities": [
+        {
+          "id": "GHSA-jjg7-2v4v-x38h",
+          "title": "Internationalized Domain Names in Applications (IDNA) vulnerable to denial of service from specially crafted inputs to idna.encode",
+          "aliases": ["CVE-2024-3651", "PYSEC-2024-60"],
+          "severities": [
+            {
+              "type": "CVSSV3",
+              "score": "CVSS:3.1/AV:L/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "risk": "MEDIUM"
+            },
+            {
+              "score": "CVSS:4.0/AV:L/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N"
+            }
+          ]
+        },
+        {
+          "id": "PYSEC-2024-60",
+          "aliases": ["CVE-2024-3651", "GHSA-jjg7-2v4v-x38h"],
+          "severities": [
+            {
+              "type": "CVSSV3",
+              "score": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "risk": "HIGH"
+            }
+          ]
+        }
+      ],
+      "licenses": [
+        {
+          "id": "non-standard"
+        }
+      ],
+      "projects": [
+        {
+          "name": "kjd/idna",
+          "stars": 253,
+          "url": "https://github.com/kjd/idna"
+        }
+      ]
+    },
+    {
+      "package": {
+        "ecosystem": "PyPI",
+        "name": "click",
+        "version": "7.1.2"
+      },
+      "manifests": ["1cfebbdd71379ef6"],
+      "licenses": [
+        {
+          "id": "BSD-3-Clause"
+        }
+      ],
+      "projects": [
+        {
+          "name": "pallets/click",
+          "stars": 16076,
+          "url": "https://github.com/pallets/click"
+        }
+      ]
+    },
+    {
+      "package": {
+        "ecosystem": "PyPI",
+        "name": "jinja2",
+        "version": "2.10"
+      },
+      "manifests": ["1cfebbdd71379ef6"],
+      "violations": [
+        {
+          "check_type": "CheckTypeVulnerability",
+          "filter": {
+            "name": "critical-or-high-vulns",
+            "value": "vulns.critical.exists(p, true) || vulns.high.exists(p, true)\n",
+            "check_type": "CheckTypeVulnerability",
+            "summary": "Critical or high risk vulnerabilities were found"
+          }
+        }
+      ],
+      "advices": [
+        {
+          "type": "UpgradePackage",
+          "target_alternate_package_version": "3.1.5"
+        },
+        {
+          "type": "UpgradePackage",
+          "target_package_name": "jinja2",
+          "target_package_version": "3.1.5"
+        }
+      ],
+      "vulnerabilities": [
+        {
+          "id": "GHSA-462w-v97r-4m45",
+          "title": "Jinja2 sandbox escape via string formatting",
+          "aliases": ["CVE-2019-10906", "PYSEC-2019-217"],
+          "severities": [
+            {
+              "type": "CVSSV3",
+              "score": "CVSS:3.0/AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:N/A:N",
+              "risk": "HIGH"
+            },
+            {
+              "score": "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:N/SC:H/SI:N/SA:N"
+            }
+          ]
+        },
+        {
+          "id": "GHSA-g3rq-g295-4j3m",
+          "title": "Regular Expression Denial of Service (ReDoS) in Jinja2",
+          "aliases": [
+            "CVE-2020-28493",
+            "PYSEC-2021-66",
+            "SNYK-PYTHON-JINJA2-1012994"
+          ],
+          "severities": [
+            {
+              "type": "CVSSV3",
+              "score": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L",
+              "risk": "MEDIUM"
+            },
+            {
+              "score": "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:L/SC:N/SI:N/SA:N"
+            }
+          ]
+        },
+        {
+          "id": "GHSA-h5c8-rqwp-cp95",
+          "title": "Jinja vulnerable to HTML attribute injection when passing user input as keys to xmlattr filter",
+          "aliases": ["CVE-2024-22195"],
+          "severities": [
+            {
+              "type": "CVSSV3",
+              "score": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:L/I:L/A:N",
+              "risk": "MEDIUM"
+            }
+          ]
+        },
+        {
+          "id": "GHSA-h75v-3vvj-5mfj",
+          "title": "Jinja vulnerable to HTML attribute injection when passing user input as keys to xmlattr filter",
+          "aliases": ["CGA-g5xx-83xq-8g5j", "CVE-2024-34064"],
+          "severities": [
+            {
+              "type": "CVSSV3",
+              "score": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:L/I:L/A:N",
+              "risk": "MEDIUM"
+            }
+          ]
+        },
+        {
+          "id": "GHSA-q2x7-8rv6-6q7h",
+          "title": "Jinja has a sandbox breakout through indirect reference to format method",
+          "aliases": ["CVE-2024-56326"],
+          "severities": [
+            {
+              "type": "CVSSV3",
+              "score": "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H",
+              "risk": "HIGH"
+            },
+            {
+              "score": "CVSS:4.0/AV:L/AC:L/AT:P/PR:L/UI:P/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N"
+            }
+          ]
+        },
+        {
+          "id": "PYSEC-2019-217",
+          "aliases": ["CVE-2019-10906", "GHSA-462w-v97r-4m45"]
+        },
+        {
+          "id": "PYSEC-2021-66",
+          "aliases": [
+            "CVE-2020-28493",
+            "GHSA-g3rq-g295-4j3m",
+            "SNYK-PYTHON-JINJA2-1012994"
+          ]
+        }
+      ]
+    },
+    {
+      "package": {
+        "ecosystem": "PyPI",
+        "name": "websockets",
+        "version": "8.1.0"
+      },
+      "manifests": ["1cfebbdd71379ef6"],
+      "advices": [
+        {
+          "type": "UpgradePackage",
+          "target_alternate_package_version": "15.0.0"
+        }
+      ],
+      "vulnerabilities": [
+        {
+          "id": "GHSA-8ch4-58qp-g3mp",
+          "title": "Observable Timing Discrepancy in aaugustin websockets library",
+          "aliases": ["CVE-2021-33880", "PYSEC-2021-95"],
+          "severities": [
+            {
+              "type": "CVSSV3",
+              "score": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:N/A:N",
+              "risk": "MEDIUM"
+            },
+            {
+              "score": "CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N"
+            }
+          ]
+        },
+        {
+          "id": "PYSEC-2021-95",
+          "aliases": ["CVE-2021-33880", "GHSA-8ch4-58qp-g3mp"]
+        }
+      ],
+      "licenses": [
+        {
+          "id": "non-standard"
+        }
+      ],
+      "projects": [
+        {
+          "name": "aaugustin/websockets",
+          "stars": 5324,
+          "url": "https://github.com/aaugustin/websockets"
+        }
+      ]
+    },
+    {
+      "package": {
+        "ecosystem": "PyPI",
+        "name": "starlette",
+        "version": "0.13.6"
+      },
+      "manifests": ["1cfebbdd71379ef6"],
+      "violations": [
+        {
+          "check_type": "CheckTypeVulnerability",
+          "filter": {
+            "name": "critical-or-high-vulns",
+            "value": "vulns.critical.exists(p, true) || vulns.high.exists(p, true)\n",
+            "check_type": "CheckTypeVulnerability",
+            "summary": "Critical or high risk vulnerabilities were found"
+          }
+        }
+      ],
+      "advices": [
+        {
+          "type": "UpgradePackage",
+          "target_alternate_package_version": "0.46.0"
+        },
+        {
+          "type": "UpgradePackage",
+          "target_package_name": "starlette",
+          "target_package_version": "0.46.0"
+        }
+      ],
+      "vulnerabilities": [
+        {
+          "id": "GHSA-74m5-2c7w-9w3x",
+          "title": "MultipartParser denial of service with too many fields or files",
+          "aliases": ["CVE-2023-30798", "PYSEC-2023-48"],
+          "severities": [
+            {
+              "type": "CVSSV3",
+              "score": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "risk": "HIGH"
+            },
+            {
+              "score": "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N"
+            }
+          ]
+        },
+        {
+          "id": "GHSA-f96h-pmfr-66vw",
+          "title": "Starlette Denial of service (DoS) via multipart/form-data",
+          "aliases": ["CVE-2024-47874"],
+          "severities": [
+            {
+              "type": "CVSSV3",
+              "score": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:N"
+            },
+            {
+              "score": "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N"
+            }
+          ]
+        },
+        {
+          "id": "GHSA-v5gw-mw7f-84px",
+          "title": "Starlette has Path Traversal vulnerability in StaticFiles",
+          "aliases": ["CVE-2023-29159", "PYSEC-2023-83"],
+          "severities": [
+            {
+              "type": "CVSSV3",
+              "score": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:L/I:N/A:N",
+              "risk": "LOW"
+            },
+            {
+              "score": "CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:L/VI:N/VA:N/SC:N/SI:N/SA:N"
+            }
+          ]
+        },
+        {
+          "id": "PYSEC-2023-48",
+          "aliases": ["CVE-2023-30798", "GHSA-74m5-2c7w-9w3x"]
+        },
+        {
+          "id": "PYSEC-2023-83",
+          "aliases": ["CVE-2023-29159", "GHSA-v5gw-mw7f-84px"]
+        }
+      ],
+      "licenses": [
+        {
+          "id": "non-standard"
+        }
+      ],
+      "projects": [
+        {
+          "name": "encode/starlette",
+          "stars": 10637,
+          "url": "https://github.com/encode/starlette"
+        }
+      ]
+    },
+    {
+      "package": {
+        "ecosystem": "PyPI",
+        "name": "fastapi",
+        "version": "0.61.2"
+      },
+      "manifests": ["1cfebbdd71379ef6"],
+      "violations": [
+        {
+          "check_type": "CheckTypeVulnerability",
+          "filter": {
+            "name": "critical-or-high-vulns",
+            "value": "vulns.critical.exists(p, true) || vulns.high.exists(p, true)\n",
+            "check_type": "CheckTypeVulnerability",
+            "summary": "Critical or high risk vulnerabilities were found"
+          }
+        }
+      ],
+      "advices": [
+        {
+          "type": "UpgradePackage",
+          "target_alternate_package_version": "0.115.8"
+        },
+        {
+          "type": "UpgradePackage",
+          "target_package_name": "fastapi",
+          "target_package_version": "0.115.8"
+        }
+      ],
+      "vulnerabilities": [
+        {
+          "id": "GHSA-8h2j-cgx8-6xv7",
+          "title": "Cross-Site Request Forgery (CSRF) in FastAPI",
+          "aliases": ["CVE-2021-32677", "PYSEC-2021-100"],
+          "severities": [
+            {
+              "type": "CVSSV3",
+              "score": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:H/A:N",
+              "risk": "HIGH"
+            },
+            {
+              "score": "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:L/VI:H/VA:N/SC:N/SI:N/SA:N"
+            }
+          ]
+        },
+        {
+          "id": "PYSEC-2021-100",
+          "aliases": ["CVE-2021-32677", "GHSA-8h2j-cgx8-6xv7"]
+        },
+        {
+          "id": "PYSEC-2024-38",
+          "aliases": [
+            "CVE-2024-24762",
+            "GHSA-2jv5-9r88-3w3p",
+            "GHSA-qf9m-vfgh-m389"
+          ],
+          "severities": [
+            {
+              "type": "CVSSV3",
+              "score": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "risk": "HIGH"
+            }
+          ]
+        }
+      ],
+      "projects": [
+        {
+          "name": "tiangolo/fastapi",
+          "stars": 81216,
+          "url": "https://github.com/tiangolo/fastapi"
+        }
+      ]
+    },
+    {
+      "package": {
+        "ecosystem": "PyPI",
+        "name": "pydantic",
+        "version": "1.10.21"
+      },
+      "manifests": ["1cfebbdd71379ef6"],
+      "licenses": [
+        {
+          "id": "MIT"
+        }
+      ],
+      "projects": [
+        {
+          "name": "pydantic/pydantic",
+          "stars": 22530,
+          "url": "https://github.com/pydantic/pydantic"
+        }
+      ]
+    },
+    {
+      "package": {
+        "ecosystem": "PyPI",
+        "name": "certifi",
+        "version": "2025.1.31"
+      },
+      "manifests": ["1cfebbdd71379ef6"],
+      "licenses": [
+        {
+          "id": "MPL-2.0"
+        }
+      ],
+      "projects": [
+        {
+          "name": "certifi/python-certifi",
+          "stars": 859,
+          "url": "https://github.com/certifi/python-certifi"
+        }
+      ]
+    },
+    {
+      "package": {
+        "ecosystem": "PyPI",
+        "name": "uvloop",
+        "version": "0.21.0"
+      },
+      "manifests": ["1cfebbdd71379ef6"],
+      "licenses": [
+        {
+          "id": "MIT"
+        }
+      ],
+      "projects": [
+        {
+          "name": "magicstack/uvloop",
+          "stars": 10678,
+          "url": "https://github.com/magicstack/uvloop"
+        }
+      ]
+    },
+    {
+      "package": {
+        "ecosystem": "PyPI",
+        "name": "uvicorn",
+        "version": "0.11.7"
+      },
+      "manifests": ["1cfebbdd71379ef6"],
+      "licenses": [
+        {
+          "id": "non-standard"
+        }
+      ],
+      "projects": [
+        {
+          "name": "encode/uvicorn",
+          "stars": 8897,
+          "url": "https://github.com/encode/uvicorn"
+        }
+      ]
+    },
+    {
+      "package": {
+        "ecosystem": "PyPI",
+        "name": "chardet",
+        "version": "3.0.4"
+      },
+      "manifests": ["1cfebbdd71379ef6"],
+      "licenses": [
+        {
+          "id": "non-standard"
+        }
+      ],
+      "projects": [
+        {
+          "name": "chardet/chardet",
+          "stars": 2227,
+          "url": "https://github.com/chardet/chardet"
+        }
+      ]
+    },
+    {
+      "package": {
+        "ecosystem": "PyPI",
+        "name": "httptools",
+        "version": "0.1.2"
+      },
+      "manifests": ["1cfebbdd71379ef6"],
+      "violations": [
+        {
+          "check_type": "CheckTypeMaintenance",
+          "filter": {
+            "name": "ossf-unmaintained",
+            "value": "scorecard.scores[\"Maintained\"] == 0\n",
+            "check_type": "CheckTypeMaintenance",
+            "summary": "Component appears to be unmaintained"
+          }
+        }
+      ],
+      "licenses": [
+        {
+          "id": "MIT"
+        }
+      ],
+      "projects": [
+        {
+          "name": "magicstack/httptools",
+          "stars": 1229,
+          "url": "https://github.com/magicstack/httptools"
+        }
+      ]
+    },
+    {
+      "package": {
+        "ecosystem": "PyPI",
+        "name": "urllib3",
+        "version": "1.23.0"
+      },
+      "manifests": ["1cfebbdd71379ef6"],
+      "violations": [
+        {
+          "check_type": "CheckTypeVulnerability",
+          "filter": {
+            "name": "critical-or-high-vulns",
+            "value": "vulns.critical.exists(p, true) || vulns.high.exists(p, true)\n",
+            "check_type": "CheckTypeVulnerability",
+            "summary": "Critical or high risk vulnerabilities were found"
+          }
+        }
+      ],
+      "advices": [
+        {
+          "type": "UpgradePackage",
+          "target_alternate_package_version": "2.3.0"
+        },
+        {
+          "type": "UpgradePackage",
+          "target_package_name": "urllib3",
+          "target_package_version": "2.3.0"
+        }
+      ],
+      "vulnerabilities": [
+        {
+          "id": "GHSA-34jh-p97f-mpxf",
+          "title": "urllib3's Proxy-Authorization request header isn't stripped during cross-origin redirects",
+          "aliases": ["CVE-2024-37891"],
+          "severities": [
+            {
+              "type": "CVSSV3",
+              "score": "CVSS:3.1/AV:N/AC:H/PR:H/UI:N/S:U/C:H/I:N/A:N",
+              "risk": "MEDIUM"
+            }
+          ]
+        },
+        {
+          "id": "GHSA-g4mx-q9vg-27p4",
+          "title": "urllib3's request body not stripped after redirect from 303 status changes request method to GET",
+          "aliases": ["CVE-2023-45803", "PYSEC-2023-212"],
+          "severities": [
+            {
+              "type": "CVSSV3",
+              "score": "CVSS:3.1/AV:A/AC:H/PR:H/UI:N/S:U/C:H/I:N/A:N",
+              "risk": "MEDIUM"
+            },
+            {
+              "score": "CVSS:4.0/AV:A/AC:L/AT:P/PR:H/UI:N/VC:H/VI:N/VA:N/SC:N/SI:N/SA:N"
+            }
+          ]
+        },
+        {
+          "id": "GHSA-gwvm-45gx-3cf8",
+          "title": "Authorization Header forwarded on redirect",
+          "aliases": ["CVE-2018-25091", "PYSEC-2023-207"],
+          "severities": [
+            {
+              "type": "CVSSV3",
+              "score": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:L/I:L/A:N",
+              "risk": "MEDIUM"
+            },
+            {
+              "score": "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:P/VC:N/VI:N/VA:N/SC:L/SI:L/SA:N"
+            }
+          ]
+        },
+        {
+          "id": "GHSA-mh33-7rrq-662w",
+          "title": "Improper Certificate Validation in urllib3",
+          "aliases": ["CVE-2019-11324", "PYSEC-2019-133"],
+          "severities": [
+            {
+              "type": "CVSSV3",
+              "score": "CVSS:3.0/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N",
+              "risk": "HIGH"
+            },
+            {
+              "score": "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:H/VA:N/SC:N/SI:N/SA:N"
+            }
+          ]
+        },
+        {
+          "id": "GHSA-r64q-w8jr-g9qp",
+          "title": "Improper Neutralization of CRLF Sequences in urllib3 library for Python",
+          "aliases": ["CVE-2019-11236", "PYSEC-2019-132"],
+          "severities": [
+            {
+              "type": "CVSSV3",
+              "score": "CVSS:3.0/AV:N/AC:L/PR:N/UI:R/S:C/C:L/I:L/A:N",
+              "risk": "MEDIUM"
+            },
+            {
+              "score": "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:P/VC:N/VI:N/VA:N/SC:L/SI:L/SA:N"
+            }
+          ]
+        },
+        {
+          "id": "GHSA-v845-jxx5-vc9f",
+          "title": "`Cookie` HTTP header isn't stripped on cross-origin redirects",
+          "aliases": ["CVE-2023-43804", "PYSEC-2023-192"],
+          "severities": [
+            {
+              "type": "CVSSV3",
+              "score": "CVSS:3.1/AV:N/AC:H/PR:H/UI:N/S:U/C:H/I:H/A:N",
+              "risk": "MEDIUM"
+            },
+            {
+              "score": "CVSS:4.0/AV:N/AC:L/AT:P/PR:H/UI:N/VC:H/VI:H/VA:N/SC:N/SI:N/SA:N"
+            }
+          ]
+        },
+        {
+          "id": "GHSA-wqvq-5m8c-6g24",
+          "title": "CRLF injection in urllib3",
+          "aliases": ["CVE-2020-26137", "PYSEC-2020-148"],
+          "severities": [
+            {
+              "type": "CVSSV3",
+              "score": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:N",
+              "risk": "MEDIUM"
+            },
+            {
+              "score": "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:L/VI:L/VA:N/SC:N/SI:N/SA:N"
+            }
+          ]
+        },
+        {
+          "id": "PYSEC-2019-132",
+          "aliases": ["CVE-2019-11236", "GHSA-r64q-w8jr-g9qp"]
+        },
+        {
+          "id": "PYSEC-2019-133",
+          "aliases": ["CVE-2019-11324", "GHSA-mh33-7rrq-662w"]
+        },
+        {
+          "id": "PYSEC-2020-148",
+          "aliases": ["CVE-2020-26137", "GHSA-wqvq-5m8c-6g24"]
+        },
+        {
+          "id": "PYSEC-2021-108",
+          "aliases": ["CVE-2021-33503", "GHSA-q2q7-5pp4-w6pg"]
+        },
+        {
+          "id": "PYSEC-2023-192",
+          "aliases": ["CVE-2023-43804", "GHSA-v845-jxx5-vc9f"],
+          "severities": [
+            {
+              "type": "CVSSV3",
+              "score": "CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:N",
+              "risk": "HIGH"
+            }
+          ]
+        },
+        {
+          "id": "PYSEC-2023-207",
+          "aliases": ["CVE-2018-25091", "GHSA-gwvm-45gx-3cf8"],
+          "severities": [
+            {
+              "type": "CVSSV3",
+              "score": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:L/I:L/A:N",
+              "risk": "MEDIUM"
+            }
+          ]
+        },
+        {
+          "id": "PYSEC-2023-212",
+          "aliases": ["CVE-2023-45803", "GHSA-g4mx-q9vg-27p4"],
+          "severities": [
+            {
+              "type": "CVSSV3",
+              "score": "CVSS:3.1/AV:A/AC:H/PR:H/UI:N/S:U/C:H/I:N/A:N",
+              "risk": "MEDIUM"
+            }
+          ]
+        }
+      ],
+      "licenses": [
+        {
+          "id": "MIT"
+        }
+      ]
+    }
+  ]
+}
