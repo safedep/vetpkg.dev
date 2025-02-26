@@ -8,11 +8,17 @@ export interface Violation {
   };
 }
 
+export interface VulnerabilitySeverity {
+  type: string;
+  score: string;
+  risk: string;
+}
+
 export interface Vulnerability {
-  severity: string;
-  description: string;
-  affected_versions?: string[];
-  fixed_versions?: string[];
+  id: string;
+  title: string;
+  severities: VulnerabilitySeverity[];
+  aliases: string[];
 }
 
 export interface License {
