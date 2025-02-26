@@ -37,12 +37,19 @@ export interface Package {
   version: string;
 }
 
+export interface Project {
+  name: string;
+  stars: number;
+  url: string;
+}
+
 export interface PackageData {
   package: Package;
   violations?: Violation[];
   vulnerabilities?: Vulnerability[];
   licenses?: License[];
   advices?: Advice[];
+  projects?: Project[];
 }
 
 export interface VetData {
