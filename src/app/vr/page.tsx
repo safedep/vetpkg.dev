@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { AlertCircle, Shield, Book, Star, Activity } from "lucide-react";
+import { AlertCircle, Shield, Book, Star } from "lucide-react";
 import { FileUpload } from "./FileUpload";
 import { VetData } from "./types";
 import sampleData from "./sample.json";
@@ -10,9 +10,8 @@ import { ViolationsTab } from "./components/tabs/ViolationsTab";
 import { VulnerabilitiesTab } from "./components/tabs/VulnerabilitiesTab";
 import { LicensesTab } from "./components/tabs/LicensesTab";
 import { PopularityTab } from "./components/tabs/PopularityTab";
-import { AdviceTab } from "./components/tabs/AdviceTab";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 
 export default function Page() {
   const [data, setData] = useState<VetData | null>(null);
@@ -68,7 +67,7 @@ export default function Page() {
         <>
           <div className="flex flex-col items-center p-4 rounded-lg shadow-md">
             <Tabs defaultValue="violations" className="w-full">
-              <TabsList className="grid w-full grid-cols-5 gap-2">
+              <TabsList className="grid w-full grid-cols-4 gap-2">
                 <TabsTrigger
                   value="violations"
                   className="flex items-center justify-center p-2 bg-indigo-100 hover:bg-indigo-200 rounded-md"
@@ -105,15 +104,6 @@ export default function Page() {
                     ⭐ Popularity
                   </span>
                 </TabsTrigger>
-                <TabsTrigger
-                  value="other"
-                  className="flex items-center justify-center p-2 bg-indigo-100 hover:bg-indigo-200 rounded-md"
-                >
-                  <Activity className="w-4 h-4 mr-2 text-indigo-500" />
-                  <span className="font-semibold text-indigo-600">
-                    ℹ️ Other Info
-                  </span>
-                </TabsTrigger>
               </TabsList>
 
               <TabsContent value="violations">
@@ -130,10 +120,6 @@ export default function Page() {
 
               <TabsContent value="popularity">
                 <PopularityTab data={data?.packages || []} />
-              </TabsContent>
-
-              <TabsContent value="other">
-                <AdviceTab data={data?.packages || []} />
               </TabsContent>
             </Tabs>
           </div>
