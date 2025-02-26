@@ -3,33 +3,30 @@ import { ColumnDef } from "@tanstack/react-table";
 import { PackageData } from "../../types";
 import { DataTable } from "../DataTable";
 
-const licenseColumns: ColumnDef<PackageData>[] = [
+interface License {
+  id: string;
+  packageName: string;
+  packageVersion: string;
+}
+
+const licenseColumns: ColumnDef<License>[] = [
   {
-    accessorKey: "package.name",
+    accessorKey: "packageName",
     header: "Package Name",
     enableSorting: true,
     enableColumnFilter: true,
   },
   {
-    accessorKey: "package.version",
+    accessorKey: "packageVersion",
     header: "Version",
     enableSorting: true,
     enableColumnFilter: true,
   },
   {
-    accessorKey: "licenses",
-    header: "Licenses",
-    enableSorting: false,
-    enableColumnFilter: false,
-    cell: ({ row }) => {
-      const licenses = row.original.licenses || [];
-      return licenses.map((l, i) => (
-        <div key={i} className="mb-2">
-          <p className="font-medium">{l.name}</p>
-          <p className="text-sm text-muted-foreground">{l.description}</p>
-        </div>
-      ));
-    },
+    accessorKey: "id",
+    header: "License Code",
+    enableSorting: true,
+    enableColumnFilter: true,
   },
 ];
 
@@ -38,10 +35,19 @@ interface LicensesTabProps {
 }
 
 export function LicensesTab({ data }: LicensesTabProps) {
+  const licenses = data.flatMap(
+    (pkg) =>
+      pkg.licenses?.map((l) => ({
+        packageName: pkg.package.name,
+        packageVersion: pkg.package.version,
+        id: l.id,
+      })) ?? [],
+  );
+
   return (
     <Card>
       <CardContent className="pt-6">
-        <DataTable columns={licenseColumns} data={data} />
+        <DataTable columns={licenseColumns} data={licenses} />
       </CardContent>
     </Card>
   );

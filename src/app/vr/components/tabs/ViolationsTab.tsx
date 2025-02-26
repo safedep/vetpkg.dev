@@ -3,33 +3,45 @@ import { ColumnDef } from "@tanstack/react-table";
 import { PackageData } from "../../types";
 import { DataTable } from "../DataTable";
 
-const violationColumns: ColumnDef<PackageData>[] = [
+interface Violation {
+  packageName: string;
+  packageVersion: string;
+  checkType: string;
+  name: string;
+  summary: string;
+  value: string;
+}
+
+const violationColumns: ColumnDef<Violation>[] = [
   {
-    accessorKey: "package.name",
+    accessorKey: "packageName",
     header: "Package Name",
     enableSorting: true,
     enableColumnFilter: true,
   },
   {
-    accessorKey: "package.version",
+    accessorKey: "packageVersion",
     header: "Version",
     enableSorting: true,
     enableColumnFilter: true,
   },
   {
-    accessorKey: "violations",
-    header: "Policy Violations",
-    enableSorting: false,
+    accessorKey: "checkType",
+    header: "Check Type",
+    enableSorting: true,
+    enableColumnFilter: true,
+  },
+  {
+    accessorKey: "name",
+    header: "Name",
+    enableSorting: true,
     enableColumnFilter: false,
-    cell: ({ row }) => {
-      const violations = row.original.violations || [];
-      return violations.map((v, i) => (
-        <div key={i} className="mb-2">
-          <p className="font-medium">{v.check_type}</p>
-          <p className="text-sm text-muted-foreground">{v.filter.summary}</p>
-        </div>
-      ));
-    },
+  },
+  {
+    accessorKey: "summary",
+    header: "Summary",
+    enableSorting: true,
+    enableColumnFilter: false,
   },
 ];
 
@@ -38,10 +50,22 @@ interface ViolationsTabProps {
 }
 
 export function ViolationsTab({ data }: ViolationsTabProps) {
+  const violations = data.flatMap(
+    (pkg) =>
+      pkg.violations?.map((v) => ({
+        packageName: pkg.package.name,
+        packageVersion: pkg.package.version,
+        checkType: v.check_type,
+        name: v.filter.name,
+        summary: v.filter.summary,
+        value: v.filter.value,
+      })) ?? [],
+  );
+
   return (
     <Card>
       <CardContent className="pt-6">
-        <DataTable columns={violationColumns} data={data} />
+        <DataTable columns={violationColumns} data={violations} />
       </CardContent>
     </Card>
   );

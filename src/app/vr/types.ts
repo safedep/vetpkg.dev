@@ -22,9 +22,7 @@ export interface Vulnerability {
 }
 
 export interface License {
-  name: string;
-  description: string;
-  type?: string;
+  id: string;
 }
 
 export interface Advice {
