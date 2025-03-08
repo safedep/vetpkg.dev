@@ -8,6 +8,7 @@ import { z } from "zod";
 import Image from "next/image";
 import vetActionDemo from "./vet-actions-demo.png";
 import { useState } from "react";
+import { initiateGithubAuth } from "./auth";
 
 const githubRepoFormSchema = z.object({
   repoUrl: z
@@ -20,9 +21,8 @@ const githubRepoFormSchema = z.object({
 });
 
 export default function GitHubActionsIntegration() {
-  // Router declared but commented out until needed for actual implementation
-  // const router = useRouter();
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
+  const [isAuthenticating, setIsAuthenticating] = useState(false);
 
   const githubRepoForm = useForm<z.infer<typeof githubRepoFormSchema>>({
     resolver: zodResolver(githubRepoFormSchema),
@@ -34,13 +34,23 @@ export default function GitHubActionsIntegration() {
   const onSubmitGitHubRepoForm = (
     data: z.infer<typeof githubRepoFormSchema>,
   ) => {
-    // This would connect to the backend to create a PR
-    console.log("Submitting repository URL:", data.repoUrl);
-    // Placeholder for actual implementation
-    alert(
-      "GitHub authentication required. Redirecting to authentication page...",
-    );
-    // Future implementation: router.push("/gha/auth") or API call
+    setIsAuthenticating(true);
+
+    try {
+      // Initiate GitHub OAuth flow
+      initiateGithubAuth(data.repoUrl);
+
+      // Note: The page will redirect to GitHub, so the code below may not execute
+      console.log("Redirecting to GitHub for authentication...");
+    } catch (error) {
+      console.error("Error initiating GitHub authentication:", error);
+      setIsAuthenticating(false);
+
+      // Show an error alert
+      alert(
+        "Failed to initiate GitHub authentication. Please try again later.",
+      );
+    }
   };
 
   return (
@@ -126,6 +136,7 @@ export default function GitHubActionsIntegration() {
                         type="text"
                         placeholder="https://github.com/username/repository"
                         className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent font-mono text-sm transition-all"
+                        disabled={isAuthenticating}
                       />
                       <FormMessage />
                     </FormItem>
@@ -145,9 +156,38 @@ export default function GitHubActionsIntegration() {
 
                 <button
                   type="submit"
-                  className="w-full px-4 py-3 text-white bg-indigo-600 hover:bg-indigo-700 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors font-semibold"
+                  className={`w-full px-4 py-3 text-white bg-indigo-600 hover:bg-indigo-700 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors font-semibold ${
+                    isAuthenticating ? "opacity-70 cursor-not-allowed" : ""
+                  }`}
+                  disabled={isAuthenticating}
                 >
-                  Create Pull Request 🚀
+                  {isAuthenticating ? (
+                    <span className="flex items-center justify-center">
+                      <svg
+                        className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        ></circle>
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        ></path>
+                      </svg>
+                      Authenticating...
+                    </span>
+                  ) : (
+                    "Create Pull Request 🚀"
+                  )}
                 </button>
               </form>
             </Form>
