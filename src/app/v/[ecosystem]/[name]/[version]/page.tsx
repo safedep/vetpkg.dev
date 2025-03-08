@@ -94,6 +94,8 @@ function getEcosystemIcon(ecosystem: string) {
       return "☕";
     case "pypi":
       return "🐍";
+    case "packagist":
+      return "🐘";
     default:
       return "📦";
   }

@@ -20,6 +20,8 @@ export function parseEcosystem(ecosystem: string): Ecosystem {
       return Ecosystem.MAVEN;
     case "pypi":
       return Ecosystem.PYPI;
+    case "packagist":
+      return Ecosystem.PACKAGIST;
     default:
       throw new Error(`Unsupported ecosystem: ${ecosystem}`);
   }

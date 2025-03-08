@@ -18,6 +18,16 @@ const purlInputFormSchema = z.object({
   purl: z.string().min(5),
 });
 
+const PACKAGE_ECOSYSTEM_OPTIONS = [
+  { value: "", label: "Select an ecosystem" },
+  { value: "npm", label: "npm 📦" },
+  { value: "pypi", label: "PyPI 🐍" },
+  { value: "maven", label: "Maven ☕️" },
+  { value: "rubygem", label: "RubyGems 💎" },
+  { value: "Go", label: "Go 🐹" },
+  { value: "packagist", label: "PHP Composer 🐘" },
+];
+
 export default function Home() {
   const [usePurlBasedQuery, setUsePurlBasedQuery] = useState<boolean>(false);
   const router = useRouter();
@@ -147,12 +157,11 @@ export default function Home() {
                         {...field}
                         className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
                       >
-                        <option value="">Select an ecosystem</option>
-                        <option value="npm">npm 📦</option>
-                        <option value="pypi">PyPI 🐍</option>
-                        <option value="maven">Maven ☕️</option>
-                        <option value="rubygem">RubyGems 💎</option>
-                        <option value="Go">Go 🐹</option>
+                        {PACKAGE_ECOSYSTEM_OPTIONS.map((option) => (
+                          <option key={option.value} value={option.value}>
+                            {option.label}
+                          </option>
+                        ))}
                       </select>
                       <FormMessage />
                     </FormItem>
