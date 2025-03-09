@@ -1,4 +1,5 @@
 import { Octokit } from "octokit";
+import { createVetPR } from "./actions";
 
 /**
  * Raises a pull request to integrate vet into the user's repository
@@ -10,27 +11,23 @@ export async function raiseVetIntegrationPullRequest(
   repoUrl: string,
   userToken: string,
 ): Promise<{ success: boolean; message: string; prUrl?: string }> {
-  // This is a placeholder function as specified in the requirements
-  // Actual implementation will use the GitHub API to create a PR
-
   try {
+    const client = new Octokit({ auth: userToken });
+    const user = await client.rest.users.getAuthenticated();
+
     const { owner, repo } = await parseRepoUrl(repoUrl);
+    // This function is called from the callback page, which has already verified
+    // that the user is a contributor to the repository.
+    const { success, message, prUrl } = await createVetPR({
+      owner,
+      repo,
+      user: user.data.login,
+    });
 
-    console.log(`Creating PR for ${owner}/${repo} using user token`);
-
-    // TODO: Implement actual PR creation logic using GitHub API
-    // 1. Check if the user is a contributor to the repository
-    // 2. Fork the repository if needed
-    // 3. Create a new branch
-    // 4. Add vet GitHub Action workflow file
-    // 5. Commit changes
-    // 6. Create pull request
-
-    // Simulate successful PR creation
     return {
-      success: true,
-      message: "Pull request created successfully",
-      prUrl: `https://github.com/${owner}/${repo}/pull/1`,
+      success,
+      message,
+      prUrl,
     };
   } catch (error) {
     console.error("Error creating pull request:", error);
