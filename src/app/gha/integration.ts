@@ -1,4 +1,4 @@
-// integration.ts - GitHub Actions Integration functions
+import { Octokit } from "octokit";
 
 /**
  * Raises a pull request to integrate vet into the user's repository
@@ -14,12 +14,7 @@ export async function raiseVetIntegrationPullRequest(
   // Actual implementation will use the GitHub API to create a PR
 
   try {
-    // Extract owner and repo from the URL
-    const urlParts = repoUrl
-      .replace(/^https?:\/\/github\.com\//, "")
-      .split("/");
-    const owner = urlParts[0];
-    const repo = urlParts[1];
+    const { owner, repo } = await parseRepoUrl(repoUrl);
 
     console.log(`Creating PR for ${owner}/${repo} using user token`);
 
@@ -57,11 +52,31 @@ export async function isUserContributor(
   repoUrl: string,
   userToken: string,
 ): Promise<boolean> {
-  // TODO: Implement check using GitHub API
-  // This will be implemented to verify the user has access to the repository
+  const client = new Octokit({ auth: userToken });
+  const { owner, repo } = await parseRepoUrl(repoUrl);
+
+  console.log(`Getting user info using token`);
+  const user = await client.rest.users.getAuthenticated();
+  console.log(`User: ${user.data.login}`);
 
   console.log(`Checking if user is contributor to ${repoUrl}`);
+  const response = await client.rest.repos.listContributors({
+    owner: owner,
+    repo: repo,
+    per_page: 100,
+  });
 
-  // Placeholder implementation
-  return true;
+  const isContributor = response.data.some(
+    (contributor) => contributor.login === user.data.login,
+  );
+
+  console.log(`Is contributor: ${isContributor}`);
+  return isContributor;
+}
+
+async function parseRepoUrl(
+  repoUrl: string,
+): Promise<{ owner: string; repo: string }> {
+  const urlParts = repoUrl.replace(/^https?:\/\/github\.com\//, "").split("/");
+  return { owner: urlParts[0], repo: urlParts[1] };
 }
