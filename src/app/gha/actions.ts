@@ -198,12 +198,31 @@ export async function createVetPR({
     owner: owner,
     repo: repo,
     title: "Add vet GitHub Action workflow",
-    body: `This PR adds a GitHub Action workflow to [vet](https://github.com/safedep/vet) the repository.
-    This PR is raised on behalf of \`${user}\` using \`https://vetpkg.dev/gha\`.    
+    body: `
+# 🚀 Protect Against Risky Open Source Components
+
+> Integrates [vet](https://github.com/safedep/vet) to automate vetting of OSS packages for security vulnerabilities, malicious code and other risks.
+> This PR is raised on behalf of [${user}](https://github.com/${user}) using [https://vetpkg.dev/gha](https://vetpkg.dev/gha).
+    
+## Why?
+
+This PR integrates [vet](https://github.com/safedep/vet) to automate vetting of OSS packages for security vulnerabilities, malware and other risks. 
+The policy is configured to be minimal, checking only for common OSS risks. The policy can be fine tuned / improved based on as required.
+
+## Example
+
+<img width="588" alt="example" src="https://github.com/user-attachments/assets/06f83184-2c27-45c5-8893-9fb79cee9cfa">
+
+## Learn more
+
+- [vet](https://github.com/safedep/vet)
+- [vet-action](https://github.com/safedep/vet-action)
+- [Malicious OSS Package Scanning](https://docs.safedep.io/cloud/malware-analysis)
     `,
     head: prBranchName,
     head_repo: fork.data.full_name,
     base: defaultBranch,
+    maintainer_can_modify: true,
   });
 
   return {

@@ -149,8 +149,8 @@ export default function GitHubActionsIntegration() {
                   </p>
                   <p>
                     You&apos;ll need to authenticate with GitHub to verify your
-                    access to the repository. This allows us to create a pull
-                    request on your behalf.
+                    access to the repository. We ensure only a repository
+                    contributor can initiate the integration to avoid spam.
                   </p>
                 </div>
 
@@ -196,14 +196,16 @@ export default function GitHubActionsIntegration() {
                 After integration, you will get:
               </h3>
               <ul className="list-disc pl-5 space-y-2 text-gray-700">
-                <li>Automated dependency scanning in your workflow</li>
-                <li>Security vulnerability detection and alerts</li>
-                <li>Supply chain risk assessment</li>
-                <li>Actionable recommendations for dependency issues</li>
+                <li>Automated OSS component scanning in your workflow</li>
+                <li>Custom policy to check for common OSS risks</li>
+                <li>Protect against malicious code and other risks</li>
+                <li>Security guardrails to catch issues early</li>
               </ul>
               <p className="text-sm text-gray-600 italic mt-3">
-                All results are integrated directly in your GitHub workflow,
-                with no additional tools required.
+                All results are integrated directly in your GitHub workflow.
+                <br />
+                Like what you see?{" "}
+                <a href="https://github.com/safedep/vet">⭐️ us on GitHub!</a>
               </p>
             </div>
           </div>
@@ -235,8 +237,11 @@ export default function GitHubActionsIntegration() {
             <div className="space-y-3 mt-4">
               <h3 className="font-semibold">
                 <a href="https://github.com/safedep/vet-action">vet-action</a>{" "}
-                integrates <span className="text-indigo-500">vet</span> into
-                your GitHub workflow
+                integrates{" "}
+                <span className="text-indigo-500">
+                  <a href="https://github.com/safedep/vet">vet</a>
+                </span>{" "}
+                into your GitHub workflow
               </h3>
               <ul className="list-disc pl-5 space-y-2 text-gray-700">
                 <li>Scan only changes files in the pull request</li>
