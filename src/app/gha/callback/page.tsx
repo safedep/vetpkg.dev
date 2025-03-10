@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { validateOAuthState, exchangeCodeForToken } from "../auth";
 import {
@@ -8,7 +8,7 @@ import {
   raiseVetIntegrationPullRequest,
 } from "../integration";
 
-export default function GitHubOAuthCallback() {
+function CallbackContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [status, setStatus] = useState<string>("Authenticating with GitHub...");
@@ -149,5 +149,26 @@ export default function GitHubOAuthCallback() {
         <p className="text-center text-gray-700 text-lg">{status}</p>
       </div>
     </div>
+  );
+}
+
+function CallbackLoading() {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="p-8 bg-white rounded-lg shadow-md max-w-md w-full">
+        <div className="flex justify-center mb-4">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+        </div>
+        <p className="text-center text-gray-700 text-lg">Loading...</p>
+      </div>
+    </div>
+  );
+}
+
+export default function GitHubOAuthCallback() {
+  return (
+    <Suspense fallback={<CallbackLoading />}>
+      <CallbackContent />
+    </Suspense>
   );
 }
