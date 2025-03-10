@@ -75,5 +75,9 @@ async function parseRepoUrl(
   repoUrl: string,
 ): Promise<{ owner: string; repo: string }> {
   const urlParts = repoUrl.replace(/^https?:\/\/github\.com\//, "").split("/");
+  if (urlParts.length < 2) {
+    throw new Error("Invalid repository URL");
+  }
+
   return { owner: urlParts[0], repo: urlParts[1] };
 }

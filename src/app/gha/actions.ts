@@ -123,6 +123,7 @@ export async function createVetPR({
 
   // Fork the repository
   let fork;
+  let forkReady = false;
   try {
     console.log(`Creating fork ${owner}/${repo}-vet-integration`);
     fork = await client.rest.repos.createFork({
@@ -141,10 +142,38 @@ export async function createVetPR({
       owner: botUser.data.login,
       repo: `${owner}-${repo}-vet-integration`,
     });
+
+    forkReady = true;
   }
 
   // Wait for the fork to be created
-  await new Promise((resolve) => setTimeout(resolve, 5000));
+  if (!forkReady) {
+    const maxRetries = 10;
+    const retryDelay = (ms: number) =>
+      new Promise((resolve) => setTimeout(resolve, ms));
+
+    for (let i = 0; i < maxRetries; i++) {
+      try {
+        fork = await client.rest.repos.get({
+          owner: botUser.data.login,
+          repo: `${owner}-${repo}-vet-integration`,
+        });
+
+        forkReady = true;
+        break;
+      } catch (error) {
+        console.log(`Failed to get repository info: ${error}`);
+        console.log(`Fork not ready yet, retrying... (${i + 1}/${maxRetries})`);
+        console.log(`Waiting for 2 seconds before retrying...`);
+
+        await retryDelay(2000);
+      }
+    }
+
+    if (!forkReady) {
+      throw new Error("Fork was not created within the expected time frame.");
+    }
+  }
 
   const defaultBranch = fork.data.default_branch;
   const prBranchName = `vet-integration-${randomUUID()}`;
