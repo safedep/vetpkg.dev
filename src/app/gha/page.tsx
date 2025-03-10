@@ -258,7 +258,6 @@ export default function GitHubActionsIntegration() {
           </div>
         </div>
       </div>
-
       <Footer />
     </div>
   );

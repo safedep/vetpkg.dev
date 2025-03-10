@@ -81,6 +81,7 @@ import {
   PackageSafetyStatus,
 } from "./types";
 import ReactMarkdown from "react-markdown";
+import Footer from "@/components/app/footer";
 
 function getEcosystemIcon(ecosystem: string) {
   switch (ecosystem.toLowerCase()) {
@@ -1348,6 +1349,7 @@ export default function Page() {
             </Card>
           </TabsContent>
         </Tabs>
+        <Footer />
       </div>
       <Dialog open={showDiffViewer} onOpenChange={setShowDiffViewer}>
         <DialogTrigger></DialogTrigger>

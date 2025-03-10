@@ -12,6 +12,7 @@ import { LicensesTab } from "./components/tabs/LicensesTab";
 import { PopularityTab } from "./components/tabs/PopularityTab";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import Footer from "@/components/app/footer";
 
 export default function Page() {
   const [data, setData] = useState<VetData | null>(null);
@@ -67,6 +68,7 @@ export default function Page() {
               </CardContent>
             </Card>
           </div>
+          <Footer />
         </div>
       ) : (
         <>
@@ -138,6 +140,7 @@ export default function Page() {
               </TabsContent>
             </Tabs>
           </div>
+          <Footer />
         </>
       )}
     </div>

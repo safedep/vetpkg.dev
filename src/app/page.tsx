@@ -7,6 +7,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { PackageURL } from "packageurl-js";
+import Footer from "@/components/app/footer";
 
 const verboseInputFormSchema = z.object({
   ecosystem: z.string().min(1),
@@ -225,40 +226,7 @@ export default function Home() {
           )}
         </div>
       </div>
-
-      <div className="flex flex-col items-center justify-around max-w-4xl mt-8 sm:w-full">
-        <div className="flex items-center justify-center">
-          <p className="text-sm text-gray-500 text-center font-mono">
-            Built with <span className="text-red-500">♥</span> by{" "}
-            <a
-              href="https://safedep.io"
-              className="text-indigo-600 hover:text-indigo-800 font-medium"
-              target="_blank"
-            >
-              SafeDep Team
-            </a>{" "}
-            using{" "}
-            <a
-              href="https://docs.safedep.io/cloud"
-              className="text-indigo-600 hover:text-indigo-800 font-medium"
-              target="_blank"
-            >
-              SafeDep Cloud API
-            </a>{" "}
-          </p>
-        </div>
-        <div className="flex items-center justify-center">
-          <p className="text-sm text-gray-500 text-center font-mono">
-            ⚡️{" "}
-            <a
-              href="/about"
-              className="text-indigo-600 hover:text-indigo-800 font-medium"
-            >
-              About
-            </a>
-          </p>
-        </div>
-      </div>
+      <Footer />
     </div>
   );
 }

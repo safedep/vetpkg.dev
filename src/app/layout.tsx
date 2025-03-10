@@ -5,6 +5,7 @@ import "./globals.css";
 import { Theme } from "@radix-ui/themes";
 import { Toaster } from "@/components/ui/toaster";
 import Script from "next/script";
+import Footer from "@/components/app/footer";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
