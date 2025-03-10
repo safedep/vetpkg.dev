@@ -5,7 +5,7 @@ import "./globals.css";
 import { Theme } from "@radix-ui/themes";
 import { Toaster } from "@/components/ui/toaster";
 import Script from "next/script";
-import Footer from "@/components/app/footer";
+import Header from "@/components/app/header";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -54,6 +54,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col min-h-screen`}
       >
         <Theme>
+          <Header />
           <main className="flex-grow">{children}</main>
           <Toaster />
         </Theme>
