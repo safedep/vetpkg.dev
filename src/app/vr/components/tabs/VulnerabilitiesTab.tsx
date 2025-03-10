@@ -50,7 +50,7 @@ const vulnerabilityColumns: ColumnDef<VulnerabilityEntry>[] = [
     enableSorting: true,
     enableColumnFilter: false,
     cell: ({ row }) => {
-      return row.original.aliases.length > 0 ? (
+      return row.original.aliases?.length > 0 ? (
         <div className="flex flex-wrap gap-2">
           {row.original.aliases.map((alias) => (
             <Badge key={alias} variant="outline">
