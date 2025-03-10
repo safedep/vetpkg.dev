@@ -37,7 +37,7 @@ const popularityColumns: ColumnDef<ProjectInfo>[] = [
     enableSorting: true,
     enableColumnFilter: false,
     cell: ({ row }) => {
-      const stars = row.original.stars;
+      const stars = row.original.stars ?? 0;
       let badgeColor = "bg-gray-200"; // default color
 
       if (stars > 500) {
@@ -48,6 +48,8 @@ const popularityColumns: ColumnDef<ProjectInfo>[] = [
         badgeColor = "bg-yellow-200";
       } else if (stars >= 10) {
         badgeColor = "bg-orange-200";
+      } else {
+        badgeColor = "bg-red-200";
       }
 
       return <Badge className={`${badgeColor} text-black`}>{stars}</Badge>;

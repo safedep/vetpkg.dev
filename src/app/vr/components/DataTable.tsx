@@ -16,6 +16,7 @@ import {
   getPaginationRowModel,
   getFilteredRowModel,
   getSortedRowModel,
+  SortingState,
 } from "@tanstack/react-table";
 import { Input } from "@/components/ui/input";
 import {
@@ -27,6 +28,8 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { TABLE_CONFIG } from "../config";
+import { useState } from "react";
+import { ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -37,6 +40,8 @@ export function DataTable<TData, TValue>({
   columns,
   data,
 }: DataTableProps<TData, TValue>) {
+  const [sorting, setSorting] = useState<SortingState>([]);
+
   const table = useReactTable({
     data,
     columns,
@@ -44,6 +49,10 @@ export function DataTable<TData, TValue>({
     getPaginationRowModel: getPaginationRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getSortedRowModel: getSortedRowModel(),
+    onSortingChange: setSorting,
+    state: {
+      sorting,
+    },
     initialState: {
       pagination: {
         pageSize: TABLE_CONFIG.defaultPageSize,
@@ -73,16 +82,43 @@ export function DataTable<TData, TValue>({
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id}>
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext(),
+                {headerGroup.headers.map((header) => {
+                  // Check if the column is sortable
+                  const isSortable = header.column.getCanSort();
+
+                  return (
+                    <TableHead
+                      key={header.id}
+                      className={isSortable ? "cursor-pointer select-none" : ""}
+                      onClick={
+                        isSortable
+                          ? header.column.getToggleSortingHandler()
+                          : undefined
+                      }
+                    >
+                      <div className="flex items-center gap-2">
+                        {header.isPlaceholder
+                          ? null
+                          : flexRender(
+                              header.column.columnDef.header,
+                              header.getContext(),
+                            )}
+
+                        {isSortable && (
+                          <div className="flex items-center">
+                            {header.column.getIsSorted() === "asc" ? (
+                              <ArrowUp className="ml-1 h-4 w-4" />
+                            ) : header.column.getIsSorted() === "desc" ? (
+                              <ArrowDown className="ml-1 h-4 w-4" />
+                            ) : (
+                              <ArrowUpDown className="ml-1 h-4 w-4 opacity-50" />
+                            )}
+                          </div>
                         )}
-                  </TableHead>
-                ))}
+                      </div>
+                    </TableHead>
+                  );
+                })}
               </TableRow>
             ))}
           </TableHeader>
