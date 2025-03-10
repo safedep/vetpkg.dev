@@ -1,5 +1,6 @@
 "use server";
 
+import { randomUUID } from "node:crypto";
 import { Octokit } from "octokit";
 
 const vetWorkflowTemplate = Buffer.from(`
@@ -47,11 +48,12 @@ jobs:
 const vetPolicyTemplate = Buffer.from(`
 # https://github.com/safedep/vet-action
 # https://github.com/safedep/vet
+# Learn more about policies: https://docs.safedep.io/advanced/filtering
 name: vet Open Source Components
 description: General purpose OSS best practices policy for vet
 tags:
   - general
-  - safedep-managed
+  - community
 filters:
   - name: critical-or-high-vulns
     check_type: CheckTypeVulnerability
@@ -80,6 +82,9 @@ filters:
 
 const SAFEDEP_GITHUB_BOT_TOKEN = process.env.SAFEDEP_GITHUB_BOT_TOKEN;
 
+const vetWorkflowPath = ".github/workflows/vet-ci.yml";
+const vetPolicyPath = ".github/vet/policy.yml";
+
 export async function createVetPR({
   owner,
   repo,
@@ -94,30 +99,70 @@ export async function createVetPR({
   }
 
   const client = new Octokit({ auth: SAFEDEP_GITHUB_BOT_TOKEN });
+  const botUser = await client.rest.users.getAuthenticated();
+
+  console.log(`Bot user: ${botUser.data.login}`);
+
+  // Check if the repository already has a vet-ci.yml file
+  try {
+    await client.rest.repos.getContent({
+      owner: owner,
+      repo: repo,
+      path: vetWorkflowPath,
+    });
+
+    console.log(`${vetWorkflowPath} already exists`);
+    return {
+      success: true,
+      message:
+        "Looks like the repository already has vet integration using `.github/workflows/vet-ci.yml`",
+    };
+  } catch (error) {
+    console.log(`${vetWorkflowPath} does not exist, error: ${error}`);
+  }
 
   // Fork the repository
-  const fork = await client.rest.repos.createFork({
-    owner: owner,
-    repo: repo,
-    name: `${repo}-vet-integration-${Date.now()}`,
-    default_branch_only: true,
-  });
+  let fork;
+  try {
+    console.log(`Creating fork ${owner}/${repo}-vet-integration`);
+    fork = await client.rest.repos.createFork({
+      owner: owner,
+      repo: repo,
+      name: `${owner}-${repo}-vet-integration`,
+      default_branch_only: true,
+    });
+  } catch (error) {
+    console.log(`Error creating fork: ${error}`);
+    console.log(`Attempting to get existing fork`);
+
+    // We may already have a forked repo, so we don't need to create a new one
+    // and we can use the existing one.
+    fork = await client.rest.repos.get({
+      owner: botUser.data.login,
+      repo: `${owner}-${repo}-vet-integration`,
+    });
+  }
 
   // Wait for the fork to be created
   await new Promise((resolve) => setTimeout(resolve, 5000));
 
   const defaultBranch = fork.data.default_branch;
-  const prBranchName = `vet-integration`;
+  const prBranchName = `vet-integration-${randomUUID()}`;
 
   // Get the default branch head commit
+  console.log(`Getting default branch head commit for ${fork.data.full_name}`);
   const defaultBranchHeadCommit = await client.rest.git.getRef({
     owner: fork.data.owner.login,
     repo: fork.data.name,
     ref: `heads/${defaultBranch}`,
   });
 
+  console.log(
+    `Default branch head commit: ${defaultBranchHeadCommit.data.object.sha}`,
+  );
+
   // Create a new branch
-  console.log(`Creating branch`);
+  console.log(`Creating branch ${prBranchName} for ${fork.data.full_name}`);
   const branch = await client.rest.git.createRef({
     owner: fork.data.owner.login,
     repo: fork.data.name,
@@ -126,28 +171,29 @@ export async function createVetPR({
   });
 
   // Add vet GitHub Action workflow file
-  console.log(`Adding vet GitHub Action workflow file`);
+  console.log(`Adding vet GitHub Action workflow file to ${prBranchName}`);
   await client.rest.repos.createOrUpdateFileContents({
     owner: fork.data.owner.login,
     repo: fork.data.name,
-    path: ".github/workflows/vet-ci.yml",
+    path: vetWorkflowPath,
     message: "Add vet GitHub Action workflow",
     content: vetWorkflowTemplate.toString("base64"),
     branch: branch.data.ref,
   });
 
   // Add vet policy file
-  console.log(`Adding vet policy file`);
+  console.log(`Adding vet policy file to ${prBranchName}`);
   await client.rest.repos.createOrUpdateFileContents({
     owner: fork.data.owner.login,
     repo: fork.data.name,
-    path: ".github/vet/policy.yml",
+    path: vetPolicyPath,
     message: "Add vet policy",
     content: vetPolicyTemplate.toString("base64"),
     branch: branch.data.ref,
   });
 
   // Create pull request
+  console.log(`Creating pull request from ${prBranchName} to ${defaultBranch}`);
   const pr = await client.rest.pulls.create({
     owner: owner,
     repo: repo,
