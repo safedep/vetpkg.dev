@@ -44,8 +44,11 @@ export default function Page() {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                🛠️ <span className="text-indigo-500">vet</span> JSON Report
-                Viewer
+                🛠️{" "}
+                <span className="text-indigo-500 dark:text-indigo-400">
+                  vet
+                </span>{" "}
+                JSON Report Viewer
               </a>
             </h2>
           </div>
@@ -54,11 +57,11 @@ export default function Page() {
               <CardContent className="pt-6">
                 <div className="space-y-6">
                   <FileUpload onDataUpdate={handleDataUpdate} />
-                  <div className="text-center text-sm text-gray-400">
+                  <div className="text-center text-sm text-gray-400 dark:text-gray-500">
                     <span>or </span>
                     <Button
                       variant="link"
-                      className="p-0 h-auto font-normal text-indigo-500 hover:text-indigo-600"
+                      className="p-0 h-auto font-normal text-indigo-500 hover:text-indigo-600 dark:text-indigo-400 dark:hover:text-indigo-300"
                       onClick={handleShowExample}
                     >
                       📊 view example analysis
@@ -72,12 +75,12 @@ export default function Page() {
         </div>
       ) : (
         <>
-          <div className="flex flex-col items-center p-4 rounded-lg shadow-md">
+          <div className="flex flex-col items-center p-4 rounded-lg shadow-md dark:bg-gray-800">
             <div className="w-full flex justify-end">
               <Button
                 variant="outline"
                 onClick={handleBack}
-                className="text-indigo-800"
+                className="text-indigo-800 dark:text-indigo-300"
               >
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Back to upload
@@ -87,37 +90,37 @@ export default function Page() {
               <TabsList className="grid w-full grid-cols-4 gap-2">
                 <TabsTrigger
                   value="violations"
-                  className="flex items-center justify-center p-2 bg-indigo-100 hover:bg-indigo-200 rounded-md"
+                  className="flex items-center justify-center p-2 bg-indigo-100 dark:bg-indigo-900 hover:bg-indigo-200 dark:hover:bg-indigo-800 rounded-md"
                 >
-                  <AlertCircle className="w-4 h-4 mr-2 text-indigo-500" />
-                  <span className="font-semibold text-indigo-600">
+                  <AlertCircle className="w-4 h-4 mr-2 text-indigo-500 dark:text-indigo-400" />
+                  <span className="font-semibold text-indigo-600 dark:text-indigo-300">
                     🚨 Policy Violations
                   </span>
                 </TabsTrigger>
                 <TabsTrigger
                   value="vulnerabilities"
-                  className="flex items-center justify-center p-2 bg-indigo-100 hover:bg-indigo-200 rounded-md"
+                  className="flex items-center justify-center p-2 bg-indigo-100 dark:bg-indigo-900 hover:bg-indigo-200 dark:hover:bg-indigo-800 rounded-md"
                 >
-                  <Shield className="w-4 h-4 mr-2 text-indigo-500" />
-                  <span className="font-semibold text-indigo-600">
+                  <Shield className="w-4 h-4 mr-2 text-indigo-500 dark:text-indigo-400" />
+                  <span className="font-semibold text-indigo-600 dark:text-indigo-300">
                     🛡️ Vulnerabilities
                   </span>
                 </TabsTrigger>
                 <TabsTrigger
                   value="licenses"
-                  className="flex items-center justify-center p-2 bg-indigo-100 hover:bg-indigo-200 rounded-md"
+                  className="flex items-center justify-center p-2 bg-indigo-100 dark:bg-indigo-900 hover:bg-indigo-200 dark:hover:bg-indigo-800 rounded-md"
                 >
-                  <Book className="w-4 h-4 mr-2 text-indigo-500" />
-                  <span className="font-semibold text-indigo-600">
+                  <Book className="w-4 h-4 mr-2 text-indigo-500 dark:text-indigo-400" />
+                  <span className="font-semibold text-indigo-600 dark:text-indigo-300">
                     📚 License Info
                   </span>
                 </TabsTrigger>
                 <TabsTrigger
                   value="popularity"
-                  className="flex items-center justify-center p-2 bg-indigo-100 hover:bg-indigo-200 rounded-md"
+                  className="flex items-center justify-center p-2 bg-indigo-100 dark:bg-indigo-900 hover:bg-indigo-200 dark:hover:bg-indigo-800 rounded-md"
                 >
-                  <Star className="w-4 h-4 mr-2 text-indigo-500" />
-                  <span className="font-semibold text-indigo-600">
+                  <Star className="w-4 h-4 mr-2 text-indigo-500 dark:text-indigo-400" />
+                  <span className="font-semibold text-indigo-600 dark:text-indigo-300">
                     ⭐ Popularity
                   </span>
                 </TabsTrigger>

@@ -21,7 +21,7 @@ export default function AboutPage() {
             <CardDescription>
               Advanced package security analysis for modern development teams by{" "}
               <Link
-                className="text-blue-500 hover:text-blue-700"
+                className="text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
                 href="https://safedep.io"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -33,7 +33,7 @@ export default function AboutPage() {
           <CardContent className="space-y-6">
             <section className="space-y-4">
               <h2 className="text-xl font-semibold">What is vetpkg.dev?</h2>
-              <ReactMarkdown>
+              <ReactMarkdown className="dark:text-gray-300">
                 `vetpkg.dev` is a service built using [SafeDep Cloud
                 API](https://docs.safedep.io) with the goal of providing a
                 simple and easy to use interface for developers to scan their
@@ -44,7 +44,7 @@ export default function AboutPage() {
 
             <section className="space-y-4">
               <h2 className="text-xl font-semibold">Key Features</h2>
-              <ul className="list-disc list-inside space-y-2 text-muted-foreground">
+              <ul className="list-disc list-inside space-y-2 text-muted-foreground dark:text-gray-400">
                 <li>
                   Deep package analysis with vulnerability and CVE detection
                 </li>
@@ -63,11 +63,11 @@ export default function AboutPage() {
                     <CardTitle className="text-lg">SafeDep Cloud API</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-sm text-muted-foreground dark:text-gray-400">
                       SafeDep Cloud API provides aggregated open source package
                       security insights data. It also provides a{" "}
                       <Link
-                        className="text-blue-500 hover:text-blue-700"
+                        className="text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
                         href="https://docs.safedep.io/cloud/malware-analysis"
                       >
                         {" "}
@@ -80,7 +80,7 @@ export default function AboutPage() {
                       href="https://docs.safedep.io"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="mt-2 inline-flex items-center gap-1 text-blue-500 hover:text-blue-700"
+                      className="mt-2 inline-flex items-center gap-1 text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
                     >
                       Learn more <ExternalLink className="h-4 w-4" />
                     </Link>
@@ -92,7 +92,7 @@ export default function AboutPage() {
                     <CardTitle className="text-lg">OpenSSF Scorecard</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-sm text-muted-foreground dark:text-gray-400">
                       Security health metrics from the Open Source Security
                       Foundation&apos;s Scorecard project.
                     </p>
@@ -100,7 +100,7 @@ export default function AboutPage() {
                       href="https://securityscorecards.dev"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="mt-2 inline-flex items-center gap-1 text-blue-500 hover:text-blue-700"
+                      className="mt-2 inline-flex items-center gap-1 text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
                     >
                       Learn more <ExternalLink className="h-4 w-4" />
                     </Link>
@@ -112,7 +112,7 @@ export default function AboutPage() {
                     <CardTitle className="text-lg">deps.dev</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-sm text-muted-foreground dark:text-gray-400">
                       Google&apos;s OSS insights project providing insights into
                       package metadata, dependencies, and security information
                       across multiple ecosystems.
@@ -121,7 +121,7 @@ export default function AboutPage() {
                       href="https://deps.dev"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="mt-2 inline-flex items-center gap-1 text-blue-500 hover:text-blue-700"
+                      className="mt-2 inline-flex items-center gap-1 text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
                     >
                       Learn more <ExternalLink className="h-4 w-4" />
                     </Link>
@@ -133,7 +133,7 @@ export default function AboutPage() {
                     <CardTitle className="text-lg">OSV</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-sm text-muted-foreground dark:text-gray-400">
                       Vulnerability database for open source projects maintained
                       by the Google Open Source Security team.
                     </p>
@@ -141,7 +141,7 @@ export default function AboutPage() {
                       href="https://osv.dev"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="mt-2 inline-flex items-center gap-1 text-blue-500 hover:text-blue-700"
+                      className="mt-2 inline-flex items-center gap-1 text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
                     >
                       Learn more <ExternalLink className="h-4 w-4" />
                     </Link>
@@ -152,7 +152,7 @@ export default function AboutPage() {
 
             <section className="space-y-4">
               <h2 className="text-xl font-semibold">Get Started</h2>
-              <p className="text-muted-foreground">
+              <p className="text-muted-foreground dark:text-gray-400">
                 Ready to scan your packages? Head back to the scanner and enter
                 your package details.
               </p>
