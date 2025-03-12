@@ -48,7 +48,7 @@ export default function Header() {
             </span>
             <span className="inline sm:hidden">{currentTool.emoji}</span>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
+          <DropdownMenuContent className="bg-gray-100 shadow-lg" align="end">
             {tools.map((tool) => (
               <DropdownMenuItem key={tool.path} asChild>
                 <Link href={tool.path} className="w-full">
