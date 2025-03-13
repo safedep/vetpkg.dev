@@ -2,6 +2,7 @@ import { PackageVersionInsight } from "@buf/safedep_api.bufbuild_es/safedep/mess
 import React, { useEffect, useState, memo } from "react";
 import { Graph } from "react-d3-graph";
 import type { GraphNode as D3GraphNode } from "react-d3-graph";
+import { useTheme } from "next-themes";
 
 interface DependencyGraphProps {
   insights: PackageVersionInsight | null;
@@ -23,10 +24,18 @@ const DependencyGraph: React.FC<DependencyGraphProps> = ({
   packageName,
   packageVersion,
 }) => {
+  const { theme, resolvedTheme } = useTheme();
+  const isDarkMode = theme === "dark" || resolvedTheme === "dark";
+  const [mounted, setMounted] = useState(false);
   const [graphData, setGraphData] = useState<{
     nodes: CustomGraphNode[];
     links: { source: string; target: string }[];
   }>({ nodes: [], links: [] });
+
+  // useEffect only runs on the client, so we can safely check for the theme
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     if (!insights) return;
@@ -48,22 +57,36 @@ const DependencyGraph: React.FC<DependencyGraphProps> = ({
       target: relation.to.toString(),
     }));
 
+    // Choose the color for the root node based on the theme
+    const rootNodeColor = isDarkMode ? "#ef4444" : "#dc2626"; // lighter red for dark mode
+
     setGraphData({
       nodes: [
         {
           id: "0",
           label: `${packageName}@${packageVersion}`,
-          color: "#dc2626",
+          color: rootNodeColor,
         },
         ...nodes,
       ],
       links: edges,
     });
-  }, [insights, packageName, packageVersion]);
+  }, [insights, packageName, packageVersion, isDarkMode]);
 
   if (!insights) {
     return <div>No insights available to render the graph.</div>;
   }
+
+  if (!mounted) {
+    return <div className="w-full h-full min-h-[400px]">Loading graph...</div>;
+  }
+
+  // Define colors based on theme
+  const nodeColor = isDarkMode ? "#818cf8" : "#6366f1"; // indigo-400 in dark mode, indigo-500 in light mode
+  const highlightStrokeColor = isDarkMode ? "#60a5fa" : "#1d4ed8"; // blue-400 in dark mode, blue-700 in light mode
+  const linkColor = isDarkMode ? "#6b7280" : "#94a3b8"; // gray-500 in dark mode, gray-400 in light mode
+  const linkHighlightColor = isDarkMode ? "#60a5fa" : "#93c5fd"; // blue-400 in dark mode, blue-300 in light mode
+  const textColor = isDarkMode ? "#f3f4f6" : "#1f2937"; // gray-100 in dark mode, gray-800 in light mode
 
   return (
     <div className="w-full h-full min-h-[400px]">
@@ -74,18 +97,19 @@ const DependencyGraph: React.FC<DependencyGraphProps> = ({
           config={{
             nodeHighlightBehavior: true,
             node: {
-              color: "#6366f1",
+              color: nodeColor,
               size: 800,
-              highlightStrokeColor: "#1d4ed8",
+              highlightStrokeColor: highlightStrokeColor,
               labelProperty: (node: D3GraphNode) =>
                 (node as CustomGraphNode).label,
               fontSize: 16,
               fontWeight: "bold",
               strokeWidth: 3,
+              fontColor: textColor,
             },
             link: {
-              highlightColor: "#93c5fd",
-              color: "#94a3b8",
+              highlightColor: linkHighlightColor,
+              color: linkColor,
               strokeWidth: 2,
             },
             height: window?.innerHeight ? window.innerHeight - 100 : 800,
