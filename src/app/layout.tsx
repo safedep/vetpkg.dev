@@ -7,6 +7,7 @@ import { Toaster } from "@/components/ui/toaster";
 import Script from "next/script";
 import Header from "@/components/app/header";
 import { ThemeProvider } from "next-themes";
+import { Analytics } from "@vercel/analytics/react";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -58,6 +59,7 @@ export default function RootLayout({
           <Theme>
             <Header />
             <main className="flex-grow">{children}</main>
+            <Analytics />
             <Toaster />
           </Theme>
         </ThemeProvider>
