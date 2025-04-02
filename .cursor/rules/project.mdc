@@ -1,0 +1,10 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Project Rules
+
+- Aim for better developer experience
+- Customise look and feel for developers and technical audience
+- Use `pnpm` instead of `npm` while suggesting package installation

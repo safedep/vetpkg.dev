@@ -1,17 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { listMalwareAnalysis } from "./actions";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -20,15 +10,29 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
-import { useRouter } from "next/navigation";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { ToEcosystemName } from "@/lib/rpc/utils";
+import { PackageAnalysisTarget } from "@buf/safedep_api.bufbuild_es/safedep/messages/malysis/v1/request_pb";
 import { ListPackageAnalysisRecordsResponse_AnalysisRecord } from "@buf/safedep_api.bufbuild_es/safedep/services/malysis/v1/malysis_pb";
 import { Timestamp } from "@bufbuild/protobuf/wkt";
-import { PackageAnalysisTarget } from "@buf/safedep_api.bufbuild_es/safedep/messages/malysis/v1/request_pb";
-import { ToEcosystemName } from "@/lib/rpc/utils";
+import { useEffect, useState, useRef, useCallback } from "react";
+import { listMalwareAnalysis } from "./actions";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
+import { ExternalLink, Copy, MoreHorizontal } from "lucide-react";
 
 export default function MalwarePage() {
-  const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [records, setRecords] = useState<
     ListPackageAnalysisRecordsResponse_AnalysisRecord[]
@@ -42,30 +46,57 @@ export default function MalwarePage() {
     onlyVerified: false,
     pageSize: 10,
   });
+  const [autoRefresh, setAutoRefresh] = useState(false);
+  const refreshTimerRef = useRef<NodeJS.Timeout | null>(null);
 
-  const fetchRecords = async (pageToken?: string) => {
-    setLoading(true);
-    try {
-      const response = await listMalwareAnalysis({
-        onlyMalware: filters.onlyMalware,
-        onlyVerified: filters.onlyVerified,
-        pageSize: filters.pageSize,
-        pageToken: pageToken,
-      });
+  const fetchRecords = useCallback(
+    async (pageToken?: string) => {
+      setLoading(true);
+      try {
+        const response = await listMalwareAnalysis({
+          onlyMalware: filters.onlyMalware,
+          onlyVerified: filters.onlyVerified,
+          pageSize: filters.pageSize,
+          pageToken: pageToken,
+        });
 
-      // Convert the response records to our expected format
-      setRecords(response.records || []);
-      setNextPageToken(response.pagination?.nextPageToken);
-      setLoading(false);
-    } catch (error) {
-      console.error("Error fetching package analysis records:", error);
-      setLoading(false);
-    }
-  };
+        // Convert the response records to our expected format
+        setRecords(response.records || []);
+        setNextPageToken(response.pagination?.nextPageToken);
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching package analysis records:", error);
+        setLoading(false);
+      }
+    },
+    [filters.onlyMalware, filters.onlyVerified, filters.pageSize],
+  );
 
   useEffect(() => {
     fetchRecords();
-  }, [filters.onlyMalware, filters.onlyVerified, filters.pageSize]);
+  }, [fetchRecords]);
+
+  useEffect(() => {
+    // Clear any existing timer
+    if (refreshTimerRef.current) {
+      clearInterval(refreshTimerRef.current);
+      refreshTimerRef.current = null;
+    }
+
+    // Set up auto-refresh if enabled
+    if (autoRefresh) {
+      refreshTimerRef.current = setInterval(() => {
+        fetchRecords();
+      }, 5000);
+    }
+
+    // Cleanup function
+    return () => {
+      if (refreshTimerRef.current) {
+        clearInterval(refreshTimerRef.current);
+      }
+    };
+  }, [autoRefresh, fetchRecords]);
 
   const handleNextPage = () => {
     if (nextPageToken) {
@@ -118,8 +149,21 @@ export default function MalwarePage() {
     <div className="container mx-auto p-4 max-w-6xl">
       <h1 className="scroll-m-20 text-3xl font-extrabold tracking-tight lg:text-4xl mb-6 font-mono">
         <span className="text-indigo-500 dark:text-indigo-400">Malware</span>{" "}
-        Analysis Dashboard
+        Analysis Records
       </h1>
+
+      <p className="text-md text-gray-500 dark:text-gray-400 mb-6">
+        Malicious Package Analysis is a{" "}
+        <a
+          href="https://docs.safedep.io/cloud/malware-analysis"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-1"
+        >
+          <ExternalLink className="h-4 w-4" /> SafeDep Cloud
+        </a>{" "}
+        service.
+      </p>
 
       <div className="flex flex-col space-y-6">
         <Card>
@@ -152,6 +196,17 @@ export default function MalwarePage() {
                   className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
                 />
                 <Label htmlFor="onlyVerified">Only Verified</Label>
+              </div>
+
+              <div className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  id="autoRefresh"
+                  checked={autoRefresh}
+                  onChange={(e) => setAutoRefresh(e.target.checked)}
+                  className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                />
+                <Label htmlFor="autoRefresh">Auto Refresh (5s)</Label>
               </div>
 
               <div className="flex items-center space-x-2">
@@ -232,17 +287,39 @@ export default function MalwarePage() {
                             {formatTimestamp(record.createdAt)}
                           </TableCell>
                           <TableCell>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => {
-                                if (record.id) {
-                                  router.push(`/mal/${record.id}`);
-                                }
-                              }}
-                            >
-                              View Details
-                            </Button>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="outline" size="sm">
+                                  <span>Options</span>
+                                  <MoreHorizontal className="h-4 w-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end" className="menu">
+                                <DropdownMenuItem>
+                                  <ExternalLink className="mr-2 h-4 w-4">
+                                    <a
+                                      href={`https://platform.safedep.io/community/malysis/${record.analysisId}`}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                    >
+                                      Details
+                                    </a>
+                                  </ExternalLink>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onClick={() => {
+                                    if (record.analysisId) {
+                                      navigator.clipboard.writeText(
+                                        record.analysisId,
+                                      );
+                                    }
+                                  }}
+                                >
+                                  <Copy className="mr-2 h-4 w-4" />
+                                  <span>Copy ID</span>
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
                           </TableCell>
                         </TableRow>
                       ),
