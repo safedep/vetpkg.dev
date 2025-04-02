@@ -19,10 +19,6 @@ export default function Footer() {
           >
             SafeDep Cloud API
           </a>{" "}
-        </p>
-      </div>
-      <div className="flex items-center justify-center">
-        <p className="text-sm text-gray-500 dark:text-gray-400 text-center font-mono">
           ⚡️{" "}
           <a
             href="/about"

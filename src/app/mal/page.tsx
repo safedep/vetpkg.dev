@@ -156,7 +156,7 @@ export default function MalwarePage() {
       <p className="text-md text-gray-500 dark:text-gray-400 mb-6">
         Malicious Package Analysis is a{" "}
         <a
-          href="https://docs.safedep.io/cloud/malware-analysis"
+          href="https://safedep.io"
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex items-center gap-1"
@@ -290,22 +290,22 @@ export default function MalwarePage() {
                           <TableCell>
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
-                                <Button variant="outline" size="sm">
-                                  <span>Options</span>
-                                  <MoreHorizontal className="h-4 w-4" />
-                                </Button>
+                                <div className="flex items-center gap-2">
+                                  <a href="#" className="cursor-pointer">
+                                    <MoreHorizontal className="h-4 w-4" />
+                                  </a>
+                                </div>
                               </DropdownMenuTrigger>
                               <DropdownMenuContent align="end" className="menu">
                                 <DropdownMenuItem>
-                                  <ExternalLink className="mr-2 h-4 w-4">
-                                    <a
-                                      href={`https://platform.safedep.io/community/malysis/${record.analysisId}`}
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                    >
-                                      Details
-                                    </a>
-                                  </ExternalLink>
+                                  <ExternalLink className="mr-2 h-4 w-4" />
+                                  <a
+                                    href={`https://platform.safedep.io/community/malysis/${record.analysisId}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                  >
+                                    Details
+                                  </a>
                                 </DropdownMenuItem>
                                 <DropdownMenuItem
                                   onClick={() => {
