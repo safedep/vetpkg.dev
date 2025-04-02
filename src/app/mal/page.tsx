@@ -31,6 +31,7 @@ import {
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 import { ExternalLink, Copy, MoreHorizontal } from "lucide-react";
+import Footer from "@/components/app/footer";
 
 export default function MalwarePage() {
   const [loading, setLoading] = useState(true);
@@ -351,6 +352,7 @@ export default function MalwarePage() {
           </CardContent>
         </Card>
       </div>
+      <Footer />
     </div>
   );
 }
