@@ -166,6 +166,21 @@ export default function MalwarePage() {
         service.
       </p>
 
+      <div className="mb-8">
+        <a
+          href="https://docs.safedep.io/cloud/malware-analysis"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <span className="inline-flex items-center gap-2 px-6 py-3 text-lg font-mono bg-gradient-to-r from-indigo-600 to-indigo-800 hover:from-indigo-700 hover:to-indigo-900 text-white rounded-lg shadow-md hover:shadow-lg transition-all duration-200 border border-indigo-500/20">
+            <code className="text-indigo-200">$</code>
+            vet scan --malware
+            <span className="opacity-75">|</span>
+            Enforce CI/CD Guardrails
+          </span>
+        </a>
+      </div>
+
       <div className="flex flex-col space-y-6">
         <Card>
           <CardHeader>
@@ -263,7 +278,16 @@ export default function MalwarePage() {
                       ) => (
                         <TableRow key={record.analysisId || index}>
                           <TableCell className="font-mono">
-                            {formatPackageName(record.target)}
+                            <span className="flex items-center gap-2">
+                              <ExternalLink className="h-4 w-4" />
+                              <a
+                                href={`https://platform.safedep.io/community/malysis/${record.analysisId}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                              >
+                                {formatPackageName(record.target)}
+                              </a>
+                            </span>
                           </TableCell>
                           <TableCell>
                             {record.isMalware ? (
@@ -285,7 +309,12 @@ export default function MalwarePage() {
                             {record.isVerified ? "Yes" : "No"}
                           </TableCell>
                           <TableCell>
-                            {formatTimestamp(record.createdAt)}
+                            <span
+                              className="font-mono text-sm text-gray-600 dark:text-gray-400"
+                              title={formatTimestamp(record.createdAt)}
+                            >
+                              {formatTimestamp(record.createdAt)}
+                            </span>
                           </TableCell>
                           <TableCell>
                             <DropdownMenu>
