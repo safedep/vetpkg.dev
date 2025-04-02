@@ -8,7 +8,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Menu, Moon, Sun } from "lucide-react";
+import { Menu, Moon, Sun, Star } from "lucide-react";
 import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
@@ -24,6 +24,46 @@ const tools: Tool[] = [
   { name: "vet Report Visualization", path: "/vr", emoji: "📊" },
   { name: "vet GitHub Actions PR Bot", path: "/gha", emoji: "🤖" },
 ];
+
+function GitHubStars() {
+  const [stars, setStars] = useState<number | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchStars() {
+      try {
+        const res = await fetch("https://api.github.com/repos/safedep/vet");
+        const data = await res.json();
+        setStars(data.stargazers_count);
+      } catch (error) {
+        console.error("Failed to fetch stars:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchStars();
+  }, []);
+
+  return (
+    <Link
+      href="https://github.com/safedep/vet"
+      target="_blank"
+      rel="noopener noreferrer"
+      className="flex items-center gap-2 text-sm hover:opacity-90 transition-opacity group"
+    >
+      <div className="flex items-center gap-1 bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded-md border border-gray-200 dark:border-gray-700">
+        <Star className="h-4 w-4 text-yellow-500" fill="currentColor" />
+        <span className="font-medium">
+          {loading ? "..." : stars?.toLocaleString()}
+        </span>
+      </div>
+      <span className="text-gray-500 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-300 transition-colors">
+        Like this? Star us on GitHub
+      </span>
+    </Link>
+  );
+}
 
 export default function Header() {
   const pathname = usePathname();
@@ -51,6 +91,7 @@ export default function Header() {
           >
             🚀 vet
           </Link>
+          {mounted && <GitHubStars />}
         </div>
 
         <div className="flex items-center">
