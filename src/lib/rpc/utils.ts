@@ -28,6 +28,37 @@ export function parseEcosystem(ecosystem: string): Ecosystem {
 }
 
 /**
+ * Convert the ecosystem enum to the corresponding ecosystem name.
+ *
+ * @param {Ecosystem | undefined} ecosystem - The ecosystem enum
+ * @returns {string} The corresponding ecosystem name
+ */
+export function ToEcosystemName(ecosystem: Ecosystem | undefined): string {
+  if (!ecosystem) return "unknown";
+
+  switch (ecosystem) {
+    case Ecosystem.NPM:
+      return "npm";
+    case Ecosystem.RUBYGEMS:
+      return "rubygems";
+    case Ecosystem.GO:
+      return "go";
+    case Ecosystem.MAVEN:
+      return "maven";
+    case Ecosystem.PYPI:
+      return "pypi";
+    case Ecosystem.PACKAGIST:
+      return "packagist";
+    case Ecosystem.GITHUB_ACTIONS:
+      return "github-actions";
+    case Ecosystem.GITHUB_REPOSITORY:
+      return "github-repository";
+    default:
+      return "unknown";
+  }
+}
+
+/**
  * Get the credentials for the RPC call. These are static credentials
  * passed through the environment variables.
  *
