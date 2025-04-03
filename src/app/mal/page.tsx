@@ -236,7 +236,7 @@ export default function MalwarePage() {
                   <SelectTrigger className="w-24">
                     <SelectValue placeholder="10" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="bg-gray-100 dark:bg-gray-800 shadow-lg">
                     <SelectItem value="10">10</SelectItem>
                     <SelectItem value="25">25</SelectItem>
                     <SelectItem value="50">50</SelectItem>
@@ -325,7 +325,10 @@ export default function MalwarePage() {
                                   </a>
                                 </div>
                               </DropdownMenuTrigger>
-                              <DropdownMenuContent align="end" className="menu">
+                              <DropdownMenuContent
+                                align="end"
+                                className="menu bg-gray-100 dark:bg-gray-800 shadow-lg"
+                              >
                                 <DropdownMenuItem>
                                   <ExternalLink className="mr-2 h-4 w-4" />
                                   <a
