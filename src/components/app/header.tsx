@@ -23,7 +23,7 @@ const tools: Tool[] = [
   { name: "OSS Package Security Insight", path: "/", emoji: "🔍" },
   { name: "vet Report Visualization", path: "/vr", emoji: "📊" },
   { name: "vet GitHub Actions PR Bot", path: "/gha", emoji: "🤖" },
-  { name: "Malware Analysis Records", path: "/mal", emoji: "🔍" },
+  { name: "Package Analysis", path: "/mal", emoji: "🧐" },
 ];
 
 function GitHubStars() {
