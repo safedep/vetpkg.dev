@@ -84,7 +84,7 @@ export default function MalwarePage() {
   );
 
   useEffect(() => {
-    fetchRecords();
+    fetchRecords({ isAutoRefresh: false });
   }, [fetchRecords]);
 
   useEffect(() => {
@@ -112,7 +112,7 @@ export default function MalwarePage() {
   const handleNextPage = () => {
     if (nextPageToken) {
       setPrevPageTokens([...prevPageTokens, ""]); // Save current page state
-      fetchRecords({ pageToken: nextPageToken });
+      fetchRecords({ pageToken: nextPageToken, isAutoRefresh: false });
     }
   };
 
@@ -121,7 +121,7 @@ export default function MalwarePage() {
       const newPrevTokens = [...prevPageTokens];
       const prevToken = newPrevTokens.pop();
       setPrevPageTokens(newPrevTokens);
-      fetchRecords({ pageToken: prevToken });
+      fetchRecords({ pageToken: prevToken, isAutoRefresh: false });
     }
   };
 
