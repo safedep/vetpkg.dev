@@ -51,8 +51,16 @@ export default function MalwarePage() {
   const refreshTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   const fetchRecords = useCallback(
-    async (pageToken?: string) => {
-      setLoading(true);
+    async ({
+      pageToken,
+      isAutoRefresh = false,
+    }: {
+      pageToken?: string;
+      isAutoRefresh?: boolean;
+    }) => {
+      if (!isAutoRefresh) {
+        setLoading(true);
+      }
       try {
         const response = await listMalwareAnalysis({
           onlyMalware: filters.onlyMalware,
@@ -64,7 +72,9 @@ export default function MalwarePage() {
         // Convert the response records to our expected format
         setRecords(response.records || []);
         setNextPageToken(response.pagination?.nextPageToken);
-        setLoading(false);
+        if (!isAutoRefresh) {
+          setLoading(false);
+        }
       } catch (error) {
         console.error("Error fetching package analysis records:", error);
         setLoading(false);
@@ -74,7 +84,7 @@ export default function MalwarePage() {
   );
 
   useEffect(() => {
-    fetchRecords();
+    fetchRecords({ isAutoRefresh: false });
   }, [fetchRecords]);
 
   useEffect(() => {
@@ -87,7 +97,7 @@ export default function MalwarePage() {
     // Set up auto-refresh if enabled
     if (autoRefresh) {
       refreshTimerRef.current = setInterval(() => {
-        fetchRecords();
+        fetchRecords({ isAutoRefresh: true });
       }, 5000);
     }
 
@@ -102,7 +112,7 @@ export default function MalwarePage() {
   const handleNextPage = () => {
     if (nextPageToken) {
       setPrevPageTokens([...prevPageTokens, ""]); // Save current page state
-      fetchRecords(nextPageToken);
+      fetchRecords({ pageToken: nextPageToken, isAutoRefresh: false });
     }
   };
 
@@ -111,7 +121,7 @@ export default function MalwarePage() {
       const newPrevTokens = [...prevPageTokens];
       const prevToken = newPrevTokens.pop();
       setPrevPageTokens(newPrevTokens);
-      fetchRecords(prevToken);
+      fetchRecords({ pageToken: prevToken, isAutoRefresh: false });
     }
   };
 
