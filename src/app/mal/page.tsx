@@ -182,8 +182,8 @@ export default function MalwarePage() {
           target="_blank"
           rel="noopener noreferrer"
         >
-          <span className="inline-flex items-center gap-2 px-6 py-3 text-lg font-mono bg-gradient-to-r from-indigo-600 to-indigo-800 hover:from-indigo-700 hover:to-indigo-900 text-white rounded-lg shadow-md hover:shadow-lg transition-all duration-200 border border-indigo-500/20">
-            <code className="text-indigo-200">$</code>
+          <span className="inline-flex items-center gap-1 px-4 py-2 text-sm font-mono bg-indigo-100 hover:bg-indigo-200 dark:bg-indigo-900/30 dark:hover:bg-indigo-800/40 text-indigo-700 dark:text-indigo-300 rounded-md shadow-sm hover:shadow transition-all duration-200 border border-indigo-200 dark:border-indigo-800/30">
+            <code className="text-indigo-500 dark:text-indigo-400">$</code>
             vet scan --malware
             <span className="opacity-75">|</span>
             Enforce CI/CD Guardrails
