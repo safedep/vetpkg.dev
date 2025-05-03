@@ -228,15 +228,15 @@ export async function createVetPR({
     repo: repo,
     title: "Add vet GitHub Action workflow",
     body: `
-# 🚀 Protect Against Risky Open Source Components
+# 🚀 Protect against Malicious Open Source Components
 
 > Integrates [vet](https://github.com/safedep/vet) to automate vetting of OSS packages for security vulnerabilities, malicious code and other risks.
 > This PR is raised on behalf of [${user}](https://github.com/${user}) using [https://vetpkg.dev/gha](https://vetpkg.dev/gha).
     
 ## Why?
 
-This PR integrates [vet](https://github.com/safedep/vet) to automate vetting of OSS packages for security vulnerabilities, malware and other risks. 
-The policy is configured to be minimal, checking only for common OSS risks. The policy can be fine tuned / improved based on as required.
+This PR integrates [vet](https://github.com/safedep/vet) to automate vetting of open source packages for security vulnerabilities, malware and other risks. 
+The policy is configured to be minimal, checking only for common OSS risks. The policy can be fine tuned / improved based on the project requirements.
 
 ## Example
 
