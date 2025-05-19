@@ -9,7 +9,7 @@ export const githubOAuthConfig = {
     typeof window !== "undefined"
       ? `${window.location.origin}/starscout/callback`
       : "",
-  scope: "repo", // Need repo scope to access stars data
+  scope: "read:org,read:user,user:email,user:follow",
 };
 
 /**
