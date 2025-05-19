@@ -18,6 +18,8 @@ async function getRepositoryInfo(
   repo: string,
   octokit: Octokit,
 ): Promise<Repository> {
+  console.log(`Getting repository info for ${owner}/${repo}`);
+
   const { data } = await octokit.rest.repos.get({
     owner,
     repo,
@@ -43,6 +45,8 @@ async function getStargazersWithTimestamps(
   let page = 1;
   let hasMorePages = true;
 
+  console.log(`Getting stargazers for ${owner}/${repo}`);
+
   // GitHub API pagination for stargazers with timestamps
   while (hasMorePages) {
     const response = await octokit.rest.activity.listStargazersForRepo({
@@ -55,26 +59,34 @@ async function getStargazersWithTimestamps(
       },
     });
 
+    if (!response?.data) {
+      console.error(`No data returned for ${owner}/${repo} on page ${page}`);
+      hasMorePages = false;
+      continue;
+    }
+
     if (response.data.length === 0) {
       hasMorePages = false;
-    } else {
-      // Add stars to the collection
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      response.data.forEach((item: any) => {
-        if (item.user && item.starred_at) {
-          starEvents.push({
-            user: {
-              id: item.user.id,
-              login: item.user.login,
-              avatar_url: item.user.avatar_url,
-              html_url: item.user.html_url,
-            },
-            starred_at: item.starred_at,
-          });
-        }
-      });
-      page++;
+      continue;
     }
+
+    // Add stars to the collection
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    response.data.forEach((item: any) => {
+      if (item.user && item.starred_at) {
+        starEvents.push({
+          user: {
+            id: item.user.id,
+            login: item.user.login,
+            avatar_url: item.user.avatar_url,
+            html_url: item.user.html_url,
+          },
+          starred_at: item.starred_at,
+        });
+      }
+    });
+
+    page++;
   }
 
   return starEvents;
@@ -260,8 +272,12 @@ export async function analyzeRepoForFakeStars(
   // Step 1: Get repository information
   const repository = await getRepositoryInfo(owner, repo, octokit);
 
+  console.log(`Found repository info for ${owner}/${repo}`);
+
   // Step 2: Get all stargazers with timestamps
   const stars = await getStargazersWithTimestamps(owner, repo, octokit);
+
+  console.log(`Found ${stars.length} stargazers for ${owner}/${repo}`);
 
   // Step 3A: Check for low-activity signature
   const lowActivityPromises = stars.map(async (star) => {
@@ -277,6 +293,11 @@ export async function analyzeRepoForFakeStars(
   });
 
   const lowActivityResults = await Promise.all(lowActivityPromises);
+
+  console.log(
+    `Found ${lowActivityResults.length} low-activity suspects for ${owner}/${repo}`,
+  );
+
   const lowActivitySuspects = lowActivityResults.filter(
     Boolean,
   ) as SuspectedStar[];
@@ -284,8 +305,14 @@ export async function analyzeRepoForFakeStars(
   // Step 3B: Check for lock-step signature
   const lockStepSuspects = checkLockStepSignature(stars);
 
+  console.log(
+    `Found ${lockStepSuspects.length} lock-step suspects for ${owner}/${repo}`,
+  );
+
   // Step 4: Merge suspicions
   const allSuspects = [...lowActivitySuspects];
+
+  console.log(`Found ${allSuspects.length} suspects for ${owner}/${repo}`);
 
   // Add lock-step suspects, avoiding duplicates
   for (const suspect of lockStepSuspects) {

@@ -30,6 +30,8 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       );
     }
 
+    console.log(`Exchanging code for token with client ID: ${clientId}`);
+
     // Exchange the code for an access token
     const tokenResponse = await fetch(GITHUB_TOKEN_URL, {
       method: "POST",
