@@ -377,7 +377,13 @@ function CallbackContent() {
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
         </div>
         <p className="text-center text-gray-700 dark:text-gray-300 text-lg">
-          {status}
+          <div>
+            <p className="mb-2">{status}</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              Note: Analysis may take longer for repositories with large number
+              of stars and watchers
+            </p>
+          </div>
         </p>
       </div>
     </div>
