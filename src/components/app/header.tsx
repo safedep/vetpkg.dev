@@ -24,6 +24,7 @@ const tools: Tool[] = [
   { name: "vet Report Visualization", path: "/vr", emoji: "📊" },
   { name: "vet GitHub Actions PR Bot", path: "/gha", emoji: "🤖" },
   { name: "Package Analysis", path: "/mal", emoji: "🧐" },
+  { name: "Star Scout", path: "/starscout", emoji: "🌟" },
 ];
 
 function GitHubStars() {

@@ -64,9 +64,17 @@ export default function StarScoutPage() {
 
       <p className="text-lg text-gray-600 dark:text-gray-300 mb-8 max-w-3xl mx-auto text-center">
         Detect fake GitHub stars and evaluate repository risk using the
-        StarScout algorithm
+        <a
+          href="https://arxiv.org/abs/2412.13459"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300"
+        >
+          {" "}
+          StarScout
+        </a>{" "}
+        approach.
       </p>
-
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
         {/* Left column - Form */}
         <div className="space-y-6">
@@ -154,9 +162,30 @@ export default function StarScoutPage() {
             <h2 className="text-xl font-bold mb-4">About StarScout</h2>
             <div className="space-y-4">
               <p>
-                StarScout is an algorithm that helps detect fake GitHub stars
-                and evaluates the risk of a repository being part of a fake-star
-                campaign.
+                <a
+                  href="https://arxiv.org/abs/2412.13459"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300"
+                >
+                  StarScout{" "}
+                  <svg
+                    className="inline-block w-4 h-4 ml-0.5"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                    />
+                  </svg>
+                </a>{" "}
+                is an approach that helps detect fake GitHub stars and evaluates
+                the risk of a repository being part of a fake-star campaign.
               </p>
 
               <h3 className="font-bold text-md">How StarScout Works:</h3>
