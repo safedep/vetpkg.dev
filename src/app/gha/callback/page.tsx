@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { validateOAuthState, exchangeCodeForToken } from "../auth";
 import {
   isUserContributor,
+  isUserOwner,
   raiseVetIntegrationPullRequest,
 } from "../integration";
 
@@ -54,16 +55,22 @@ function CallbackContent() {
 
         setStatus("Verifying repository access...");
 
-        // Verify the user is a contributor to the repository
-        const isContributor = await isUserContributor(
-          validatedState.repoUrl,
-          token,
-        );
+        // First check if the user is the owner of the repository
+        const isOwner = await isUserOwner(validatedState.repoUrl, token);
 
-        if (!isContributor) {
-          throw new Error(
-            "You don't have contributor access to this repository",
+        if (!isOwner) {
+          // If not owner, check if they are a contributor
+          setStatus("Checking contributor access...");
+          const isContributor = await isUserContributor(
+            validatedState.repoUrl,
+            token,
           );
+
+          if (!isContributor) {
+            throw new Error(
+              "You don't have contributor access to this repository",
+            );
+          }
         }
 
         setStatus("Creating pull request...");

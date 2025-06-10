@@ -71,6 +71,30 @@ export async function isUserContributor(
   return isContributor;
 }
 
+/**
+ * Checks if a user is the owner of a repository
+ * @param repoUrl GitHub repository URL
+ * @param userToken GitHub OAuth token of the user
+ * @returns Promise with boolean indicating if user is the owner
+ */
+export async function isUserOwner(
+  repoUrl: string,
+  userToken: string,
+): Promise<boolean> {
+  const client = new Octokit({ auth: userToken });
+  const { owner } = await parseRepoUrl(repoUrl);
+
+  console.log(`Getting user info using token`);
+  const user = await client.rest.users.getAuthenticated();
+  console.log(`User: ${user.data.login}`);
+
+  console.log(`Checking if user is owner of ${repoUrl}`);
+  const isOwner = user.data.login === owner;
+
+  console.log(`Is owner: ${isOwner}`);
+  return isOwner;
+}
+
 async function parseRepoUrl(
   repoUrl: string,
 ): Promise<{ owner: string; repo: string }> {

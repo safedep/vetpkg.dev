@@ -12,6 +12,7 @@ on:
   push:
     branches:
       - main
+      - master
 
 permissions:
   # Required for actions/checkout@v4
