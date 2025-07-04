@@ -106,8 +106,12 @@ export default function GitHubActionsIntegration() {
       </h1>
 
       <p className="text-lg text-gray-600 dark:text-gray-300 mb-8 max-w-3xl mx-auto font-mono text-center">
-        Automatically integrate vet into your GitHub Actions workflow to secure
-        your open source supply chain with a single pull request.
+        Automatically integrate{" "}
+        <a href="https://github.com/safedep/vet" target="_blank">
+          SafeDep vet
+        </a>{" "}
+        into your GitHub Actions workflow to secure your open source supply
+        chain with a single pull request
       </p>
 
       {/* Two-column layout */}

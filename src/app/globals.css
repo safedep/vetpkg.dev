@@ -3,17 +3,441 @@
 @tailwind utilities;
 
 :root {
+  /* Light theme - GitHub inspired with better contrast */
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #1f2328;
+
+  /* Surface colors */
+  --surface: #f6f8fa;
+  --surface-hover: #ebedef;
+  --surface-border: #d1d9e0;
+
+  /* Developer-friendly accents */
+  --accent: #0969da;
+  --accent-hover: #0860ca;
+  --accent-muted: #0969da15;
+  --accent-foreground: #ffffff;
+
+  /* Code colors */
+  --code-bg: #f6f8fa;
+  --code-border: #d1d9e0;
+  --code-text: #1f2328;
+
+  /* Status colors */
+  --success: #2da44e;
+  --warning: #fb8500;
+  --error: #da3633;
+  --info: #0969da;
+
+  /* Semantic colors with better contrast */
+  --muted: #656d76;
+  --muted-lighter: #8b949e;
+  --muted-foreground: #1f2328;
+  --subtle: #afb8c133;
+
+  /* Interactive states */
+  --interactive-hover: #ebedef;
+  --interactive-active: #d1d9e0;
+  --interactive-text: #1f2328;
+  --interactive-text-hover: #0969da;
+
+  /* Missing shadcn variables */
+  --card: #ffffff;
+  --card-foreground: #1f2328;
+  --popover: #ffffff;
+  --popover-foreground: #1f2328;
+  --primary: #0969da;
+  --primary-foreground: #ffffff;
+  --secondary: #f6f8fa;
+  --secondary-foreground: #1f2328;
+  --muted-foreground: #656d76;
+  --border: #d1d9e0;
+  --input: #d1d9e0;
+  --ring: #0969da;
+  --destructive: #da3633;
+  --destructive-foreground: #ffffff;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1),
+    0 4px 6px -4px rgb(0 0 0 / 0.1);
+
+  /* Borders */
+  --border-radius: 8px;
+  --border-radius-sm: 6px;
+  --border-radius-lg: 12px;
 }
 
 .dark {
-  --background: #0a0a0a;
-  --foreground: #ededed;
+  /* Dark theme - VS Code inspired with better contrast */
+  --background: #0d1117;
+  --foreground: #f0f6fc;
+
+  /* Surface colors */
+  --surface: #161b22;
+  --surface-hover: #21262d;
+  --surface-border: #30363d;
+
+  /* Developer-friendly accents */
+  --accent: #58a6ff;
+  --accent-hover: #79c0ff;
+  --accent-muted: #58a6ff15;
+  --accent-foreground: #0d1117;
+
+  /* Code colors */
+  --code-bg: #161b22;
+  --code-border: #30363d;
+  --code-text: #f0f6fc;
+
+  /* Status colors */
+  --success: #3fb950;
+  --warning: #d29922;
+  --error: #f85149;
+  --info: #58a6ff;
+
+  /* Semantic colors with better contrast */
+  --muted: #8b949e;
+  --muted-lighter: #656d76;
+  --muted-foreground: #f0f6fc;
+  --subtle: #6e768166;
+
+  /* Interactive states */
+  --interactive-hover: #21262d;
+  --interactive-active: #30363d;
+  --interactive-text: #f0f6fc;
+  --interactive-text-hover: #58a6ff;
+
+  /* Missing shadcn variables */
+  --card: #161b22;
+  --card-foreground: #f0f6fc;
+  --popover: #161b22;
+  --popover-foreground: #f0f6fc;
+  --primary: #58a6ff;
+  --primary-foreground: #0d1117;
+  --secondary: #161b22;
+  --secondary-foreground: #f0f6fc;
+  --muted-foreground: #8b949e;
+  --border: #30363d;
+  --input: #30363d;
+  --ring: #58a6ff;
+  --destructive: #f85149;
+  --destructive-foreground: #ffffff;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.4);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.4),
+    0 4px 6px -4px rgb(0 0 0 / 0.4);
 }
 
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family:
+    "Geist",
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    sans-serif;
+  line-height: 1.6;
+  font-feature-settings:
+    "rlig" 1,
+    "calt" 1;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+/* Code-style elements */
+.code-style {
+  font-family: "Geist Mono", ui-monospace, SFMono-Regular, "SF Mono", Menlo,
+    Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-variant-ligatures: common-ligatures;
+  font-feature-settings:
+    "liga" 1,
+    "calt" 1;
+}
+
+/* Terminal-style input */
+.terminal-input {
+  background: var(--code-bg);
+  border: 1px solid var(--code-border);
+  color: var(--code-text);
+  border-radius: var(--border-radius-sm);
+  transition: all 0.2s ease;
+  font-family: "Geist Mono", ui-monospace, monospace;
+  box-shadow: var(--shadow-sm);
+}
+
+.terminal-input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow:
+    0 0 0 3px var(--accent-muted),
+    var(--shadow-md);
+}
+
+.terminal-input:hover {
+  border-color: var(--accent);
+}
+
+/* Enhanced button styles */
+.btn-primary {
+  background: linear-gradient(
+    135deg,
+    var(--accent) 0%,
+    var(--accent-hover) 100%
+  );
+  color: var(--accent-foreground);
+  border: none;
+  border-radius: var(--border-radius);
+  transition: all 0.2s ease;
+  box-shadow: var(--shadow-sm);
+  font-weight: 500;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-primary::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.1),
+    transparent
+  );
+  transition: left 0.5s ease;
+}
+
+.btn-primary:hover::before {
+  left: 100%;
+}
+
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-lg);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+/* Enhanced card styles */
+.dev-card {
+  background: var(--surface);
+  border: 1px solid var(--surface-border);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-md);
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+  color: var(--foreground);
+}
+
+.dev-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.dev-card:hover {
+  border-color: var(--accent);
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-2px);
+}
+
+.dev-card:hover::before {
+  opacity: 1;
+}
+
+/* Status indicators */
+.status-success {
+  color: var(--success);
+}
+
+.status-warning {
+  color: var(--warning);
+}
+
+.status-error {
+  color: var(--error);
+}
+
+.status-info {
+  color: var(--info);
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Selection styling */
+::selection {
+  background: var(--accent-muted);
+  color: var(--accent);
+}
+
+/* Focus improvements */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Loading states */
+.loading {
+  position: relative;
+  color: transparent;
+}
+
+.loading::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 16px;
+  height: 16px;
+  margin: -8px 0 0 -8px;
+  border: 2px solid var(--muted);
+  border-top: 2px solid var(--accent);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Improved typography */
+.text-gradient {
+  background: linear-gradient(
+    135deg,
+    var(--accent) 0%,
+    var(--accent-hover) 100%
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Enhanced link styles */
+a {
+  color: var(--accent);
+  text-decoration: none;
+  transition: color 0.2s ease;
+  position: relative;
+}
+
+a:hover {
+  color: var(--accent-hover);
+}
+
+/* Dropdown menu improvements */
+.dropdown-menu-item {
+  color: var(--interactive-text);
+  transition: all 0.2s ease;
+}
+
+.dropdown-menu-item:hover {
+  background: var(--interactive-hover);
+  color: var(--interactive-text-hover);
+}
+
+.dropdown-menu-item:focus {
+  background: var(--interactive-hover);
+  color: var(--interactive-text-hover);
+  outline: none;
+}
+
+a:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Code block improvements */
+code {
+  background: var(--code-bg);
+  border: 1px solid var(--code-border);
+  border-radius: var(--border-radius-sm);
+  padding: 0.125rem 0.25rem;
+  font-family: "Geist Mono", ui-monospace, monospace;
+  font-size: 0.875em;
+  color: var(--code-text);
+}
+
+pre {
+  background: var(--code-bg);
+  border: 1px solid var(--code-border);
+  border-radius: var(--border-radius);
+  padding: 1rem;
+  overflow-x: auto;
+  font-family: "Geist Mono", ui-monospace, monospace;
+  line-height: 1.5;
+  color: var(--code-text);
+}
+
+/* Utility classes */
+.font-code {
+  font-family: "Geist Mono", ui-monospace, monospace;
+}
+
+.text-muted {
+  color: var(--muted);
+}
+
+.text-muted-lighter {
+  color: var(--muted-lighter);
+}
+
+.text-interactive {
+  color: var(--interactive-text);
+}
+
+.text-interactive-hover {
+  color: var(--interactive-text-hover);
+}
+
+.bg-interactive-hover {
+  background: var(--interactive-hover);
+}
+
+.bg-interactive-active {
+  background: var(--interactive-active);
+}
+
+.bg-surface {
+  background: var(--surface);
+}
+
+.bg-surface-hover {
+  background: var(--surface-hover);
+}
+
+.border-surface {
+  border-color: var(--surface-border);
+}
+
+.shadow-dev {
+  box-shadow: var(--shadow-md);
+}
+
+.shadow-dev-lg {
+  box-shadow: var(--shadow-lg);
 }

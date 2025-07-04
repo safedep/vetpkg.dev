@@ -589,20 +589,20 @@ export default function Page() {
         <TabsList className="grid w-full md:grid-cols-3 min-h-max">
           <TabsTrigger
             value="insights"
-            className="bg-blue-100 hover:bg-blue-200 dark:bg-blue-900 dark:hover:bg-blue-800 dark:text-blue-100 px-4 py-2 flex items-center gap-2"
+            className="px-4 py-2 flex items-center gap-2"
           >
             📊 Package Insights
           </TabsTrigger>
           <TabsTrigger
             value="malware"
-            className="bg-blue-100 hover:bg-blue-200 dark:bg-blue-900 dark:hover:bg-blue-800 dark:text-blue-100 px-4 py-2 flex items-center gap-2"
+            className="px-4 py-2 flex items-center gap-2"
           >
             🔍 Malware Analysis
           </TabsTrigger>
           <TabsTrigger
             value="back"
             onClick={() => setShowRawJSON(false)}
-            className="bg-blue-100 hover:bg-blue-200 dark:bg-blue-900 dark:hover:bg-blue-800 dark:text-blue-100 px-4 py-2 flex items-center gap-2"
+            className="px-4 py-2 flex items-center gap-2"
           >
             ↩️ Back to UI
           </TabsTrigger>
@@ -759,33 +759,24 @@ export default function Page() {
         {/* Replace the grid div with Tabs */}
         <Tabs defaultValue="security" className="w-full">
           <TabsList className="w-full grid grid-cols-1 md:grid-cols-5 min-h-max">
-            <TabsTrigger
-              value="security"
-              className="flex items-center gap-2 data-[state=active]:bg-blue-100 dark:data-[state=active]:bg-blue-900 dark:data-[state=active]:text-blue-100"
-            >
+            <TabsTrigger value="security" className="flex items-center gap-2">
               🛡️ Security Posture
             </TabsTrigger>
             <TabsTrigger
               value="vulnerabilities"
-              className="flex items-center gap-2 data-[state=active]:bg-red-100 dark:data-[state=active]:bg-red-900 dark:data-[state=active]:text-red-100"
+              className="flex items-center gap-2"
             >
               🔍 Vulnerabilities
             </TabsTrigger>
-            <TabsTrigger
-              value="code"
-              className="flex items-center gap-2 data-[state=active]:bg-green-100 dark:data-[state=active]:bg-green-900 dark:data-[state=active]:text-green-100"
-            >
+            <TabsTrigger value="code" className="flex items-center gap-2">
               🐛 Malicious Package Analysis
             </TabsTrigger>
-            <TabsTrigger
-              value="versions"
-              className="flex items-center gap-2 data-[state=active]:bg-purple-100 dark:data-[state=active]:bg-purple-900 dark:data-[state=active]:text-purple-100"
-            >
+            <TabsTrigger value="versions" className="flex items-center gap-2">
               📦 Available Versions
             </TabsTrigger>
             <TabsTrigger
               value="dependency-graph"
-              className="flex items-center gap-2 data-[state=active]:bg-yellow-100 dark:data-[state=active]:bg-yellow-900 dark:data-[state=active]:text-yellow-100"
+              className="flex items-center gap-2"
             >
               📈 Dependency Graph
             </TabsTrigger>

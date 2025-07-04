@@ -52,15 +52,18 @@ function GitHubStars() {
       href="https://github.com/safedep/vet"
       target="_blank"
       rel="noopener noreferrer"
-      className="flex items-center gap-2 text-sm hover:opacity-90 transition-opacity group"
+      className="flex items-center gap-2 text-sm hover:opacity-90 transition-all group hover:scale-105"
     >
-      <div className="flex items-center gap-1 bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded-md border border-gray-200 dark:border-gray-700">
-        <Star className="h-4 w-4 text-yellow-500" fill="currentColor" />
-        <span className="font-medium">
+      <div className="flex items-center gap-1 bg-surface border border-surface-border px-2 py-1 rounded-md shadow-dev-sm transition-all group-hover:shadow-dev">
+        <Star
+          className="h-4 w-4 text-yellow-500 transition-transform group-hover:scale-110"
+          fill="currentColor"
+        />
+        <span className="font-medium font-code">
           {loading ? "..." : stars?.toLocaleString()}
         </span>
       </div>
-      <span className="text-gray-500 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-300 transition-colors">
+      <span className="text-muted group-hover:text-interactive-text-hover transition-colors font-code">
         Like this? Star us on GitHub
       </span>
     </Link>
@@ -84,12 +87,12 @@ export default function Header() {
     ) || tools[0];
 
   return (
-    <header className="border-b border-gray-200 py-2">
+    <header className="border-b border-surface py-2 bg-surface/50 backdrop-blur-dev">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 flex justify-between items-center">
         <div className="flex items-center">
           <Link
             href="/"
-            className="text-lg font-bold text-gray-900 dark:text-gray-100 mr-8"
+            className="text-lg font-bold text-gradient mr-8 font-code transition-transform hover:scale-105"
           >
             🚀 vet
           </Link>
@@ -103,31 +106,34 @@ export default function Header() {
               size="icon"
               onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
               aria-label="Toggle dark mode"
-              className="mr-2"
+              className="mr-2 hover:bg-surface-hover transition-all hover:scale-105"
             >
               {theme === "dark" ? (
-                <Sun className="h-5 w-5" />
+                <Sun className="h-5 w-5 transition-transform hover:rotate-180" />
               ) : (
-                <Moon className="h-5 w-5" />
+                <Moon className="h-5 w-5 transition-transform hover:rotate-12" />
               )}
             </Button>
           )}
 
           <DropdownMenu>
-            <DropdownMenuTrigger className="inline-flex items-center gap-1.5 text-sm font-medium px-3 py-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none">
-              <Menu className="h-4 w-4" />
+            <DropdownMenuTrigger className="inline-flex items-center gap-1.5 text-sm font-medium px-3 py-1.5 rounded-md hover:bg-interactive-hover focus:outline-none transition-all hover:scale-105 font-code text-interactive hover:text-interactive-text-hover">
+              <Menu className="h-4 w-4 transition-transform hover:rotate-180" />
               <span className="hidden sm:inline">
                 {currentTool.emoji} {currentTool.name}
               </span>
               <span className="inline sm:hidden">{currentTool.emoji}</span>
             </DropdownMenuTrigger>
             <DropdownMenuContent
-              className="bg-gray-100 dark:bg-gray-800 shadow-lg"
+              className="bg-surface border-surface-border shadow-dev-lg backdrop-blur-dev"
               align="end"
             >
               {tools.map((tool) => (
                 <DropdownMenuItem key={tool.path} asChild>
-                  <Link href={tool.path} className="w-full">
+                  <Link
+                    href={tool.path}
+                    className="w-full font-code dropdown-menu-item hover:bg-interactive-hover transition-colors"
+                  >
                     <span className="mr-2">{tool.emoji}</span>
                     {tool.name}
                   </Link>

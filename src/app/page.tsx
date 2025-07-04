@@ -112,7 +112,7 @@ export default function Home() {
                         {...field}
                         type="text"
                         placeholder="pkg:npm/express@4.17.1"
-                        className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent font-mono text-sm transition-all dark:text-gray-200"
+                        className="w-full px-4 py-3 terminal-input font-code text-sm"
                       />
                       <FormMessage />
                     </FormItem>
@@ -120,7 +120,7 @@ export default function Home() {
                 />
                 <button
                   type="submit"
-                  className="w-full px-4 py-3 text-white bg-indigo-600 hover:bg-indigo-700 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors font-semibold"
+                  className="w-full px-4 py-3 btn-primary font-semibold"
                 >
                   Analyze Package 🚀
                 </button>
@@ -199,7 +199,7 @@ export default function Home() {
                         {...field}
                         type="text"
                         placeholder="4.17.1"
-                        className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent font-mono text-sm transition-all dark:text-gray-200"
+                        className="w-full px-4 py-3 terminal-input font-code text-sm"
                       />
                       <FormMessage />
                     </FormItem>
@@ -207,7 +207,7 @@ export default function Home() {
                 />
                 <button
                   type="submit"
-                  className="w-full px-4 py-3 text-white bg-indigo-600 hover:bg-indigo-700 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors font-semibold"
+                  className="w-full px-4 py-3 btn-primary font-semibold"
                 >
                   Analyze Package 🚀
                 </button>
