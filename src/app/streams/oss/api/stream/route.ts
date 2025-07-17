@@ -8,7 +8,7 @@ export async function GET(request: NextRequest) {
     "Content-Type": "text/event-stream",
     "Cache-Control": "no-cache",
     Connection: "keep-alive",
-    "Access-Control-Allow-Origin": "http://localhost:3000, https://vetpkg.dev",
+    "Access-Control-Allow-Origin": "*",
     Vary: "Origin",
     "Access-Control-Allow-Headers": "Cache-Control",
   });
