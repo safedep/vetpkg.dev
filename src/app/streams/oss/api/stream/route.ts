@@ -27,6 +27,11 @@ export async function GET(request: NextRequest) {
           "S2_BASIN",
           "S2_OSS_PACKAGE_READER_STREAM",
         );
+
+        if (!config) {
+          throw new Error("S2 configuration not found");
+        }
+
         const s2Reader = createS2StreamReader<PackageStreamItem>(config!);
 
         // Check for fromSequence query parameter
