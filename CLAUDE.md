@@ -2,6 +2,8 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+IMPORTANT: ALWAYS vet new npm packages using `vet` MCP server before installing or suggesting them.
+
 ## Development Commands
 
 ### Package Manager
