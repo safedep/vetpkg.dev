@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { StreamingPackageList } from "./StreamingPackageList";
 import { PackageStreamItem } from "./types";
+import { ChevronUp, ChevronDown } from "lucide-react";
 
 // Cache configuration
 const CACHE_WINDOW_MS = 5 * 60 * 1000; // 5 minutes in milliseconds
@@ -19,6 +20,7 @@ export default function OSSStreamsPage() {
   const [lastSequenceNumber, setLastSequenceNumber] = useState<number | null>(
     null,
   );
+  const [isStatusExpanded, setIsStatusExpanded] = useState(false);
 
   // Use useRef to maintain cache across renders without causing re-renders
   const packageCacheRef = useRef<Map<string, number>>(new Map());
@@ -50,7 +52,7 @@ export default function OSSStreamsPage() {
   /**
    * Check if a package is a duplicate within the time window
    */
-  const isDuplicate = (packageData: PackageStreamItem): boolean => {
+  const isDuplicate = useCallback((packageData: PackageStreamItem): boolean => {
     const hash = generatePackageHash(packageData);
     const now = Date.now();
 
@@ -64,7 +66,7 @@ export default function OSSStreamsPage() {
     // Add to cache
     packageCacheRef.current.set(hash, now);
     return false;
-  };
+  }, []);
 
   // Set up periodic cache cleanup
   useEffect(() => {
@@ -229,7 +231,7 @@ export default function OSSStreamsPage() {
         clearTimeout(reconnectTimer);
       }
     };
-  }, [forceReconnect, isManuallyDisconnected]);
+  }, [forceReconnect, isManuallyDisconnected, isDuplicate]);
 
   const manualReconnect = () => {
     setReconnectInProgress(true);
@@ -262,13 +264,14 @@ export default function OSSStreamsPage() {
   };
 
   return (
-    <div className="h-screen bg-gray-50 dark:bg-gray-900 overflow-hidden">
-      <div className="container mx-auto px-4 py-8 h-full flex flex-col">
-        <div className="mb-1">
-          <h1 className="text-3xl font-bold mb-2 text-gray-900 dark:text-gray-100">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
+      <div className="container mx-auto px-4 py-4 lg:py-8 flex-1 flex flex-col">
+        {/* Header - compact on mobile */}
+        <div className="mb-4">
+          <h1 className="text-2xl lg:text-3xl font-bold mb-2 text-gray-900 dark:text-gray-100">
             Open Source Package Stream
           </h1>
-          <p className="text-gray-600 dark:text-gray-300 mb-6">
+          <p className="text-sm lg:text-base text-gray-600 dark:text-gray-300 mb-4 lg:mb-6">
             Real-time stream of newly published open source packages monitored
             by &nbsp;
             <a
@@ -290,8 +293,8 @@ export default function OSSStreamsPage() {
             </a>
           </p>
 
-          {/* Call to Action */}
-          <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-6">
+          {/* Call to Action - hidden on mobile */}
+          <div className="hidden lg:block bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-6">
             <div className="flex items-center gap-2">
               <div className="w-4 h-4 text-blue-500 dark:text-blue-400">💡</div>
               <p className="text-blue-700 dark:text-blue-300">
@@ -312,8 +315,142 @@ export default function OSSStreamsPage() {
             </div>
           </div>
 
-          {/* Status Bar */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-600 p-4 mb-6">
+          {/* Mobile Status Bar - Collapsible */}
+          <div className="lg:hidden bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-600 mb-4">
+            <button
+              onClick={() => setIsStatusExpanded(!isStatusExpanded)}
+              className="w-full px-4 py-3 flex items-center justify-between"
+            >
+              <div className="flex items-center gap-3">
+                <div
+                  className={`w-2 h-2 rounded-full ${isConnected ? "bg-green-500" : isManuallyDisconnected ? "bg-gray-500" : "bg-red-500"}`}
+                />
+                <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                  {isConnected
+                    ? "Connected"
+                    : isManuallyDisconnected
+                      ? "Disconnected"
+                      : "Disconnected"}
+                </span>
+                <span className="text-xs font-mono bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100 px-2 py-1 rounded">
+                  {totalPackagesCount}
+                </span>
+              </div>
+              {isStatusExpanded ? (
+                <ChevronUp className="w-4 h-4 text-gray-400" />
+              ) : (
+                <ChevronDown className="w-4 h-4 text-gray-400" />
+              )}
+            </button>
+
+            {isStatusExpanded && (
+              <div className="px-4 pb-4 border-t border-gray-200 dark:border-gray-600">
+                <div className="grid grid-cols-1 gap-3 mt-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-600 dark:text-gray-300">
+                      Packages received:
+                    </span>
+                    <span className="text-sm font-mono bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100 px-2 py-1 rounded">
+                      {totalPackagesCount}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-600 dark:text-gray-300">
+                      Duplicates filtered:
+                    </span>
+                    <span className="text-sm font-mono bg-yellow-100 dark:bg-yellow-900 text-yellow-900 dark:text-yellow-100 px-2 py-1 rounded">
+                      {duplicatesFilteredCount}
+                    </span>
+                  </div>
+
+                  {lastSequenceNumber !== null && (
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-gray-600 dark:text-gray-300">
+                        Last sequence:
+                      </span>
+                      <span className="text-sm font-mono bg-blue-100 dark:bg-blue-900 text-blue-900 dark:text-blue-100 px-2 py-1 rounded">
+                        {lastSequenceNumber}
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Connection status and error */}
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-600 dark:text-gray-300">
+                      Status:
+                    </span>
+                    <div className="flex items-center gap-2">
+                      <div
+                        className={`w-2 h-2 rounded-full ${isConnected ? "bg-green-500" : isManuallyDisconnected ? "bg-gray-500" : "bg-red-500"}`}
+                      />
+                      <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                        {isConnected
+                          ? "Connected"
+                          : isManuallyDisconnected
+                            ? "Manually Disconnected"
+                            : "Disconnected"}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Error message */}
+                  {connectionError && !isManuallyDisconnected && (
+                    <div className="text-xs text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-900/20 p-2 rounded">
+                      {connectionError}
+                    </div>
+                  )}
+
+                  {/* Connection Control Buttons */}
+                  <div className="flex items-center justify-center gap-2 mt-2">
+                    {reconnectInProgress && (
+                      <div className="flex items-center gap-2">
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                        <span className="text-sm text-blue-600 dark:text-blue-400">
+                          Reconnecting...
+                        </span>
+                      </div>
+                    )}
+
+                    {!isConnected &&
+                      !reconnectInProgress &&
+                      connectionError &&
+                      !isManuallyDisconnected && (
+                        <button
+                          onClick={manualReconnect}
+                          className="px-3 py-1 bg-orange-600 dark:bg-orange-700 text-white text-xs rounded-md hover:bg-orange-700 dark:hover:bg-orange-600 transition-colors font-medium"
+                        >
+                          Reconnect
+                        </button>
+                      )}
+
+                    {isConnected &&
+                      !isManuallyDisconnected &&
+                      !reconnectInProgress && (
+                        <button
+                          onClick={manualDisconnect}
+                          className="px-3 py-1 bg-gray-200 dark:bg-gray-700 text-red-600 dark:text-red-400 text-xs rounded-md hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors font-medium"
+                        >
+                          Disconnect
+                        </button>
+                      )}
+
+                    {isManuallyDisconnected && !reconnectInProgress && (
+                      <button
+                        onClick={manualConnect}
+                        className="px-3 py-1 bg-gray-200 dark:bg-gray-700 text-green-600 dark:text-green-400 text-xs rounded-md hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors font-medium"
+                      >
+                        Connect
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Desktop Status Bar */}
+          <div className="hidden lg:block bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-600 p-4 mb-6">
             <div className="flex items-center gap-6 flex-wrap">
               <div className="flex items-center gap-2">
                 <span className="text-sm text-gray-600 dark:text-gray-300">
@@ -410,7 +547,7 @@ export default function OSSStreamsPage() {
           </div>
         </div>
 
-        <div className="flex-1 min-h-0">
+        <div>
           <StreamingPackageList packages={packages} />
         </div>
       </div>
