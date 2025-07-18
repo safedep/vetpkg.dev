@@ -314,20 +314,7 @@ export default function OSSStreamsPage() {
 
           {/* Status Bar */}
           <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-600 p-4 mb-6">
-            <div className="flex items-center gap-6">
-              <div className="flex items-center gap-2">
-                <div
-                  className={`w-2 h-2 rounded-full ${isConnected ? "bg-green-500" : isManuallyDisconnected ? "bg-gray-500" : "bg-red-500"}`}
-                />
-                <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                  {isConnected
-                    ? "Connected"
-                    : isManuallyDisconnected
-                      ? "Manually Disconnected"
-                      : "Disconnected"}
-                </span>
-              </div>
-
+            <div className="flex items-center gap-6 flex-wrap">
               <div className="flex items-center gap-2">
                 <span className="text-sm text-gray-600 dark:text-gray-300">
                   Packages received:
@@ -357,30 +344,63 @@ export default function OSSStreamsPage() {
                 </div>
               )}
 
-              {reconnectInProgress && (
-                <div className="flex items-center gap-2">
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
-                  <span className="text-sm text-blue-600 dark:text-blue-400">
-                    Reconnecting...
+              <div className="flex items-center gap-2">
+                <div
+                  className={`w-2 h-2 rounded-full ${isConnected ? "bg-green-500" : isManuallyDisconnected ? "bg-gray-500" : "bg-red-500"}`}
+                />
+                <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                  {isConnected
+                    ? "Connected"
+                    : isManuallyDisconnected
+                      ? "Manually Disconnected"
+                      : "Disconnected"}
+                </span>
+                {/* Error message integrated into connection status */}
+                {connectionError && !isManuallyDisconnected && (
+                  <span className="text-xs text-orange-600 dark:text-orange-400 ml-2">
+                    — {connectionError}
                   </span>
-                </div>
-              )}
+                )}
+              </div>
 
               {/* Connection Control Buttons */}
               <div className="flex items-center gap-2 ml-auto">
-                {isConnected && !isManuallyDisconnected && (
-                  <button
-                    onClick={manualDisconnect}
-                    className="px-4 py-2 bg-red-600 dark:bg-red-700 text-white text-sm rounded-md hover:bg-red-700 dark:hover:bg-red-600 transition-colors font-medium"
-                  >
-                    Disconnect
-                  </button>
+                {reconnectInProgress && (
+                  <div className="flex items-center gap-2">
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                    <span className="text-sm text-blue-600 dark:text-blue-400">
+                      Reconnecting...
+                    </span>
+                  </div>
                 )}
 
-                {isManuallyDisconnected && (
+                {!isConnected &&
+                  !reconnectInProgress &&
+                  connectionError &&
+                  !isManuallyDisconnected && (
+                    <button
+                      onClick={manualReconnect}
+                      className="px-3 py-1 bg-orange-600 dark:bg-orange-700 text-white text-xs rounded-md hover:bg-orange-700 dark:hover:bg-orange-600 transition-colors font-medium"
+                    >
+                      Reconnect
+                    </button>
+                  )}
+
+                {isConnected &&
+                  !isManuallyDisconnected &&
+                  !reconnectInProgress && (
+                    <button
+                      onClick={manualDisconnect}
+                      className="px-3 py-1 bg-gray-200 dark:bg-gray-700 text-red-600 dark:text-red-400 text-xs rounded-md hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors font-medium"
+                    >
+                      Disconnect
+                    </button>
+                  )}
+
+                {isManuallyDisconnected && !reconnectInProgress && (
                   <button
                     onClick={manualConnect}
-                    className="px-4 py-2 bg-green-600 dark:bg-green-700 text-white text-sm rounded-md hover:bg-green-700 dark:hover:bg-green-600 transition-colors font-medium"
+                    className="px-3 py-1 bg-gray-200 dark:bg-gray-700 text-green-600 dark:text-green-400 text-xs rounded-md hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors font-medium"
                   >
                     Connect
                   </button>
@@ -388,29 +408,6 @@ export default function OSSStreamsPage() {
               </div>
             </div>
           </div>
-
-          {connectionError && !isManuallyDisconnected && (
-            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 mb-6">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 text-red-500 dark:text-red-400">
-                    ⚠
-                  </div>
-                  <p className="text-red-700 dark:text-red-300 font-medium">
-                    {connectionError}
-                  </p>
-                </div>
-                {!isConnected && !reconnectInProgress && (
-                  <button
-                    onClick={manualReconnect}
-                    className="px-4 py-2 bg-red-600 dark:bg-red-700 text-white text-sm rounded-md hover:bg-red-700 dark:hover:bg-red-600 transition-colors font-medium"
-                  >
-                    Reconnect
-                  </button>
-                )}
-              </div>
-            </div>
-          )}
         </div>
 
         <div className="flex-1 min-h-0">

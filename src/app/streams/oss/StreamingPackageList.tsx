@@ -102,14 +102,11 @@ export function StreamingPackageList({ packages }: StreamingPackageListProps) {
                 : "unknown"}
             </span>
             <Link
-              href={`/v/${pkg.package?.ecosystem ? formatEcosystem(pkg.package.ecosystem) : "unknown"}/${pkg.package?.name || "unknown"}/${pkg.version || "unknown"}`}
+              href="#"
               className="text-cyan-400 dark:text-cyan-300 ml-2 hover:text-cyan-300 dark:hover:text-cyan-200 hover:underline"
             >
-              {pkg.package?.name || "unknown"}
+              {pkg.package?.name || "unknown"}@{pkg.version || "unknown"}
             </Link>
-            <span className="text-gray-400 dark:text-gray-300 ml-1">
-              @{pkg.version || "unknown"}
-            </span>
           </div>
         ))}
 
