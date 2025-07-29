@@ -30,7 +30,16 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
-import { ExternalLink, Copy, MoreHorizontal } from "lucide-react";
+import {
+  ExternalLink,
+  Copy,
+  MoreHorizontal,
+  Filter,
+  ChevronDown,
+  Github,
+  Shield,
+  Terminal,
+} from "lucide-react";
 import Footer from "@/components/app/footer";
 
 export default function MalwarePage() {
@@ -48,6 +57,7 @@ export default function MalwarePage() {
     pageSize: 10,
   });
   const [autoRefresh, setAutoRefresh] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
   const refreshTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   const fetchRecords = useCallback(
@@ -177,86 +187,145 @@ export default function MalwarePage() {
       </p>
 
       <div className="mb-8">
-        <a
-          href="https://docs.safedep.io/cloud/malware-analysis"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <span className="inline-flex items-center gap-1 px-4 py-2 text-sm font-mono bg-indigo-100 hover:bg-indigo-200 dark:bg-indigo-900/30 dark:hover:bg-indigo-800/40 text-indigo-700 dark:text-indigo-300 rounded-md shadow-sm hover:shadow transition-all duration-200 border border-indigo-200 dark:border-indigo-800/30">
-            <code className="text-indigo-500 dark:text-indigo-400">$</code>
-            vet scan --malware
-            <span className="opacity-75">|</span>
-            Enforce CI/CD Guardrails
-          </span>
-        </a>
+        <div className="bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-950/50 dark:to-purple-950/50 rounded-lg border border-indigo-200/50 dark:border-indigo-800/30 p-6">
+          <div className="flex items-start gap-4">
+            <div className="flex-shrink-0">
+              <div className="w-12 h-12 bg-indigo-100 dark:bg-indigo-900/50 rounded-lg flex items-center justify-center">
+                <Shield className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
+              </div>
+            </div>
+            <div className="flex-1 min-w-0">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
+                Protect Your CI/CD Pipeline
+              </h3>
+              <p className="text-gray-600 dark:text-gray-400 text-sm mb-4">
+                Use SafeDep vet to automatically detect and block malicious
+                packages before they reach production. Add security scanning to
+                your workflow in minutes.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-3">
+                <a
+                  href="https://github.com/safedep/vet"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group"
+                >
+                  <div className="inline-flex items-center gap-3 px-4 py-3 bg-gray-900 hover:bg-gray-800 dark:bg-gray-700 dark:hover:bg-gray-600 text-white rounded-lg font-medium text-sm transition-all duration-200 shadow-sm hover:shadow-md">
+                    <Terminal className="w-4 h-4" />
+                    <code className="font-mono">$ vet scan --malware</code>
+                    <Github className="w-4 h-4 opacity-75 group-hover:opacity-100 transition-opacity" />
+                  </div>
+                </a>
+                <a
+                  href="https://docs.safedep.io/cloud/malware-analysis"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-4 py-3 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg font-medium text-sm transition-all duration-200 shadow-sm hover:shadow-md border border-gray-200 dark:border-gray-700"
+                >
+                  <ExternalLink className="w-4 h-4" />
+                  View Documentation
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div className="flex flex-col space-y-6">
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-xl font-mono">Filters</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex flex-wrap gap-6">
-              <div className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  id="onlyMalware"
-                  checked={filters.onlyMalware}
-                  onChange={(e) =>
-                    handleFilterChange("onlyMalware", e.target.checked)
-                  }
-                  className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                />
-                <Label htmlFor="onlyMalware">Only Malware</Label>
-              </div>
+        <div className="bg-gray-50 dark:bg-gray-900/50 rounded-lg border border-gray-200 dark:border-gray-800">
+          <Button
+            variant="ghost"
+            onClick={() => setShowFilters(!showFilters)}
+            className="w-full flex items-center justify-between p-3 text-sm font-medium hover:bg-gray-100 dark:hover:bg-gray-800/50"
+          >
+            <div className="flex items-center gap-2">
+              <Filter className="h-4 w-4" />
+              <span>Filters</span>
+              {(filters.onlyMalware ||
+                filters.onlyVerified ||
+                autoRefresh ||
+                filters.pageSize !== 10) && (
+                <span className="ml-2 px-2 py-0.5 bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 text-xs rounded-full">
+                  Active
+                </span>
+              )}
+            </div>
+            <ChevronDown
+              className={`h-4 w-4 transition-transform ${showFilters ? "rotate-180" : ""}`}
+            />
+          </Button>
 
-              <div className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  id="onlyVerified"
-                  checked={filters.onlyVerified}
-                  onChange={(e) =>
-                    handleFilterChange("onlyVerified", e.target.checked)
-                  }
-                  className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                />
-                <Label htmlFor="onlyVerified">Only Verified</Label>
-              </div>
+          {showFilters && (
+            <div className="px-4 pb-4 border-t border-gray-200 dark:border-gray-700">
+              <div className="flex flex-wrap gap-4 pt-4">
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    id="onlyMalware"
+                    checked={filters.onlyMalware}
+                    onChange={(e) =>
+                      handleFilterChange("onlyMalware", e.target.checked)
+                    }
+                    className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                  />
+                  <Label htmlFor="onlyMalware" className="text-sm">
+                    Only Malware
+                  </Label>
+                </div>
 
-              <div className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  id="autoRefresh"
-                  checked={autoRefresh}
-                  onChange={(e) => setAutoRefresh(e.target.checked)}
-                  className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                />
-                <Label htmlFor="autoRefresh">Auto Refresh (5s)</Label>
-              </div>
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    id="onlyVerified"
+                    checked={filters.onlyVerified}
+                    onChange={(e) =>
+                      handleFilterChange("onlyVerified", e.target.checked)
+                    }
+                    className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                  />
+                  <Label htmlFor="onlyVerified" className="text-sm">
+                    Only Verified
+                  </Label>
+                </div>
 
-              <div className="flex items-center space-x-2">
-                <Label htmlFor="pageSize">Page Size:</Label>
-                <Select
-                  value={filters.pageSize.toString()}
-                  onValueChange={(value) =>
-                    handleFilterChange("pageSize", parseInt(value))
-                  }
-                >
-                  <SelectTrigger className="w-24">
-                    <SelectValue placeholder="10" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-gray-100 dark:bg-gray-800 shadow-lg">
-                    <SelectItem value="10">10</SelectItem>
-                    <SelectItem value="25">25</SelectItem>
-                    <SelectItem value="50">50</SelectItem>
-                    <SelectItem value="100">100</SelectItem>
-                  </SelectContent>
-                </Select>
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    id="autoRefresh"
+                    checked={autoRefresh}
+                    onChange={(e) => setAutoRefresh(e.target.checked)}
+                    className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                  />
+                  <Label htmlFor="autoRefresh" className="text-sm">
+                    Auto Refresh (5s)
+                  </Label>
+                </div>
+
+                <div className="flex items-center space-x-2">
+                  <Label htmlFor="pageSize" className="text-sm">
+                    Page Size:
+                  </Label>
+                  <Select
+                    value={filters.pageSize.toString()}
+                    onValueChange={(value) =>
+                      handleFilterChange("pageSize", parseInt(value))
+                    }
+                  >
+                    <SelectTrigger className="w-20 h-8">
+                      <SelectValue placeholder="10" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-gray-100 dark:bg-gray-800 shadow-lg">
+                      <SelectItem value="10">10</SelectItem>
+                      <SelectItem value="25">25</SelectItem>
+                      <SelectItem value="50">50</SelectItem>
+                      <SelectItem value="100">100</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
             </div>
-          </CardContent>
-        </Card>
+          )}
+        </div>
 
         <Card>
           <CardContent className="pt-6">
