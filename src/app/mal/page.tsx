@@ -1,7 +1,14 @@
 "use client";
 
+import Footer from "@/components/app/footer";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -22,25 +29,18 @@ import { ToEcosystemName } from "@/lib/rpc/utils";
 import { PackageAnalysisTarget } from "@buf/safedep_api.bufbuild_es/safedep/messages/malysis/v1/request_pb";
 import { ListPackageAnalysisRecordsResponse_AnalysisRecord } from "@buf/safedep_api.bufbuild_es/safedep/services/malysis/v1/malysis_pb";
 import { Timestamp } from "@bufbuild/protobuf/wkt";
-import { useEffect, useState, useRef, useCallback } from "react";
-import { listMalwareAnalysis } from "./actions";
 import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-} from "@/components/ui/dropdown-menu";
-import {
-  ExternalLink,
-  Copy,
-  MoreHorizontal,
-  Filter,
   ChevronDown,
+  Copy,
+  ExternalLink,
+  Filter,
   Github,
+  MoreHorizontal,
   Shield,
   Terminal,
 } from "lucide-react";
-import Footer from "@/components/app/footer";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { listMalwareAnalysis } from "./actions";
 
 export default function MalwarePage() {
   const [loading, setLoading] = useState(true);
