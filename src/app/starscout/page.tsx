@@ -54,15 +54,15 @@ export default function StarScoutPage() {
   };
 
   return (
-    <div className="min-h-screen py-8 px-4 max-w-6xl mx-auto">
-      <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl mb-4 font-mono text-center">
+    <div className="mx-auto min-h-screen max-w-6xl px-4 py-8">
+      <h1 className="mb-4 scroll-m-20 text-center font-mono text-4xl font-extrabold tracking-tight lg:text-5xl">
         <span role="img" aria-label="magnifying glass">
           🔍
         </span>{" "}
         <span className="text-indigo-500 dark:text-indigo-400">StarScout</span>
       </h1>
 
-      <p className="text-lg text-gray-600 dark:text-gray-300 mb-8 max-w-3xl mx-auto text-center">
+      <p className="mx-auto mb-8 max-w-3xl text-center text-lg text-gray-600 dark:text-gray-300">
         Detect fake GitHub stars and evaluate repository risk using the
         <a
           href="https://arxiv.org/abs/2412.13459"
@@ -75,11 +75,11 @@ export default function StarScoutPage() {
         </a>{" "}
         approach.
       </p>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+      <div className="mb-12 grid grid-cols-1 gap-8 md:grid-cols-2">
         {/* Left column - Form */}
         <div className="space-y-6">
-          <div className="border border-indigo-200 dark:border-indigo-800 rounded-lg shadow-lg bg-white dark:bg-gray-800 p-6">
-            <h2 className="text-xl font-bold mb-4">Analyze Repository</h2>
+          <div className="rounded-lg border border-indigo-200 bg-white p-6 shadow-lg dark:border-indigo-800 dark:bg-gray-800">
+            <h2 className="mb-4 text-xl font-bold">Analyze Repository</h2>
             <Form {...githubRepoForm}>
               <form
                 className="w-full space-y-4"
@@ -90,14 +90,14 @@ export default function StarScoutPage() {
                   name="repoUrl"
                   render={({ field }) => (
                     <FormItem>
-                      <div className="font-mono text-sm text-gray-500 dark:text-gray-400 mb-2">
+                      <div className="mb-2 font-mono text-sm text-gray-500 dark:text-gray-400">
                         GitHub Repository URL
                       </div>
                       <input
                         {...field}
                         type="text"
                         placeholder="https://github.com/username/repository"
-                        className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent font-mono text-sm transition-all dark:text-gray-200"
+                        className="w-full rounded-md border border-gray-200 bg-gray-50 px-4 py-3 font-mono text-sm shadow-xs transition-all focus:border-transparent focus:ring-2 focus:ring-indigo-500 focus:outline-hidden dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200"
                         disabled={isAuthenticating}
                       />
                       <FormMessage />
@@ -105,8 +105,8 @@ export default function StarScoutPage() {
                   )}
                 />
 
-                <div className="text-sm text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/30 p-3 rounded-md border border-amber-200 dark:border-amber-800">
-                  <p className="font-medium mb-1">
+                <div className="rounded-md border border-amber-200 bg-amber-50 p-3 text-sm text-amber-600 dark:border-amber-800 dark:bg-amber-900/30 dark:text-amber-400">
+                  <p className="mb-1 font-medium">
                     GitHub Authentication Required
                   </p>
                   <p>
@@ -118,15 +118,15 @@ export default function StarScoutPage() {
 
                 <button
                   type="submit"
-                  className={`w-full px-4 py-3 text-white bg-indigo-600 hover:bg-indigo-700 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors font-semibold ${
-                    isAuthenticating ? "opacity-70 cursor-not-allowed" : ""
+                  className={`w-full rounded-md bg-indigo-600 px-4 py-3 font-semibold text-white shadow-xs transition-colors hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:outline-hidden ${
+                    isAuthenticating ? "cursor-not-allowed opacity-70" : ""
                   }`}
                   disabled={isAuthenticating}
                 >
                   {isAuthenticating ? (
                     <span className="flex items-center justify-center">
                       <svg
-                        className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                        className="mr-3 -ml-1 h-5 w-5 animate-spin text-white"
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"
                         viewBox="0 0 24 24"
@@ -158,8 +158,8 @@ export default function StarScoutPage() {
 
         {/* Right column - Info */}
         <div className="space-y-6">
-          <div className="border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg p-6 bg-white dark:bg-gray-800">
-            <h2 className="text-xl font-bold mb-4">About StarScout</h2>
+          <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-lg dark:border-gray-700 dark:bg-gray-800">
+            <h2 className="mb-4 text-xl font-bold">About StarScout</h2>
             <div className="space-y-4">
               <p>
                 <a
@@ -170,7 +170,7 @@ export default function StarScoutPage() {
                 >
                   StarScout{" "}
                   <svg
-                    className="inline-block w-4 h-4 ml-0.5"
+                    className="ml-0.5 inline-block h-4 w-4"
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
                     viewBox="0 0 24 24"
@@ -188,8 +188,8 @@ export default function StarScoutPage() {
                 the risk of a repository being part of a fake-star campaign.
               </p>
 
-              <h3 className="font-bold text-md">How StarScout Works:</h3>
-              <ul className="list-disc pl-5 space-y-2 text-gray-700 dark:text-gray-300">
+              <h3 className="text-md font-bold">How StarScout Works:</h3>
+              <ul className="list-disc space-y-2 pl-5 text-gray-700 dark:text-gray-300">
                 <li>
                   <span className="font-semibold">Low-activity signature:</span>{" "}
                   Identifies one-shot or throw-away accounts with minimal GitHub
@@ -207,8 +207,8 @@ export default function StarScoutPage() {
                 </li>
               </ul>
 
-              <h3 className="font-bold text-md mt-4">Why This Matters:</h3>
-              <ul className="list-disc pl-5 space-y-2 text-gray-700 dark:text-gray-300">
+              <h3 className="text-md mt-4 font-bold">Why This Matters:</h3>
+              <ul className="list-disc space-y-2 pl-5 text-gray-700 dark:text-gray-300">
                 <li>
                   15.8% of trending repositories in mid-2024 were artificially
                   boosted

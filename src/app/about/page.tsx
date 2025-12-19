@@ -44,7 +44,7 @@ export default function AboutPage() {
 
             <section className="space-y-4">
               <h2 className="text-xl font-semibold">Key Features</h2>
-              <ul className="list-disc list-inside space-y-2 text-muted-foreground dark:text-gray-400">
+              <ul className="text-muted-foreground list-inside list-disc space-y-2 dark:text-gray-400">
                 <li>
                   Deep package analysis with vulnerability and CVE detection
                 </li>
@@ -63,7 +63,7 @@ export default function AboutPage() {
                     <CardTitle className="text-lg">SafeDep Cloud API</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-sm text-muted-foreground dark:text-gray-400">
+                    <p className="text-muted-foreground text-sm dark:text-gray-400">
                       SafeDep Cloud API provides aggregated open source package
                       security insights data. It also provides a{" "}
                       <Link
@@ -92,7 +92,7 @@ export default function AboutPage() {
                     <CardTitle className="text-lg">OpenSSF Scorecard</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-sm text-muted-foreground dark:text-gray-400">
+                    <p className="text-muted-foreground text-sm dark:text-gray-400">
                       Security health metrics from the Open Source Security
                       Foundation&apos;s Scorecard project.
                     </p>
@@ -112,7 +112,7 @@ export default function AboutPage() {
                     <CardTitle className="text-lg">deps.dev</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-sm text-muted-foreground dark:text-gray-400">
+                    <p className="text-muted-foreground text-sm dark:text-gray-400">
                       Google&apos;s OSS insights project providing insights into
                       package metadata, dependencies, and security information
                       across multiple ecosystems.
@@ -133,7 +133,7 @@ export default function AboutPage() {
                     <CardTitle className="text-lg">OSV</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-sm text-muted-foreground dark:text-gray-400">
+                    <p className="text-muted-foreground text-sm dark:text-gray-400">
                       Vulnerability database for open source projects maintained
                       by the Google Open Source Security team.
                     </p>

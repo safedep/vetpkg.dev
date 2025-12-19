@@ -58,21 +58,21 @@ export function DiffViewer({
   );
 
   return (
-    <div className="flex flex-col w-full">
+    <div className="flex w-full flex-col">
       <Tabs
         defaultValue="vulnerabilities"
-        className="w-full dark:text-white text-gray-800"
+        className="w-full text-gray-800 dark:text-white"
       >
         <TabsList>
           <TabsTrigger
             value="vulnerabilities"
-            className="dark:text-white text-gray-800"
+            className="text-gray-800 dark:text-white"
           >
             Vulnerabilities
           </TabsTrigger>
           <TabsTrigger
             value="malware"
-            className="dark:text-white text-gray-800"
+            className="text-gray-800 dark:text-white"
           >
             Malware Analysis
           </TabsTrigger>
@@ -87,10 +87,10 @@ export function DiffViewer({
               <div className="space-y-6">
                 {/* New Vulnerabilities */}
                 <div>
-                  <h3 className="text-lg font-semibold mb-2">
+                  <h3 className="mb-2 text-lg font-semibold">
                     New Vulnerabilities in {currentVersion}
                   </h3>
-                  <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+                  <p className="mb-4 text-sm text-gray-500 dark:text-gray-400">
                     These vulnerabilities were discovered in {currentVersion}{" "}
                     but were not present in {compareVersion}.
                   </p>
@@ -132,10 +132,10 @@ export function DiffViewer({
 
                 {/* Removed Vulnerabilities */}
                 <div>
-                  <h3 className="text-lg font-semibold mb-2">
+                  <h3 className="mb-2 text-lg font-semibold">
                     Vulnerabilities Fixed from {compareVersion}
                   </h3>
-                  <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+                  <p className="mb-4 text-sm text-gray-500 dark:text-gray-400">
                     These vulnerabilities were present in {compareVersion} but
                     have been fixed in the current version.
                   </p>
@@ -185,10 +185,10 @@ export function DiffViewer({
               <div className="space-y-6">
                 {/* New Malware Evidence */}
                 <div>
-                  <h3 className="text-lg font-semibold mb-2">
+                  <h3 className="mb-2 text-lg font-semibold">
                     New Malware Evidence in {currentVersion}
                   </h3>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-muted-foreground text-sm">
                     Malicious code patterns and behaviors detected in this
                     version that were not present before
                   </p>
@@ -229,10 +229,10 @@ export function DiffViewer({
 
                 {/* Removed Malware Evidence */}
                 <div>
-                  <h3 className="text-lg font-semibold mb-2">
+                  <h3 className="mb-2 text-lg font-semibold">
                     Resolved Malware Evidence from {compareVersion}
                   </h3>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-muted-foreground text-sm">
                     Malicious code patterns and behaviors that were present in
                     the previous version but have been removed
                   </p>

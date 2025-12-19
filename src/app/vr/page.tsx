@@ -36,9 +36,9 @@ export default function Page() {
   return (
     <div className="container mx-auto p-6">
       {!showTabs ? (
-        <div className="flex items-center justify-center min-h-screen flex-col">
+        <div className="flex min-h-screen flex-col items-center justify-center">
           <div className="w-full max-w-3xl">
-            <h2 className="text-center text-4xl font-bold mb-4">
+            <h2 className="mb-4 text-center text-4xl font-bold">
               <a
                 href="https://github.com/safedep/vet"
                 target="_blank"
@@ -53,7 +53,7 @@ export default function Page() {
             </h2>
           </div>
           <div className="w-full max-w-3xl">
-            <Card className="w-full max-w-3xl mx-auto shadow-lg">
+            <Card className="mx-auto w-full max-w-3xl shadow-lg">
               <CardContent className="pt-6">
                 <div className="space-y-6">
                   <FileUpload onDataUpdate={handleDataUpdate} />
@@ -61,7 +61,7 @@ export default function Page() {
                     <span>or </span>
                     <Button
                       variant="link"
-                      className="p-0 h-auto font-normal text-indigo-500 hover:text-indigo-600 dark:text-indigo-400 dark:hover:text-indigo-300"
+                      className="h-auto p-0 font-normal text-indigo-500 hover:text-indigo-600 dark:text-indigo-400 dark:hover:text-indigo-300"
                       onClick={handleShowExample}
                     >
                       📊 view example analysis
@@ -75,14 +75,14 @@ export default function Page() {
         </div>
       ) : (
         <>
-          <div className="flex flex-col items-center p-4 rounded-lg shadow-md dark:bg-gray-800">
-            <div className="w-full flex justify-end">
+          <div className="flex flex-col items-center rounded-lg p-4 shadow-md dark:bg-gray-800">
+            <div className="flex w-full justify-end">
               <Button
                 variant="outline"
                 onClick={handleBack}
                 className="text-indigo-800 dark:text-indigo-300"
               >
-                <ArrowLeft className="w-4 h-4 mr-2" />
+                <ArrowLeft className="mr-2 h-4 w-4" />
                 Back to upload
               </Button>
             </div>
@@ -90,36 +90,36 @@ export default function Page() {
               <TabsList className="grid w-full grid-cols-4 gap-2">
                 <TabsTrigger
                   value="violations"
-                  className="flex items-center justify-center p-2 bg-indigo-100 dark:bg-indigo-900 hover:bg-indigo-200 dark:hover:bg-indigo-800 rounded-md"
+                  className="flex items-center justify-center rounded-md bg-indigo-100 p-2 hover:bg-indigo-200 dark:bg-indigo-900 dark:hover:bg-indigo-800"
                 >
-                  <AlertCircle className="w-4 h-4 mr-2 text-indigo-500 dark:text-indigo-400" />
+                  <AlertCircle className="mr-2 h-4 w-4 text-indigo-500 dark:text-indigo-400" />
                   <span className="font-semibold text-indigo-600 dark:text-indigo-300">
                     🚨 Policy Violations
                   </span>
                 </TabsTrigger>
                 <TabsTrigger
                   value="vulnerabilities"
-                  className="flex items-center justify-center p-2 bg-indigo-100 dark:bg-indigo-900 hover:bg-indigo-200 dark:hover:bg-indigo-800 rounded-md"
+                  className="flex items-center justify-center rounded-md bg-indigo-100 p-2 hover:bg-indigo-200 dark:bg-indigo-900 dark:hover:bg-indigo-800"
                 >
-                  <Shield className="w-4 h-4 mr-2 text-indigo-500 dark:text-indigo-400" />
+                  <Shield className="mr-2 h-4 w-4 text-indigo-500 dark:text-indigo-400" />
                   <span className="font-semibold text-indigo-600 dark:text-indigo-300">
                     🛡️ Vulnerabilities
                   </span>
                 </TabsTrigger>
                 <TabsTrigger
                   value="licenses"
-                  className="flex items-center justify-center p-2 bg-indigo-100 dark:bg-indigo-900 hover:bg-indigo-200 dark:hover:bg-indigo-800 rounded-md"
+                  className="flex items-center justify-center rounded-md bg-indigo-100 p-2 hover:bg-indigo-200 dark:bg-indigo-900 dark:hover:bg-indigo-800"
                 >
-                  <Book className="w-4 h-4 mr-2 text-indigo-500 dark:text-indigo-400" />
+                  <Book className="mr-2 h-4 w-4 text-indigo-500 dark:text-indigo-400" />
                   <span className="font-semibold text-indigo-600 dark:text-indigo-300">
                     📚 License Info
                   </span>
                 </TabsTrigger>
                 <TabsTrigger
                   value="popularity"
-                  className="flex items-center justify-center p-2 bg-indigo-100 dark:bg-indigo-900 hover:bg-indigo-200 dark:hover:bg-indigo-800 rounded-md"
+                  className="flex items-center justify-center rounded-md bg-indigo-100 p-2 hover:bg-indigo-200 dark:bg-indigo-900 dark:hover:bg-indigo-800"
                 >
-                  <Star className="w-4 h-4 mr-2 text-indigo-500 dark:text-indigo-400" />
+                  <Star className="mr-2 h-4 w-4 text-indigo-500 dark:text-indigo-400" />
                   <span className="font-semibold text-indigo-600 dark:text-indigo-300">
                     ⭐ Popularity
                   </span>

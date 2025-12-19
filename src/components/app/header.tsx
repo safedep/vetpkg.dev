@@ -53,18 +53,18 @@ function GitHubStars() {
       href="https://github.com/safedep/vet"
       target="_blank"
       rel="noopener noreferrer"
-      className="flex items-center gap-2 text-sm hover:opacity-90 transition-all group hover:scale-105"
+      className="group flex items-center gap-2 text-sm transition-all hover:scale-105 hover:opacity-90"
     >
-      <div className="flex items-center gap-1 bg-surface border border-surface-border px-2 py-1 rounded-md shadow-dev-sm transition-all group-hover:shadow-dev">
+      <div className="bg-surface border-surface-border shadow-dev-sm group-hover:shadow-dev flex items-center gap-1 rounded-md border px-2 py-1 transition-all">
         <Star
           className="h-4 w-4 text-yellow-500 transition-transform group-hover:scale-110"
           fill="currentColor"
         />
-        <span className="font-medium font-code">
+        <span className="font-code font-medium">
           {loading ? "..." : stars?.toLocaleString()}
         </span>
       </div>
-      <span className="text-muted group-hover:text-interactive-text-hover transition-colors font-code">
+      <span className="text-muted group-hover:text-interactive-text-hover font-code transition-colors">
         Like this? Star us on GitHub
       </span>
     </Link>
@@ -88,12 +88,12 @@ export default function Header() {
     ) || tools[0];
 
   return (
-    <header className="border-b border-surface py-2 bg-surface/50 backdrop-blur-dev">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 flex justify-between items-center">
+    <header className="border-surface bg-surface/50 backdrop-blur-dev border-b py-2">
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 sm:px-6">
         <div className="flex items-center">
           <Link
             href="/"
-            className="text-lg font-bold text-gradient mr-8 font-code transition-transform hover:scale-105"
+            className="text-gradient font-code mr-8 text-lg font-bold transition-transform hover:scale-105"
           >
             🚀 vet
           </Link>
@@ -107,7 +107,7 @@ export default function Header() {
               size="icon"
               onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
               aria-label="Toggle dark mode"
-              className="mr-2 hover:bg-surface-hover transition-all hover:scale-105"
+              className="hover:bg-surface-hover mr-2 transition-all hover:scale-105"
             >
               {theme === "dark" ? (
                 <Sun className="h-5 w-5 transition-transform hover:rotate-180" />
@@ -118,7 +118,7 @@ export default function Header() {
           )}
 
           <DropdownMenu>
-            <DropdownMenuTrigger className="inline-flex items-center gap-1.5 text-sm font-medium px-3 py-1.5 rounded-md hover:bg-interactive-hover focus:outline-none transition-all hover:scale-105 font-code text-interactive hover:text-interactive-text-hover">
+            <DropdownMenuTrigger className="hover:bg-interactive-hover font-code text-interactive hover:text-interactive-text-hover inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition-all hover:scale-105 focus:outline-hidden">
               <Menu className="h-4 w-4 transition-transform hover:rotate-180" />
               <span className="hidden sm:inline">
                 {currentTool.emoji} {currentTool.name}
@@ -133,7 +133,7 @@ export default function Header() {
                 <DropdownMenuItem key={tool.path} asChild>
                   <Link
                     href={tool.path}
-                    className="w-full font-code dropdown-menu-item hover:bg-interactive-hover transition-colors"
+                    className="font-code dropdown-menu-item hover:bg-interactive-hover w-full transition-colors"
                   >
                     <span className="mr-2">{tool.emoji}</span>
                     {tool.name}

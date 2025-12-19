@@ -78,7 +78,7 @@ const DependencyGraph: React.FC<DependencyGraphProps> = ({
   }
 
   if (!mounted) {
-    return <div className="w-full h-full min-h-[400px]">Loading graph...</div>;
+    return <div className="h-full min-h-[400px] w-full">Loading graph...</div>;
   }
 
   // Define colors based on theme
@@ -89,7 +89,7 @@ const DependencyGraph: React.FC<DependencyGraphProps> = ({
   const textColor = isDarkMode ? "#f3f4f6" : "#1f2937"; // gray-100 in dark mode, gray-800 in light mode
 
   return (
-    <div className="w-full h-full min-h-[400px]">
+    <div className="h-full min-h-[400px] w-full">
       {graphData.nodes.length > 0 && (
         <MemoizedGraph
           id="dependency-graph"

@@ -53,12 +53,12 @@ export default function RootLayout({
         </Script>
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col min-h-screen`}
+        className={`${geistSans.variable} ${geistMono.variable} flex min-h-screen flex-col antialiased`}
       >
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <Theme>
             <Header />
-            <main className="flex-grow">{children}</main>
+            <main className="grow">{children}</main>
             <Analytics />
             <Toaster />
           </Theme>

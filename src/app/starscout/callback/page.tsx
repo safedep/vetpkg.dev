@@ -29,8 +29,8 @@ function ResultsDisplay({ results }: { results: StarScoutResults }) {
 
   return (
     <div className="space-y-8">
-      <div className="p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700">
-        <div className="flex justify-between items-center mb-4">
+      <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-lg dark:border-gray-700 dark:bg-gray-800">
+        <div className="mb-4 flex items-center justify-between">
           <h2 className="text-2xl font-bold">
             Analysis Results for{" "}
             <a
@@ -44,9 +44,9 @@ function ResultsDisplay({ results }: { results: StarScoutResults }) {
           </h2>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-          <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-            <h3 className="text-lg font-semibold mb-2">Summary</h3>
+        <div className="mb-6 grid grid-cols-1 gap-6 md:grid-cols-2">
+          <div className="rounded-lg bg-gray-50 p-4 dark:bg-gray-700">
+            <h3 className="mb-2 text-lg font-semibold">Summary</h3>
             <div className="space-y-2">
               <div className="flex justify-between">
                 <span className="text-gray-600 dark:text-gray-400">
@@ -89,10 +89,10 @@ function ResultsDisplay({ results }: { results: StarScoutResults }) {
             </div>
           </div>
 
-          <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-            <h3 className="text-lg font-semibold mb-2">Risk Score</h3>
+          <div className="rounded-lg bg-gray-50 p-4 dark:bg-gray-700">
+            <h3 className="mb-2 text-lg font-semibold">Risk Score</h3>
             <div className="mt-2">
-              <div className="relative w-full h-6 bg-gray-200 dark:bg-gray-600 rounded-full overflow-hidden">
+              <div className="relative h-6 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-gray-600">
                 <div
                   className={`h-full ${
                     results.riskScore > 75
@@ -106,7 +106,7 @@ function ResultsDisplay({ results }: { results: StarScoutResults }) {
                   style={{ width: `${results.riskScore}%` }}
                 ></div>
               </div>
-              <div className="flex justify-between mt-1">
+              <div className="mt-1 flex justify-between">
                 <span className="text-xs text-gray-500 dark:text-gray-400">
                   Low Risk
                 </span>
@@ -123,9 +123,9 @@ function ResultsDisplay({ results }: { results: StarScoutResults }) {
 
         <div className="space-y-4">
           <h3 className="text-lg font-semibold">Detected Issues</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div
-              className={`p-4 rounded-lg border ${
+              className={`rounded-lg border p-4 ${
                 results.hasLowActivityStars
                   ? "border-amber-200 bg-amber-50 dark:border-amber-800 dark:bg-amber-900/30"
                   : "border-gray-200 bg-gray-50 dark:border-gray-700 dark:bg-gray-800"
@@ -133,7 +133,7 @@ function ResultsDisplay({ results }: { results: StarScoutResults }) {
             >
               <div className="flex items-center">
                 <div
-                  className={`w-8 h-8 rounded-full flex items-center justify-center mr-3 ${
+                  className={`mr-3 flex h-8 w-8 items-center justify-center rounded-full ${
                     results.hasLowActivityStars
                       ? "bg-amber-200 dark:bg-amber-800"
                       : "bg-gray-200 dark:bg-gray-700"
@@ -159,7 +159,7 @@ function ResultsDisplay({ results }: { results: StarScoutResults }) {
             </div>
 
             <div
-              className={`p-4 rounded-lg border ${
+              className={`rounded-lg border p-4 ${
                 results.hasLockStepStars
                   ? "border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-900/30"
                   : "border-gray-200 bg-gray-50 dark:border-gray-700 dark:bg-gray-800"
@@ -167,7 +167,7 @@ function ResultsDisplay({ results }: { results: StarScoutResults }) {
             >
               <div className="flex items-center">
                 <div
-                  className={`w-8 h-8 rounded-full flex items-center justify-center mr-3 ${
+                  className={`mr-3 flex h-8 w-8 items-center justify-center rounded-full ${
                     results.hasLockStepStars
                       ? "bg-red-200 dark:bg-red-800"
                       : "bg-gray-200 dark:bg-gray-700"
@@ -194,18 +194,18 @@ function ResultsDisplay({ results }: { results: StarScoutResults }) {
 
         {results.suspectedFakeStars.length > 0 && (
           <div className="mt-8">
-            <h3 className="text-lg font-semibold mb-4">Suspicious Accounts</h3>
+            <h3 className="mb-4 text-lg font-semibold">Suspicious Accounts</h3>
             <div className="overflow-x-auto">
-              <table className="min-w-full bg-white dark:bg-gray-800 rounded-lg overflow-hidden">
+              <table className="min-w-full overflow-hidden rounded-lg bg-white dark:bg-gray-800">
                 <thead className="bg-gray-50 dark:bg-gray-700">
                   <tr>
-                    <th className="py-2 px-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    <th className="px-4 py-2 text-left text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-400">
                       User
                     </th>
-                    <th className="py-2 px-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    <th className="px-4 py-2 text-left text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-400">
                       Starred Date
                     </th>
-                    <th className="py-2 px-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    <th className="px-4 py-2 text-left text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-400">
                       Reason
                     </th>
                   </tr>
@@ -213,7 +213,7 @@ function ResultsDisplay({ results }: { results: StarScoutResults }) {
                 <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
                   {currentAccounts.map((star, index) => (
                     <tr key={index}>
-                      <td className="py-2 px-4 whitespace-nowrap">
+                      <td className="px-4 py-2 whitespace-nowrap">
                         <a
                           href={star.user.html_url}
                           target="_blank"
@@ -223,17 +223,17 @@ function ResultsDisplay({ results }: { results: StarScoutResults }) {
                           <img
                             src={star.user.avatar_url}
                             alt={star.user.login}
-                            className="w-6 h-6 rounded-full mr-2"
+                            className="mr-2 h-6 w-6 rounded-full"
                           />
                           {star.user.login}
                         </a>
                       </td>
-                      <td className="py-2 px-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">
+                      <td className="px-4 py-2 text-sm whitespace-nowrap text-gray-600 dark:text-gray-400">
                         {new Date(star.starred_at).toLocaleDateString()}
                       </td>
-                      <td className="py-2 px-4 whitespace-nowrap">
+                      <td className="px-4 py-2 whitespace-nowrap">
                         <span
-                          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                          className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
                             star.reason === "both"
                               ? "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
                               : star.reason === "lock_step"
@@ -254,7 +254,7 @@ function ResultsDisplay({ results }: { results: StarScoutResults }) {
               </table>
 
               {totalPages > 1 && (
-                <div className="mt-4 flex justify-between items-center">
+                <div className="mt-4 flex items-center justify-between">
                   <div className="text-sm text-gray-700 dark:text-gray-300">
                     Showing {indexOfFirstAccount + 1}-
                     {Math.min(
@@ -267,10 +267,10 @@ function ResultsDisplay({ results }: { results: StarScoutResults }) {
                     <button
                       onClick={() => goToPage(Math.max(1, currentPage - 1))}
                       disabled={currentPage === 1}
-                      className={`px-3 py-1 rounded ${
+                      className={`rounded px-3 py-1 ${
                         currentPage === 1
-                          ? "bg-gray-100 text-gray-400 cursor-not-allowed dark:bg-gray-700 dark:text-gray-500"
-                          : "bg-gray-200 hover:bg-gray-300 text-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-300"
+                          ? "cursor-not-allowed bg-gray-100 text-gray-400 dark:bg-gray-700 dark:text-gray-500"
+                          : "bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
                       }`}
                     >
                       Previous
@@ -292,10 +292,10 @@ function ResultsDisplay({ results }: { results: StarScoutResults }) {
                         <button
                           key={pageToShow}
                           onClick={() => goToPage(pageToShow)}
-                          className={`px-3 py-1 rounded ${
+                          className={`rounded px-3 py-1 ${
                             currentPage === pageToShow
                               ? "bg-indigo-600 text-white"
-                              : "bg-gray-200 hover:bg-gray-300 text-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-300"
+                              : "bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
                           }`}
                         >
                           {pageToShow}
@@ -307,10 +307,10 @@ function ResultsDisplay({ results }: { results: StarScoutResults }) {
                         goToPage(Math.min(totalPages, currentPage + 1))
                       }
                       disabled={currentPage === totalPages}
-                      className={`px-3 py-1 rounded ${
+                      className={`rounded px-3 py-1 ${
                         currentPage === totalPages
-                          ? "bg-gray-100 text-gray-400 cursor-not-allowed dark:bg-gray-700 dark:text-gray-500"
-                          : "bg-gray-200 hover:bg-gray-300 text-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-300"
+                          ? "cursor-not-allowed bg-gray-100 text-gray-400 dark:bg-gray-700 dark:text-gray-500"
+                          : "bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
                       }`}
                     >
                       Next
@@ -323,8 +323,8 @@ function ResultsDisplay({ results }: { results: StarScoutResults }) {
         )}
       </div>
 
-      <div className="text-sm bg-blue-50 dark:bg-blue-900/30 p-4 rounded-md border border-blue-200 dark:border-blue-800">
-        <p className="text-blue-600 dark:text-blue-400 font-medium">
+      <div className="rounded-md border border-blue-200 bg-blue-50 p-4 text-sm dark:border-blue-800 dark:bg-blue-900/30">
+        <p className="font-medium text-blue-600 dark:text-blue-400">
           Research Notes
         </p>
         <p className="mt-1 text-gray-700 dark:text-gray-300">
@@ -427,23 +427,23 @@ function CallbackContent() {
   // Display error state
   if (error) {
     return (
-      <div className="min-h-screen py-12 px-4">
-        <div className="max-w-3xl mx-auto">
-          <div className="p-8 bg-white dark:bg-gray-800 rounded-lg shadow-md">
-            <div className="text-red-600 dark:text-red-400 mb-4 text-2xl font-bold">
+      <div className="min-h-screen px-4 py-12">
+        <div className="mx-auto max-w-3xl">
+          <div className="rounded-lg bg-white p-8 shadow-md dark:bg-gray-800">
+            <div className="mb-4 text-2xl font-bold text-red-600 dark:text-red-400">
               Analysis Error
             </div>
-            <p className="text-gray-700 dark:text-gray-300 mb-6">{error}</p>
+            <p className="mb-6 text-gray-700 dark:text-gray-300">{error}</p>
 
             {isRateLimitError && (
-              <div className="mb-6 p-4 bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-800 rounded-md">
-                <h3 className="font-semibold text-amber-800 dark:text-amber-400 mb-2">
+              <div className="mb-6 rounded-md border border-amber-200 bg-amber-50 p-4 dark:border-amber-800 dark:bg-amber-900/30">
+                <h3 className="mb-2 font-semibold text-amber-800 dark:text-amber-400">
                   GitHub API Rate Limit Exceeded
                 </h3>
-                <p className="text-gray-700 dark:text-gray-300 text-sm mb-2">
+                <p className="mb-2 text-sm text-gray-700 dark:text-gray-300">
                   GitHub limits the number of API requests per hour. You can:
                 </p>
-                <ul className="list-disc list-inside text-sm text-gray-700 dark:text-gray-300 space-y-1">
+                <ul className="list-inside list-disc space-y-1 text-sm text-gray-700 dark:text-gray-300">
                   <li>Try again later when your rate limit resets</li>
                   <li>
                     Use a GitHub personal access token with higher rate limits
@@ -457,7 +457,7 @@ function CallbackContent() {
 
             <button
               onClick={() => router.push("/starscout")}
-              className="w-full px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors"
+              className="w-full rounded-md bg-indigo-600 px-4 py-2 text-white transition-colors hover:bg-indigo-700"
             >
               Return to StarScout
             </button>
@@ -470,13 +470,13 @@ function CallbackContent() {
   // Display results
   if (results) {
     return (
-      <div className="min-h-screen py-12 px-4">
-        <div className="max-w-6xl mx-auto">
-          <div className="mb-6 flex justify-between items-center">
+      <div className="min-h-screen px-4 py-12">
+        <div className="mx-auto max-w-6xl">
+          <div className="mb-6 flex items-center justify-between">
             <h1 className="text-3xl font-bold">StarScout Analysis</h1>
             <button
               onClick={() => router.push("/starscout")}
-              className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors"
+              className="rounded-md bg-indigo-600 px-4 py-2 text-white transition-colors hover:bg-indigo-700"
             >
               Analyze Another Repository
             </button>
@@ -491,12 +491,12 @@ function CallbackContent() {
   // Display loading state
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="p-8 bg-white dark:bg-gray-800 rounded-lg shadow-md max-w-md w-full">
-          <div className="flex justify-center mb-4">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="w-full max-w-md rounded-lg bg-white p-8 shadow-md dark:bg-gray-800">
+          <div className="mb-4 flex justify-center">
+            <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-indigo-600"></div>
           </div>
-          <div className="text-center text-gray-700 dark:text-gray-300 text-lg">
+          <div className="text-center text-lg text-gray-700 dark:text-gray-300">
             <p className="mb-2">{status}</p>
             <p className="text-sm text-gray-500 dark:text-gray-400">
               Note: Analysis may take longer for repositories with large number
@@ -510,16 +510,16 @@ function CallbackContent() {
 
   // Fallback state if not loading but no results or error
   return (
-    <div className="min-h-screen py-12 px-4">
-      <div className="max-w-3xl mx-auto">
-        <div className="p-8 bg-white dark:bg-gray-800 rounded-lg shadow-md">
-          <h2 className="text-xl font-semibold mb-4">Something went wrong</h2>
-          <p className="text-gray-700 dark:text-gray-300 mb-6">
+    <div className="min-h-screen px-4 py-12">
+      <div className="mx-auto max-w-3xl">
+        <div className="rounded-lg bg-white p-8 shadow-md dark:bg-gray-800">
+          <h2 className="mb-4 text-xl font-semibold">Something went wrong</h2>
+          <p className="mb-6 text-gray-700 dark:text-gray-300">
             We couldn&apos;t process your request. Please try again.
           </p>
           <button
             onClick={() => router.push("/starscout")}
-            className="w-full px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors"
+            className="w-full rounded-md bg-indigo-600 px-4 py-2 text-white transition-colors hover:bg-indigo-700"
           >
             Return to StarScout
           </button>
@@ -532,12 +532,12 @@ function CallbackContent() {
 // Loading fallback
 function CallbackLoading() {
   return (
-    <div className="min-h-screen flex items-center justify-center">
-      <div className="p-8 bg-white dark:bg-gray-800 rounded-lg shadow-md max-w-md w-full">
-        <div className="flex justify-center mb-4">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+    <div className="flex min-h-screen items-center justify-center">
+      <div className="w-full max-w-md rounded-lg bg-white p-8 shadow-md dark:bg-gray-800">
+        <div className="mb-4 flex justify-center">
+          <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-indigo-600"></div>
         </div>
-        <p className="text-center text-gray-700 dark:text-gray-300 text-lg">
+        <p className="text-center text-lg text-gray-700 dark:text-gray-300">
           Loading...
         </p>
       </div>

@@ -70,11 +70,7 @@ export function FileUpload({ onDataUpdate }: FileUploadProps) {
   return (
     <div className="w-full">
       <div
-        className={`
-          relative rounded-lg border-2 border-dashed p-6
-          ${isDragging ? "border-primary bg-primary/5" : "border-muted-foreground/25"}
-          transition-colors duration-200
-        `}
+        className={`relative rounded-lg border-2 border-dashed p-6 ${isDragging ? "border-primary bg-primary/5" : "border-muted-foreground/25"} transition-colors duration-200`}
         onDrop={handleDrop}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
@@ -83,18 +79,18 @@ export function FileUpload({ onDataUpdate }: FileUploadProps) {
           type="file"
           accept="application/json"
           onChange={handleFileSelect}
-          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+          className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
           title="Choose a JSON file or drag it here"
         />
-        <div className="text-center space-y-4">
+        <div className="space-y-4 text-center">
           <div className="flex justify-center">
             {fileName ? (
-              <div className="flex items-center gap-2 text-muted-foreground">
-                <FileJson className="w-8 h-8" />
+              <div className="text-muted-foreground flex items-center gap-2">
+                <FileJson className="h-8 w-8" />
                 <span className="text-sm">{fileName}</span>
               </div>
             ) : (
-              <Upload className="w-8 h-8 text-muted-foreground" />
+              <Upload className="text-muted-foreground h-8 w-8" />
             )}
           </div>
           <div className="space-y-1">
@@ -103,7 +99,7 @@ export function FileUpload({ onDataUpdate }: FileUploadProps) {
                 ? "Drop another file or click to replace"
                 : "Drop your vet JSON report here"}
             </p>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-muted-foreground text-xs">
               or click to select a file from your computer
             </p>
           </div>
