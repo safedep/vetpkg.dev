@@ -11,7 +11,12 @@ import {
 import { Menu, Moon, Sun, Star } from "lucide-react";
 import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
+
+// For detecting client-side rendering to avoid hydration mismatch
+const emptySubscribe = () => () => {};
+const getClientSnapshot = () => true;
+const getServerSnapshot = () => false;
 
 type Tool = {
   name: string;
@@ -74,12 +79,13 @@ function GitHubStars() {
 export default function Header() {
   const pathname = usePathname();
   const { theme, setTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
 
-  // useEffect only runs on the client, so we can safely set mounted to true
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  // Use useSyncExternalStore to detect client-side rendering and avoid hydration mismatch
+  const mounted = useSyncExternalStore(
+    emptySubscribe,
+    getClientSnapshot,
+    getServerSnapshot,
+  );
 
   // Find the current tool based on the pathname
   const currentTool =

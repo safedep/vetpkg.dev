@@ -1,4 +1,5 @@
 "use client";
+"use no memo"; // TanStack Table's useReactTable API is incompatible with React Compiler memoization
 
 import {
   Table,

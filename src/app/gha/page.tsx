@@ -231,7 +231,7 @@ export default function GitHubActionsIntegration() {
                   src={vetActionDemo}
                   alt="Vet Action Demo"
                   fill
-                  style={{ objectFit: "contain" }}
+                  className="object-contain"
                   priority
                 />
                 <div className="bg-opacity-0 hover:bg-opacity-20 absolute inset-0 flex items-center justify-center bg-black transition-all">

@@ -2,6 +2,7 @@
 
 import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import Image from "next/image";
 import { validateOAuthState, exchangeCodeForToken } from "../auth";
 import { analyzeRepoForFakeStars } from "../actions";
 import { StarScoutResults } from "../types";
@@ -220,10 +221,13 @@ function ResultsDisplay({ results }: { results: StarScoutResults }) {
                           rel="noopener noreferrer"
                           className="flex items-center text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300"
                         >
-                          <img
+                          <Image
                             src={star.user.avatar_url}
                             alt={star.user.login}
-                            className="mr-2 h-6 w-6 rounded-full"
+                            width={24}
+                            height={24}
+                            className="mr-2 rounded-full"
+                            unoptimized
                           />
                           {star.user.login}
                         </a>

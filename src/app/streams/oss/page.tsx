@@ -25,6 +25,8 @@ export default function OSSStreamsPage() {
   // Use useRef to maintain cache across renders without causing re-renders
   const packageCacheRef = useRef<Map<string, number>>(new Map());
   const cacheCleanupTimerRef = useRef<NodeJS.Timeout | null>(null);
+  // Ref to hold the latest sequence number for use in reconnection without triggering effect re-runs
+  const lastSequenceNumberRef = useRef<number | null>(null);
 
   /**
    * Generate a minimal space hash for a package
@@ -99,11 +101,13 @@ export default function OSSStreamsPage() {
         eventSource.close();
       }
 
-      // Build the URL with sequence number if available
+      // Build the URL with sequence number if available (use ref to get latest value)
       let url = "/streams/oss/api/stream";
-      if (lastSequenceNumber !== null) {
-        url += `?fromSequence=${lastSequenceNumber}`;
-        console.log(`Reconnecting from sequence number: ${lastSequenceNumber}`);
+      if (lastSequenceNumberRef.current !== null) {
+        url += `?fromSequence=${lastSequenceNumberRef.current}`;
+        console.log(
+          `Reconnecting from sequence number: ${lastSequenceNumberRef.current}`,
+        );
       }
 
       eventSource = new EventSource(url);
@@ -146,6 +150,7 @@ export default function OSSStreamsPage() {
 
           // Update last sequence number if available
           if (packageData.sequenceNumber !== undefined) {
+            lastSequenceNumberRef.current = packageData.sequenceNumber;
             setLastSequenceNumber(packageData.sequenceNumber);
           }
 

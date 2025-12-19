@@ -66,7 +66,7 @@ import {
   DialogPortal,
 } from "@radix-ui/react-dialog";
 import { Spinner } from "@radix-ui/themes";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { getPackageVersionInfo, queryMalwareAnalysis } from "./actions";
 import { DiffViewer } from "./DiffViewer";
 import { getRiskName, getRiskColor } from "./utils";
@@ -399,36 +399,63 @@ export default function Page() {
 
   const [showRawJSON, setShowRawJSON] = useState(false);
   const [insights, setInsights] = useState<PackageVersionInsight | null>(null);
-  const [insightsLoading, setInsightsLoading] = useState(true);
-  const [packageVersion, setPackageVersion] = useState<{
-    ecosystem?: string;
-    name?: string;
-    version?: string;
-  }>({});
-
   const [malwareAnalysis, setMalwareAnalysis] =
     useState<QueryPackageAnalysisResponse | null>(null);
-  const [malwareAnalysisLoading, setMalwareAnalysisLoading] = useState(true);
-  const [malwareAnalysisStatus, setMalwareAnalysisStatus] =
-    useState<MalwareStatus>(MalwareStatus.Unknown);
-  const [packageSafetyStatus, setPackageSafetyStatus] =
-    useState<PackageSafetyStatus>(PackageSafetyStatus.Unknown);
-  const [securityScorecardScores, setSecurityScorecardScores] = useState<
-    Record<SecurityScorecardCheck, number>
-  >(getSecurityScorecardScore(null));
-  const [projectRepositoryInformation, setProjectRepositoryInformation] =
-    useState<{
-      url?: string;
-      stars?: number;
-      forks?: number;
-      openIssues?: number;
-      pullRequests?: number;
-    }>({});
-  const [malwareEvidences, setMalwareEvidences] = useState<MalwareEvidence[]>(
-    [],
+
+  // Track which params we've loaded data for to derive loading state
+  const [loadedInsightsParams, setLoadedInsightsParams] = useState<string>("");
+  const [loadedMalwareParams, setLoadedMalwareParams] = useState<string>("");
+
+  // Derive current params key for comparison
+  const currentParamsKey = `${params.ecosystem}:${params.name}:${params.version}`;
+
+  // Derive loading state by comparing current params with loaded params
+  const insightsLoading = loadedInsightsParams !== currentParamsKey;
+  const malwareAnalysisLoading = loadedMalwareParams !== currentParamsKey;
+
+  // Decoded package version for display
+  const packageVersion = useMemo(
+    () => ({
+      ecosystem: decodeURIComponent(params.ecosystem),
+      name: decodeURIComponent(params.name),
+      version: decodeURIComponent(params.version),
+    }),
+    [params.ecosystem, params.name, params.version],
   );
-  const [malwareAnalysisBehavior, setMalwareAnalysisBehavior] =
-    useState<MalwareAnalysisBehavior>({});
+
+  // Derived state computed with useMemo instead of useState + useEffect
+  const malwareAnalysisStatus = useMemo(
+    () =>
+      malwareAnalysis
+        ? getMalwareAnalysisStatus(malwareAnalysis)
+        : MalwareStatus.Unknown,
+    [malwareAnalysis],
+  );
+
+  const packageSafetyStatus = useMemo(
+    () => getPackageSafetyStatus(insights, malwareAnalysis),
+    [insights, malwareAnalysis],
+  );
+
+  const securityScorecardScores = useMemo(
+    () => getSecurityScorecardScore(insights),
+    [insights],
+  );
+
+  const projectRepositoryInformation = useMemo(
+    () => getProjectRepositoryInformation(insights),
+    [insights],
+  );
+
+  const malwareEvidences = useMemo(
+    () => getMalwareEvidences(malwareAnalysis),
+    [malwareAnalysis],
+  );
+
+  const malwareAnalysisBehavior = useMemo(
+    () => getInferredBehavior(malwareAnalysis, insights),
+    [malwareAnalysis, insights],
+  );
 
   const [showDiffViewer, setShowDiffViewer] = useState(false);
   const [compareInsightsLoading, setCompareInsightsLoading] = useState(false);
@@ -439,58 +466,33 @@ export default function Page() {
     useState<QueryPackageAnalysisResponse | null>(null);
 
   useEffect(() => {
-    setInsightsLoading(true);
-    setMalwareAnalysisLoading(true);
-
+    const paramsKey = `${params.ecosystem}:${params.name}:${params.version}`;
     const ecosystem = decodeURIComponent(params.ecosystem);
     const name = decodeURIComponent(params.name);
     const version = decodeURIComponent(params.version);
 
-    setPackageVersion({ ecosystem, name, version });
-
     getPackageVersionInfo(ecosystem, name, version)
-      .then(setInsights)
+      .then((data) => {
+        setInsights(data);
+        setLoadedInsightsParams(paramsKey);
+      })
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      .catch((error: any) =>
-        console.warn("Failed to fetch package insights: ", error),
-      )
-      .finally(() => setInsightsLoading(false));
+      .catch((error: any) => {
+        console.warn("Failed to fetch package insights: ", error);
+        setLoadedInsightsParams(paramsKey); // Mark as loaded even on error
+      });
 
     queryMalwareAnalysis(ecosystem, name, version)
-      .then(setMalwareAnalysis)
+      .then((data) => {
+        setMalwareAnalysis(data);
+        setLoadedMalwareParams(paramsKey);
+      })
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      .catch((error: any) =>
-        console.warn("Failed to fetch malware analysis: ", error),
-      )
-      .finally(() => setMalwareAnalysisLoading(false));
+      .catch((error: any) => {
+        console.warn("Failed to fetch malware analysis: ", error);
+        setLoadedMalwareParams(paramsKey); // Mark as loaded even on error
+      });
   }, [params.ecosystem, params.name, params.version]);
-
-  // Separately synchronize the malware analysis status when the malware analysis is updated
-  useEffect(() => {
-    if (malwareAnalysis) {
-      setMalwareAnalysisStatus(getMalwareAnalysisStatus(malwareAnalysis));
-    }
-  }, [malwareAnalysis]);
-
-  useEffect(() => {
-    setPackageSafetyStatus(getPackageSafetyStatus(insights, malwareAnalysis));
-  }, [insights, malwareAnalysis]);
-
-  useEffect(() => {
-    setSecurityScorecardScores(getSecurityScorecardScore(insights));
-  }, [insights]);
-
-  useEffect(() => {
-    setProjectRepositoryInformation(getProjectRepositoryInformation(insights));
-  }, [insights]);
-
-  useEffect(() => {
-    setMalwareEvidences(getMalwareEvidences(malwareAnalysis));
-  }, [malwareAnalysis]);
-
-  useEffect(() => {
-    setMalwareAnalysisBehavior(getInferredBehavior(malwareAnalysis, insights));
-  }, [malwareAnalysis, insights]);
 
   const handleCompare = async (version: string) => {
     setCompareVersion(version);
