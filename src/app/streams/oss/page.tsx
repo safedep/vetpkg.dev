@@ -25,6 +25,8 @@ export default function OSSStreamsPage() {
   // Use useRef to maintain cache across renders without causing re-renders
   const packageCacheRef = useRef<Map<string, number>>(new Map());
   const cacheCleanupTimerRef = useRef<NodeJS.Timeout | null>(null);
+  // Ref to hold the latest sequence number for use in reconnection without triggering effect re-runs
+  const lastSequenceNumberRef = useRef<number | null>(null);
 
   /**
    * Generate a minimal space hash for a package
@@ -99,11 +101,13 @@ export default function OSSStreamsPage() {
         eventSource.close();
       }
 
-      // Build the URL with sequence number if available
+      // Build the URL with sequence number if available (use ref to get latest value)
       let url = "/streams/oss/api/stream";
-      if (lastSequenceNumber !== null) {
-        url += `?fromSequence=${lastSequenceNumber}`;
-        console.log(`Reconnecting from sequence number: ${lastSequenceNumber}`);
+      if (lastSequenceNumberRef.current !== null) {
+        url += `?fromSequence=${lastSequenceNumberRef.current}`;
+        console.log(
+          `Reconnecting from sequence number: ${lastSequenceNumberRef.current}`,
+        );
       }
 
       eventSource = new EventSource(url);
@@ -146,6 +150,7 @@ export default function OSSStreamsPage() {
 
           // Update last sequence number if available
           if (packageData.sequenceNumber !== undefined) {
+            lastSequenceNumberRef.current = packageData.sequenceNumber;
             setLastSequenceNumber(packageData.sequenceNumber);
           }
 
@@ -264,21 +269,21 @@ export default function OSSStreamsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
-      <div className="container mx-auto px-4 py-4 lg:py-8 flex-1 flex flex-col">
+    <div className="flex min-h-screen flex-col bg-gray-50 dark:bg-gray-900">
+      <div className="container mx-auto flex flex-1 flex-col px-4 py-4 lg:py-8">
         {/* Header - compact on mobile */}
         <div className="mb-4">
-          <h1 className="text-2xl lg:text-3xl font-bold mb-2 text-gray-900 dark:text-gray-100">
+          <h1 className="mb-2 text-2xl font-bold text-gray-900 lg:text-3xl dark:text-gray-100">
             Open Source Package Stream
           </h1>
-          <p className="text-sm lg:text-base text-gray-600 dark:text-gray-300 mb-4 lg:mb-6">
+          <p className="mb-4 text-sm text-gray-600 lg:mb-6 lg:text-base dark:text-gray-300">
             Real-time stream of newly published open source packages monitored
             by &nbsp;
             <a
               href="https://docs.safedep.io/cloud/overview"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-blue-600 dark:text-blue-400 hover:underline"
+              className="text-blue-600 hover:underline dark:text-blue-400"
             >
               SafeDep Cloud
             </a>{" "}
@@ -287,16 +292,16 @@ export default function OSSStreamsPage() {
               href="https://s2.dev"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-blue-600 dark:text-blue-400 hover:underline"
+              className="text-blue-600 hover:underline dark:text-blue-400"
             >
               s2.dev
             </a>
           </p>
 
           {/* Call to Action - hidden on mobile */}
-          <div className="hidden lg:block bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-6">
+          <div className="mb-6 hidden rounded-lg border border-blue-200 bg-blue-50 p-4 lg:block dark:border-blue-800 dark:bg-blue-900/20">
             <div className="flex items-center gap-2">
-              <div className="w-4 h-4 text-blue-500 dark:text-blue-400">💡</div>
+              <div className="h-4 w-4 text-blue-500 dark:text-blue-400">💡</div>
               <p className="text-blue-700 dark:text-blue-300">
                 <span className="font-medium">
                   Need API access to this stream?
@@ -306,7 +311,7 @@ export default function OSSStreamsPage() {
                   href="https://github.com/safedep/vet"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-blue-600 dark:text-blue-400 hover:underline font-medium"
+                  className="font-medium text-blue-600 hover:underline dark:text-blue-400"
                 >
                   <span>@safedep/vet</span>
                 </a>{" "}
@@ -316,14 +321,14 @@ export default function OSSStreamsPage() {
           </div>
 
           {/* Mobile Status Bar - Collapsible */}
-          <div className="lg:hidden bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-600 mb-4">
+          <div className="mb-4 rounded-lg border border-gray-200 bg-white lg:hidden dark:border-gray-600 dark:bg-gray-800">
             <button
               onClick={() => setIsStatusExpanded(!isStatusExpanded)}
-              className="w-full px-4 py-3 flex items-center justify-between"
+              className="flex w-full items-center justify-between px-4 py-3"
             >
               <div className="flex items-center gap-3">
                 <div
-                  className={`w-2 h-2 rounded-full ${isConnected ? "bg-green-500" : isManuallyDisconnected ? "bg-gray-500" : "bg-red-500"}`}
+                  className={`h-2 w-2 rounded-full ${isConnected ? "bg-green-500" : isManuallyDisconnected ? "bg-gray-500" : "bg-red-500"}`}
                 />
                 <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
                   {isConnected
@@ -332,25 +337,25 @@ export default function OSSStreamsPage() {
                       ? "Disconnected"
                       : "Disconnected"}
                 </span>
-                <span className="text-xs font-mono bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100 px-2 py-1 rounded">
+                <span className="rounded bg-gray-100 px-2 py-1 font-mono text-xs text-gray-900 dark:bg-gray-700 dark:text-gray-100">
                   {totalPackagesCount}
                 </span>
               </div>
               {isStatusExpanded ? (
-                <ChevronUp className="w-4 h-4 text-gray-400" />
+                <ChevronUp className="h-4 w-4 text-gray-400" />
               ) : (
-                <ChevronDown className="w-4 h-4 text-gray-400" />
+                <ChevronDown className="h-4 w-4 text-gray-400" />
               )}
             </button>
 
             {isStatusExpanded && (
-              <div className="px-4 pb-4 border-t border-gray-200 dark:border-gray-600">
-                <div className="grid grid-cols-1 gap-3 mt-3">
+              <div className="border-t border-gray-200 px-4 pb-4 dark:border-gray-600">
+                <div className="mt-3 grid grid-cols-1 gap-3">
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-gray-600 dark:text-gray-300">
                       Packages received:
                     </span>
-                    <span className="text-sm font-mono bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100 px-2 py-1 rounded">
+                    <span className="rounded bg-gray-100 px-2 py-1 font-mono text-sm text-gray-900 dark:bg-gray-700 dark:text-gray-100">
                       {totalPackagesCount}
                     </span>
                   </div>
@@ -359,7 +364,7 @@ export default function OSSStreamsPage() {
                     <span className="text-sm text-gray-600 dark:text-gray-300">
                       Duplicates filtered:
                     </span>
-                    <span className="text-sm font-mono bg-yellow-100 dark:bg-yellow-900 text-yellow-900 dark:text-yellow-100 px-2 py-1 rounded">
+                    <span className="rounded bg-yellow-100 px-2 py-1 font-mono text-sm text-yellow-900 dark:bg-yellow-900 dark:text-yellow-100">
                       {duplicatesFilteredCount}
                     </span>
                   </div>
@@ -369,7 +374,7 @@ export default function OSSStreamsPage() {
                       <span className="text-sm text-gray-600 dark:text-gray-300">
                         Last sequence:
                       </span>
-                      <span className="text-sm font-mono bg-blue-100 dark:bg-blue-900 text-blue-900 dark:text-blue-100 px-2 py-1 rounded">
+                      <span className="rounded bg-blue-100 px-2 py-1 font-mono text-sm text-blue-900 dark:bg-blue-900 dark:text-blue-100">
                         {lastSequenceNumber}
                       </span>
                     </div>
@@ -382,7 +387,7 @@ export default function OSSStreamsPage() {
                     </span>
                     <div className="flex items-center gap-2">
                       <div
-                        className={`w-2 h-2 rounded-full ${isConnected ? "bg-green-500" : isManuallyDisconnected ? "bg-gray-500" : "bg-red-500"}`}
+                        className={`h-2 w-2 rounded-full ${isConnected ? "bg-green-500" : isManuallyDisconnected ? "bg-gray-500" : "bg-red-500"}`}
                       />
                       <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
                         {isConnected
@@ -396,16 +401,16 @@ export default function OSSStreamsPage() {
 
                   {/* Error message */}
                   {connectionError && !isManuallyDisconnected && (
-                    <div className="text-xs text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-900/20 p-2 rounded">
+                    <div className="rounded bg-orange-50 p-2 text-xs text-orange-600 dark:bg-orange-900/20 dark:text-orange-400">
                       {connectionError}
                     </div>
                   )}
 
                   {/* Connection Control Buttons */}
-                  <div className="flex items-center justify-center gap-2 mt-2">
+                  <div className="mt-2 flex items-center justify-center gap-2">
                     {reconnectInProgress && (
                       <div className="flex items-center gap-2">
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                        <div className="h-4 w-4 animate-spin rounded-full border-b-2 border-blue-600"></div>
                         <span className="text-sm text-blue-600 dark:text-blue-400">
                           Reconnecting...
                         </span>
@@ -418,7 +423,7 @@ export default function OSSStreamsPage() {
                       !isManuallyDisconnected && (
                         <button
                           onClick={manualReconnect}
-                          className="px-3 py-1 bg-orange-600 dark:bg-orange-700 text-white text-xs rounded-md hover:bg-orange-700 dark:hover:bg-orange-600 transition-colors font-medium"
+                          className="rounded-md bg-orange-600 px-3 py-1 text-xs font-medium text-white transition-colors hover:bg-orange-700 dark:bg-orange-700 dark:hover:bg-orange-600"
                         >
                           Reconnect
                         </button>
@@ -429,7 +434,7 @@ export default function OSSStreamsPage() {
                       !reconnectInProgress && (
                         <button
                           onClick={manualDisconnect}
-                          className="px-3 py-1 bg-gray-200 dark:bg-gray-700 text-red-600 dark:text-red-400 text-xs rounded-md hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors font-medium"
+                          className="rounded-md bg-gray-200 px-3 py-1 text-xs font-medium text-red-600 transition-colors hover:bg-gray-300 dark:bg-gray-700 dark:text-red-400 dark:hover:bg-gray-600"
                         >
                           Disconnect
                         </button>
@@ -438,7 +443,7 @@ export default function OSSStreamsPage() {
                     {isManuallyDisconnected && !reconnectInProgress && (
                       <button
                         onClick={manualConnect}
-                        className="px-3 py-1 bg-gray-200 dark:bg-gray-700 text-green-600 dark:text-green-400 text-xs rounded-md hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors font-medium"
+                        className="rounded-md bg-gray-200 px-3 py-1 text-xs font-medium text-green-600 transition-colors hover:bg-gray-300 dark:bg-gray-700 dark:text-green-400 dark:hover:bg-gray-600"
                       >
                         Connect
                       </button>
@@ -450,13 +455,13 @@ export default function OSSStreamsPage() {
           </div>
 
           {/* Desktop Status Bar */}
-          <div className="hidden lg:block bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-600 p-4 mb-6">
-            <div className="flex items-center gap-6 flex-wrap">
+          <div className="mb-6 hidden rounded-lg border border-gray-200 bg-white p-4 lg:block dark:border-gray-600 dark:bg-gray-800">
+            <div className="flex flex-wrap items-center gap-6">
               <div className="flex items-center gap-2">
                 <span className="text-sm text-gray-600 dark:text-gray-300">
                   Packages received:
                 </span>
-                <span className="text-sm font-mono bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100 px-2 py-1 rounded">
+                <span className="rounded bg-gray-100 px-2 py-1 font-mono text-sm text-gray-900 dark:bg-gray-700 dark:text-gray-100">
                   {totalPackagesCount}
                 </span>
               </div>
@@ -465,7 +470,7 @@ export default function OSSStreamsPage() {
                 <span className="text-sm text-gray-600 dark:text-gray-300">
                   Duplicates filtered:
                 </span>
-                <span className="text-sm font-mono bg-yellow-100 dark:bg-yellow-900 text-yellow-900 dark:text-yellow-100 px-2 py-1 rounded">
+                <span className="rounded bg-yellow-100 px-2 py-1 font-mono text-sm text-yellow-900 dark:bg-yellow-900 dark:text-yellow-100">
                   {duplicatesFilteredCount}
                 </span>
               </div>
@@ -475,7 +480,7 @@ export default function OSSStreamsPage() {
                   <span className="text-sm text-gray-600 dark:text-gray-300">
                     Last sequence:
                   </span>
-                  <span className="text-sm font-mono bg-blue-100 dark:bg-blue-900 text-blue-900 dark:text-blue-100 px-2 py-1 rounded">
+                  <span className="rounded bg-blue-100 px-2 py-1 font-mono text-sm text-blue-900 dark:bg-blue-900 dark:text-blue-100">
                     {lastSequenceNumber}
                   </span>
                 </div>
@@ -483,7 +488,7 @@ export default function OSSStreamsPage() {
 
               <div className="flex items-center gap-2">
                 <div
-                  className={`w-2 h-2 rounded-full ${isConnected ? "bg-green-500" : isManuallyDisconnected ? "bg-gray-500" : "bg-red-500"}`}
+                  className={`h-2 w-2 rounded-full ${isConnected ? "bg-green-500" : isManuallyDisconnected ? "bg-gray-500" : "bg-red-500"}`}
                 />
                 <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
                   {isConnected
@@ -494,17 +499,17 @@ export default function OSSStreamsPage() {
                 </span>
                 {/* Error message integrated into connection status */}
                 {connectionError && !isManuallyDisconnected && (
-                  <span className="text-xs text-orange-600 dark:text-orange-400 ml-2">
+                  <span className="ml-2 text-xs text-orange-600 dark:text-orange-400">
                     — {connectionError}
                   </span>
                 )}
               </div>
 
               {/* Connection Control Buttons */}
-              <div className="flex items-center gap-2 ml-auto">
+              <div className="ml-auto flex items-center gap-2">
                 {reconnectInProgress && (
                   <div className="flex items-center gap-2">
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                    <div className="h-4 w-4 animate-spin rounded-full border-b-2 border-blue-600"></div>
                     <span className="text-sm text-blue-600 dark:text-blue-400">
                       Reconnecting...
                     </span>
@@ -517,7 +522,7 @@ export default function OSSStreamsPage() {
                   !isManuallyDisconnected && (
                     <button
                       onClick={manualReconnect}
-                      className="px-3 py-1 bg-orange-600 dark:bg-orange-700 text-white text-xs rounded-md hover:bg-orange-700 dark:hover:bg-orange-600 transition-colors font-medium"
+                      className="rounded-md bg-orange-600 px-3 py-1 text-xs font-medium text-white transition-colors hover:bg-orange-700 dark:bg-orange-700 dark:hover:bg-orange-600"
                     >
                       Reconnect
                     </button>
@@ -528,7 +533,7 @@ export default function OSSStreamsPage() {
                   !reconnectInProgress && (
                     <button
                       onClick={manualDisconnect}
-                      className="px-3 py-1 bg-gray-200 dark:bg-gray-700 text-red-600 dark:text-red-400 text-xs rounded-md hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors font-medium"
+                      className="rounded-md bg-gray-200 px-3 py-1 text-xs font-medium text-red-600 transition-colors hover:bg-gray-300 dark:bg-gray-700 dark:text-red-400 dark:hover:bg-gray-600"
                     >
                       Disconnect
                     </button>
@@ -537,7 +542,7 @@ export default function OSSStreamsPage() {
                 {isManuallyDisconnected && !reconnectInProgress && (
                   <button
                     onClick={manualConnect}
-                    className="px-3 py-1 bg-gray-200 dark:bg-gray-700 text-green-600 dark:text-green-400 text-xs rounded-md hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors font-medium"
+                    className="rounded-md bg-gray-200 px-3 py-1 text-xs font-medium text-green-600 transition-colors hover:bg-gray-300 dark:bg-gray-700 dark:text-green-400 dark:hover:bg-gray-600"
                   >
                     Connect
                   </button>

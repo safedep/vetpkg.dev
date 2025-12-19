@@ -54,16 +54,16 @@ export default function GitHubActionsIntegration() {
   };
 
   return (
-    <div className="min-h-screen py-8 px-4 max-w-7xl mx-auto">
+    <div className="mx-auto min-h-screen max-w-7xl px-4 py-8">
       {/* Image Modal */}
       {isImageModalOpen && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-80 z-50 flex items-center justify-center p-4"
+          className="bg-opacity-80 fixed inset-0 z-50 flex items-center justify-center bg-black p-4"
           onClick={() => setIsImageModalOpen(false)}
         >
-          <div className="relative max-w-7xl w-full max-h-screen">
+          <div className="relative max-h-screen w-full max-w-7xl">
             <button
-              className="absolute top-4 right-4 bg-white dark:bg-gray-800 rounded-full p-2 text-black dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+              className="absolute top-4 right-4 rounded-full bg-white p-2 text-black transition-colors hover:bg-gray-200 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700"
               onClick={(e) => {
                 e.stopPropagation();
                 setIsImageModalOpen(false);
@@ -84,11 +84,11 @@ export default function GitHubActionsIntegration() {
                 <line x1="6" y1="6" x2="18" y2="18"></line>
               </svg>
             </button>
-            <div className="relative w-full h-auto">
+            <div className="relative h-auto w-full">
               <Image
                 src={vetActionDemo}
                 alt="Vet Action Demo - Full View"
-                className="mx-auto object-contain max-h-[90vh] rounded-md"
+                className="mx-auto max-h-[90vh] rounded-md object-contain"
                 width={1200}
                 height={800}
               />
@@ -97,7 +97,7 @@ export default function GitHubActionsIntegration() {
         </div>
       )}
 
-      <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl mb-4 font-mono text-center">
+      <h1 className="mb-4 scroll-m-20 text-center font-mono text-4xl font-extrabold tracking-tight lg:text-5xl">
         <span role="img" aria-label="robot">
           🤖
         </span>{" "}
@@ -105,7 +105,7 @@ export default function GitHubActionsIntegration() {
         Actions PR Bot
       </h1>
 
-      <p className="text-lg text-gray-600 dark:text-gray-300 mb-8 max-w-3xl mx-auto font-mono text-center">
+      <p className="mx-auto mb-8 max-w-3xl text-center font-mono text-lg text-gray-600 dark:text-gray-300">
         Automatically integrate{" "}
         <a href="https://github.com/safedep/vet" target="_blank">
           SafeDep vet
@@ -115,11 +115,11 @@ export default function GitHubActionsIntegration() {
       </p>
 
       {/* Two-column layout */}
-      <div className="flex flex-col md:flex-row gap-8 justify-between w-full">
+      <div className="flex w-full flex-col justify-between gap-8 md:flex-row">
         {/* Left column - Form */}
-        <div className="flex-1 min-w-0">
-          <div className="border border-indigo-200 dark:border-indigo-800 rounded-lg shadow-lg bg-white dark:bg-gray-800 p-6 h-full">
-            <h2 className="text-xl font-bold mb-4">Start Integration</h2>
+        <div className="min-w-0 flex-1">
+          <div className="h-full rounded-lg border border-indigo-200 bg-white p-6 shadow-lg dark:border-indigo-800 dark:bg-gray-800">
+            <h2 className="mb-4 text-xl font-bold">Start Integration</h2>
             <Form {...githubRepoForm}>
               <form
                 className="w-full space-y-4"
@@ -130,14 +130,14 @@ export default function GitHubActionsIntegration() {
                   name="repoUrl"
                   render={({ field }) => (
                     <FormItem>
-                      <div className="font-mono text-sm text-gray-500 dark:text-gray-400 mb-2">
+                      <div className="mb-2 font-mono text-sm text-gray-500 dark:text-gray-400">
                         GitHub Repository URL
                       </div>
                       <input
                         {...field}
                         type="text"
                         placeholder="https://github.com/username/repository"
-                        className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent font-mono text-sm transition-all dark:text-gray-200"
+                        className="w-full rounded-md border border-gray-200 bg-gray-50 px-4 py-3 font-mono text-sm shadow-xs transition-all focus:border-transparent focus:ring-2 focus:ring-indigo-500 focus:outline-hidden dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200"
                         disabled={isAuthenticating}
                       />
                       <FormMessage />
@@ -145,8 +145,8 @@ export default function GitHubActionsIntegration() {
                   )}
                 />
 
-                <div className="text-sm text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/30 p-3 rounded-md border border-amber-200 dark:border-amber-800">
-                  <p className="font-medium mb-1">
+                <div className="rounded-md border border-amber-200 bg-amber-50 p-3 text-sm text-amber-600 dark:border-amber-800 dark:bg-amber-900/30 dark:text-amber-400">
+                  <p className="mb-1 font-medium">
                     GitHub Authentication Required
                   </p>
                   <p>
@@ -158,15 +158,15 @@ export default function GitHubActionsIntegration() {
 
                 <button
                   type="submit"
-                  className={`w-full px-4 py-3 text-white bg-indigo-600 hover:bg-indigo-700 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors font-semibold ${
-                    isAuthenticating ? "opacity-70 cursor-not-allowed" : ""
+                  className={`w-full rounded-md bg-indigo-600 px-4 py-3 font-semibold text-white shadow-xs transition-colors hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:outline-hidden ${
+                    isAuthenticating ? "cursor-not-allowed opacity-70" : ""
                   }`}
                   disabled={isAuthenticating}
                 >
                   {isAuthenticating ? (
                     <span className="flex items-center justify-center">
                       <svg
-                        className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                        className="mr-3 -ml-1 h-5 w-5 animate-spin text-white"
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"
                         viewBox="0 0 24 24"
@@ -193,17 +193,17 @@ export default function GitHubActionsIntegration() {
                 </button>
               </form>
             </Form>
-            <div className="space-y-3 mt-4">
+            <div className="mt-4 space-y-3">
               <h3 className="font-semibold">
                 After integration, you will get:
               </h3>
-              <ul className="list-disc pl-5 space-y-2 text-gray-700 dark:text-gray-300">
+              <ul className="list-disc space-y-2 pl-5 text-gray-700 dark:text-gray-300">
                 <li>Automated OSS component scanning in your workflow</li>
                 <li>Custom policy to check for common OSS risks</li>
                 <li>Protect against malicious code and other risks</li>
                 <li>Security guardrails to catch issues early</li>
               </ul>
-              <p className="text-sm text-gray-600 dark:text-gray-400 italic mt-3">
+              <p className="mt-3 text-sm text-gray-600 italic dark:text-gray-400">
                 All results are integrated directly in your GitHub workflow.
                 <br />
                 Like what you see?{" "}
@@ -219,29 +219,29 @@ export default function GitHubActionsIntegration() {
         </div>
 
         {/* Right column - Preview */}
-        <div className="flex-1 min-w-0">
-          <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-6 bg-white dark:bg-gray-800 shadow-lg h-full">
-            <h2 className="text-xl font-bold mb-4">How it works</h2>
+        <div className="min-w-0 flex-1">
+          <div className="h-full rounded-lg border border-gray-200 bg-white p-6 shadow-lg dark:border-gray-700 dark:bg-gray-800">
+            <h2 className="mb-4 text-xl font-bold">How it works</h2>
             <div
-              className="bg-gray-100 dark:bg-gray-700 w-full h-80 flex items-center justify-center rounded-md border border-gray-300 dark:border-gray-600 mb-4 overflow-hidden cursor-pointer"
+              className="mb-4 flex h-80 w-full cursor-pointer items-center justify-center overflow-hidden rounded-md border border-gray-300 bg-gray-100 dark:border-gray-600 dark:bg-gray-700"
               onClick={() => setIsImageModalOpen(true)}
             >
-              <div className="relative w-full h-full">
+              <div className="relative h-full w-full">
                 <Image
                   src={vetActionDemo}
                   alt="Vet Action Demo"
                   fill
-                  style={{ objectFit: "contain" }}
+                  className="object-contain"
                   priority
                 />
-                <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-0 hover:bg-opacity-20 transition-all">
-                  <div className="bg-white dark:bg-gray-800 bg-opacity-75 dark:bg-opacity-75 p-2 rounded-md opacity-0 hover:opacity-100 transition-opacity">
+                <div className="bg-opacity-0 hover:bg-opacity-20 absolute inset-0 flex items-center justify-center bg-black transition-all">
+                  <div className="bg-opacity-75 dark:bg-opacity-75 rounded-md bg-white p-2 opacity-0 transition-opacity hover:opacity-100 dark:bg-gray-800">
                     <span className="dark:text-gray-200">Click to enlarge</span>
                   </div>
                 </div>
               </div>
             </div>
-            <div className="space-y-3 mt-4">
+            <div className="mt-4 space-y-3">
               <h3 className="font-semibold">
                 <a
                   href="https://github.com/safedep/vet-action"
@@ -260,7 +260,7 @@ export default function GitHubActionsIntegration() {
                 </span>{" "}
                 into your GitHub workflow
               </h3>
-              <ul className="list-disc pl-5 space-y-2 text-gray-700 dark:text-gray-300">
+              <ul className="list-disc space-y-2 pl-5 text-gray-700 dark:text-gray-300">
                 <li>Scan only changes files in the pull request</li>
                 <li>
                   Enables policy driven guardrails against risky OSS components

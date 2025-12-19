@@ -1,8 +1,13 @@
 import { PackageVersionInsight } from "@buf/safedep_api.bufbuild_es/safedep/messages/package/v1/package_version_insight_pb";
-import React, { useEffect, useState, memo } from "react";
+import React, { useMemo, useSyncExternalStore, memo } from "react";
 import { Graph } from "react-d3-graph";
 import type { GraphNode as D3GraphNode } from "react-d3-graph";
 import { useTheme } from "next-themes";
+
+// For detecting client-side rendering to avoid hydration mismatch
+const emptySubscribe = () => () => {};
+const getClientSnapshot = () => true;
+const getServerSnapshot = () => false;
 
 interface DependencyGraphProps {
   insights: PackageVersionInsight | null;
@@ -26,19 +31,19 @@ const DependencyGraph: React.FC<DependencyGraphProps> = ({
 }) => {
   const { theme, resolvedTheme } = useTheme();
   const isDarkMode = theme === "dark" || resolvedTheme === "dark";
-  const [mounted, setMounted] = useState(false);
-  const [graphData, setGraphData] = useState<{
-    nodes: CustomGraphNode[];
-    links: { source: string; target: string }[];
-  }>({ nodes: [], links: [] });
 
-  // useEffect only runs on the client, so we can safely check for the theme
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  // Use useSyncExternalStore to detect client-side rendering and avoid hydration mismatch
+  const mounted = useSyncExternalStore(
+    emptySubscribe,
+    getClientSnapshot,
+    getServerSnapshot,
+  );
 
-  useEffect(() => {
-    if (!insights) return;
+  // Compute graph data as derived state using useMemo
+  const graphData = useMemo(() => {
+    if (!insights) {
+      return { nodes: [], links: [] };
+    }
 
     // Extract dependency data from insights
     const graph = insights.dependencyGraph || {
@@ -60,7 +65,7 @@ const DependencyGraph: React.FC<DependencyGraphProps> = ({
     // Choose the color for the root node based on the theme
     const rootNodeColor = isDarkMode ? "#ef4444" : "#dc2626"; // lighter red for dark mode
 
-    setGraphData({
+    return {
       nodes: [
         {
           id: "0",
@@ -70,7 +75,7 @@ const DependencyGraph: React.FC<DependencyGraphProps> = ({
         ...nodes,
       ],
       links: edges,
-    });
+    };
   }, [insights, packageName, packageVersion, isDarkMode]);
 
   if (!insights) {
@@ -78,7 +83,7 @@ const DependencyGraph: React.FC<DependencyGraphProps> = ({
   }
 
   if (!mounted) {
-    return <div className="w-full h-full min-h-[400px]">Loading graph...</div>;
+    return <div className="h-full min-h-[400px] w-full">Loading graph...</div>;
   }
 
   // Define colors based on theme
@@ -89,7 +94,7 @@ const DependencyGraph: React.FC<DependencyGraphProps> = ({
   const textColor = isDarkMode ? "#f3f4f6" : "#1f2937"; // gray-100 in dark mode, gray-800 in light mode
 
   return (
-    <div className="w-full h-full min-h-[400px]">
+    <div className="h-full min-h-[400px] w-full">
       {graphData.nodes.length > 0 && (
         <MemoizedGraph
           id="dependency-graph"

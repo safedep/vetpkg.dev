@@ -66,7 +66,7 @@ import {
   DialogPortal,
 } from "@radix-ui/react-dialog";
 import { Spinner } from "@radix-ui/themes";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { getPackageVersionInfo, queryMalwareAnalysis } from "./actions";
 import { DiffViewer } from "./DiffViewer";
 import { getRiskName, getRiskColor } from "./utils";
@@ -399,36 +399,63 @@ export default function Page() {
 
   const [showRawJSON, setShowRawJSON] = useState(false);
   const [insights, setInsights] = useState<PackageVersionInsight | null>(null);
-  const [insightsLoading, setInsightsLoading] = useState(true);
-  const [packageVersion, setPackageVersion] = useState<{
-    ecosystem?: string;
-    name?: string;
-    version?: string;
-  }>({});
-
   const [malwareAnalysis, setMalwareAnalysis] =
     useState<QueryPackageAnalysisResponse | null>(null);
-  const [malwareAnalysisLoading, setMalwareAnalysisLoading] = useState(true);
-  const [malwareAnalysisStatus, setMalwareAnalysisStatus] =
-    useState<MalwareStatus>(MalwareStatus.Unknown);
-  const [packageSafetyStatus, setPackageSafetyStatus] =
-    useState<PackageSafetyStatus>(PackageSafetyStatus.Unknown);
-  const [securityScorecardScores, setSecurityScorecardScores] = useState<
-    Record<SecurityScorecardCheck, number>
-  >(getSecurityScorecardScore(null));
-  const [projectRepositoryInformation, setProjectRepositoryInformation] =
-    useState<{
-      url?: string;
-      stars?: number;
-      forks?: number;
-      openIssues?: number;
-      pullRequests?: number;
-    }>({});
-  const [malwareEvidences, setMalwareEvidences] = useState<MalwareEvidence[]>(
-    [],
+
+  // Track which params we've loaded data for to derive loading state
+  const [loadedInsightsParams, setLoadedInsightsParams] = useState<string>("");
+  const [loadedMalwareParams, setLoadedMalwareParams] = useState<string>("");
+
+  // Derive current params key for comparison
+  const currentParamsKey = `${params.ecosystem}:${params.name}:${params.version}`;
+
+  // Derive loading state by comparing current params with loaded params
+  const insightsLoading = loadedInsightsParams !== currentParamsKey;
+  const malwareAnalysisLoading = loadedMalwareParams !== currentParamsKey;
+
+  // Decoded package version for display
+  const packageVersion = useMemo(
+    () => ({
+      ecosystem: decodeURIComponent(params.ecosystem),
+      name: decodeURIComponent(params.name),
+      version: decodeURIComponent(params.version),
+    }),
+    [params.ecosystem, params.name, params.version],
   );
-  const [malwareAnalysisBehavior, setMalwareAnalysisBehavior] =
-    useState<MalwareAnalysisBehavior>({});
+
+  // Derived state computed with useMemo instead of useState + useEffect
+  const malwareAnalysisStatus = useMemo(
+    () =>
+      malwareAnalysis
+        ? getMalwareAnalysisStatus(malwareAnalysis)
+        : MalwareStatus.Unknown,
+    [malwareAnalysis],
+  );
+
+  const packageSafetyStatus = useMemo(
+    () => getPackageSafetyStatus(insights, malwareAnalysis),
+    [insights, malwareAnalysis],
+  );
+
+  const securityScorecardScores = useMemo(
+    () => getSecurityScorecardScore(insights),
+    [insights],
+  );
+
+  const projectRepositoryInformation = useMemo(
+    () => getProjectRepositoryInformation(insights),
+    [insights],
+  );
+
+  const malwareEvidences = useMemo(
+    () => getMalwareEvidences(malwareAnalysis),
+    [malwareAnalysis],
+  );
+
+  const malwareAnalysisBehavior = useMemo(
+    () => getInferredBehavior(malwareAnalysis, insights),
+    [malwareAnalysis, insights],
+  );
 
   const [showDiffViewer, setShowDiffViewer] = useState(false);
   const [compareInsightsLoading, setCompareInsightsLoading] = useState(false);
@@ -439,58 +466,33 @@ export default function Page() {
     useState<QueryPackageAnalysisResponse | null>(null);
 
   useEffect(() => {
-    setInsightsLoading(true);
-    setMalwareAnalysisLoading(true);
-
+    const paramsKey = `${params.ecosystem}:${params.name}:${params.version}`;
     const ecosystem = decodeURIComponent(params.ecosystem);
     const name = decodeURIComponent(params.name);
     const version = decodeURIComponent(params.version);
 
-    setPackageVersion({ ecosystem, name, version });
-
     getPackageVersionInfo(ecosystem, name, version)
-      .then(setInsights)
+      .then((data) => {
+        setInsights(data);
+        setLoadedInsightsParams(paramsKey);
+      })
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      .catch((error: any) =>
-        console.warn("Failed to fetch package insights: ", error),
-      )
-      .finally(() => setInsightsLoading(false));
+      .catch((error: any) => {
+        console.warn("Failed to fetch package insights: ", error);
+        setLoadedInsightsParams(paramsKey); // Mark as loaded even on error
+      });
 
     queryMalwareAnalysis(ecosystem, name, version)
-      .then(setMalwareAnalysis)
+      .then((data) => {
+        setMalwareAnalysis(data);
+        setLoadedMalwareParams(paramsKey);
+      })
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      .catch((error: any) =>
-        console.warn("Failed to fetch malware analysis: ", error),
-      )
-      .finally(() => setMalwareAnalysisLoading(false));
+      .catch((error: any) => {
+        console.warn("Failed to fetch malware analysis: ", error);
+        setLoadedMalwareParams(paramsKey); // Mark as loaded even on error
+      });
   }, [params.ecosystem, params.name, params.version]);
-
-  // Separately synchronize the malware analysis status when the malware analysis is updated
-  useEffect(() => {
-    if (malwareAnalysis) {
-      setMalwareAnalysisStatus(getMalwareAnalysisStatus(malwareAnalysis));
-    }
-  }, [malwareAnalysis]);
-
-  useEffect(() => {
-    setPackageSafetyStatus(getPackageSafetyStatus(insights, malwareAnalysis));
-  }, [insights, malwareAnalysis]);
-
-  useEffect(() => {
-    setSecurityScorecardScores(getSecurityScorecardScore(insights));
-  }, [insights]);
-
-  useEffect(() => {
-    setProjectRepositoryInformation(getProjectRepositoryInformation(insights));
-  }, [insights]);
-
-  useEffect(() => {
-    setMalwareEvidences(getMalwareEvidences(malwareAnalysis));
-  }, [malwareAnalysis]);
-
-  useEffect(() => {
-    setMalwareAnalysisBehavior(getInferredBehavior(malwareAnalysis, insights));
-  }, [malwareAnalysis, insights]);
 
   const handleCompare = async (version: string) => {
     setCompareVersion(version);
@@ -539,7 +541,7 @@ export default function Page() {
 
           {/* Tabs Skeleton */}
           <div className="w-full">
-            <div className="grid w-full grid-cols-4 gap-2 mb-4">
+            <div className="mb-4 grid w-full grid-cols-4 gap-2">
               {[...Array(4)].map((_, i) => (
                 <Skeleton key={i} className="h-10" />
               ))}
@@ -560,11 +562,11 @@ export default function Page() {
               ))}
             </div>
 
-            <div className="grid gap-4 md:grid-cols-2 mt-4">
+            <div className="mt-4 grid gap-4 md:grid-cols-2">
               {[...Array(2)].map((_, i) => (
                 <Card key={i}>
                   <CardHeader>
-                    <Skeleton className="h-6 w-[200px] mb-2" />
+                    <Skeleton className="mb-2 h-6 w-[200px]" />
                     <Skeleton className="h-4 w-[300px]" />
                   </CardHeader>
                   <CardContent>
@@ -586,23 +588,23 @@ export default function Page() {
   if (showRawJSON) {
     return (
       <Tabs defaultValue="insights" className="w-full p-4 md:p-8">
-        <TabsList className="grid w-full md:grid-cols-3 min-h-max">
+        <TabsList className="grid min-h-max w-full md:grid-cols-3">
           <TabsTrigger
             value="insights"
-            className="px-4 py-2 flex items-center gap-2"
+            className="flex items-center gap-2 px-4 py-2"
           >
             📊 Package Insights
           </TabsTrigger>
           <TabsTrigger
             value="malware"
-            className="px-4 py-2 flex items-center gap-2"
+            className="flex items-center gap-2 px-4 py-2"
           >
             🔍 Malware Analysis
           </TabsTrigger>
           <TabsTrigger
             value="back"
             onClick={() => setShowRawJSON(false)}
-            className="px-4 py-2 flex items-center gap-2"
+            className="flex items-center gap-2 px-4 py-2"
           >
             ↩️ Back to UI
           </TabsTrigger>
@@ -623,7 +625,7 @@ export default function Page() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <pre className="bg-slate-950 text-slate-50 p-4 rounded-lg overflow-auto max-h-[80vh]">
+              <pre className="max-h-[80vh] overflow-auto rounded-lg bg-slate-950 p-4 text-slate-50">
                 {JSON.stringify(
                   toJson(PackageVersionInsightSchema, insights!),
                   null,
@@ -649,7 +651,7 @@ export default function Page() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <pre className="bg-slate-950 text-slate-50 p-4 rounded-lg overflow-auto max-h-[80vh]">
+              <pre className="max-h-[80vh] overflow-auto rounded-lg bg-slate-950 p-4 text-slate-50">
                 {JSON.stringify(
                   toJson(QueryPackageAnalysisResponseSchema, malwareAnalysis!),
                   null,
@@ -691,7 +693,7 @@ export default function Page() {
                   🧩 {packageVersion.name}@{packageVersion.version}
                 </CardTitle>
                 <CardDescription className="space-y-2">
-                  <span className="bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded-md">
+                  <span className="rounded-md bg-slate-100 px-2 py-1 dark:bg-slate-800">
                     {getEcosystemIcon(packageVersion.ecosystem!)}{" "}
                     {packageVersion.ecosystem!} Package
                   </span>
@@ -715,13 +717,13 @@ export default function Page() {
               </div>
               <div>
                 {packageSafetyStatus === PackageSafetyStatus.Unknown && (
-                  <div className="text-sm text-yellow-600 bg-yellow-50 p-2 rounded-md mb-2">
+                  <div className="mb-2 rounded-md bg-yellow-50 p-2 text-sm text-yellow-600">
                     ⚠️ Package name or version may be invalid
                   </div>
                 )}
                 <Badge
                   variant="default"
-                  className={`text-md px-4 py-1 flex items-center gap-2 ${
+                  className={`text-md flex items-center gap-2 px-4 py-1 ${
                     packageSafetyStatus === PackageSafetyStatus.Safe
                       ? "bg-green-100 text-green-800"
                       : packageSafetyStatus === PackageSafetyStatus.Malicious
@@ -758,7 +760,7 @@ export default function Page() {
 
         {/* Replace the grid div with Tabs */}
         <Tabs defaultValue="security" className="w-full">
-          <TabsList className="w-full grid grid-cols-1 md:grid-cols-5 min-h-max">
+          <TabsList className="grid min-h-max w-full grid-cols-1 md:grid-cols-5">
             <TabsTrigger value="security" className="flex items-center gap-2">
               🛡️ Security Posture
             </TabsTrigger>
@@ -861,7 +863,7 @@ export default function Page() {
                 </CardHeader>
                 <CardContent>
                   <div
-                    className={`text-2xl font-bold px-3 py-1 rounded-md inline-flex items-center gap-2 ${
+                    className={`inline-flex items-center gap-2 rounded-md px-3 py-1 text-2xl font-bold ${
                       getOpenSSFCombinedScore(insights) > 7
                         ? "bg-green-100 text-green-800"
                         : getOpenSSFCombinedScore(insights) >= 5
@@ -1001,7 +1003,7 @@ export default function Page() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   {/* Summary section */}
-                  <div className="rounded-lg bg-muted">
+                  <div className="bg-muted rounded-lg">
                     <h4 className="font-medium">Summary</h4>
                     <ReactMarkdown>
                       {(
@@ -1061,7 +1063,7 @@ export default function Page() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="w-full h-[300px]">
+                  <div className="h-[300px] w-full">
                     <ResponsiveContainer width="100%" height="100%">
                       <RadarChart
                         cx="50%"
@@ -1121,7 +1123,7 @@ export default function Page() {
 
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <h4 className="text-sm font-medium text-muted-foreground">
+                        <h4 className="text-muted-foreground text-sm font-medium">
                           Stars
                         </h4>
                         <p className="text-2xl font-bold">
@@ -1129,7 +1131,7 @@ export default function Page() {
                         </p>
                       </div>
                       <div>
-                        <h4 className="text-sm font-medium text-muted-foreground">
+                        <h4 className="text-muted-foreground text-sm font-medium">
                           Forks
                         </h4>
                         <p className="text-2xl font-bold">
@@ -1137,7 +1139,7 @@ export default function Page() {
                         </p>
                       </div>
                       <div>
-                        <h4 className="text-sm font-medium text-muted-foreground">
+                        <h4 className="text-muted-foreground text-sm font-medium">
                           Open Issues
                         </h4>
                         <p className="text-2xl font-bold">
@@ -1145,7 +1147,7 @@ export default function Page() {
                         </p>
                       </div>
                       <div>
-                        <h4 className="text-sm font-medium text-muted-foreground">
+                        <h4 className="text-muted-foreground text-sm font-medium">
                           Pull Requests
                         </h4>
                         <p className="text-2xl font-bold">
@@ -1163,11 +1165,11 @@ export default function Page() {
             <Card>
               <CardHeader>
                 <CardDescription>
-                  <p className="text-sm text-muted-foreground justify-left flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-2 rounded-md">
+                  <p className="text-muted-foreground justify-left flex items-center gap-1 rounded-md bg-slate-100 p-2 text-sm dark:bg-slate-800">
                     Vulnerabilities detected in the package using
                     <a
                       href="https://docs.safedep.io/guides/insights-api-using-typescript"
-                      className="text-blue-500 hover:underline flex items-center gap-1"
+                      className="flex items-center gap-1 text-blue-500 hover:underline"
                       target="_blank"
                       rel="noopener noreferrer"
                     >
@@ -1246,11 +1248,11 @@ export default function Page() {
             <Card>
               <CardHeader>
                 <CardDescription>
-                  <p className="text-sm text-muted-foreground justify-left flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-2 rounded-md">
+                  <p className="text-muted-foreground justify-left flex items-center gap-1 rounded-md bg-slate-100 p-2 text-sm dark:bg-slate-800">
                     Vulnerabilities detected in the package using
                     <a
                       href="https://docs.safedep.io/guides/insights-api-using-typescript"
-                      className="text-blue-500 hover:underline flex items-center gap-1"
+                      className="flex items-center gap-1 text-blue-500 hover:underline"
                       target="_blank"
                       rel="noopener noreferrer"
                     >
@@ -1293,21 +1295,21 @@ export default function Page() {
                         </TableCell>
                         <TableCell>
                           {version.version === packageVersion.version ? (
-                            <div className="text-gray-400 text-sm">
+                            <div className="text-sm text-gray-400">
                               Current version
                             </div>
                           ) : (
                             <div className="flex items-center gap-2">
                               <Link
                                 href={`/v/${packageVersion.ecosystem}/${packageVersion.name}/${version.version}`}
-                                className="text-blue-500 hover:text-blue-700 text-sm"
+                                className="text-sm text-blue-500 hover:text-blue-700"
                               >
                                 View
                               </Link>
                               <span className="text-gray-300">|</span>
                               <button
                                 onClick={() => handleCompare(version.version)}
-                                className="text-blue-500 hover:text-blue-700 text-sm"
+                                className="text-sm text-blue-500 hover:text-blue-700"
                               >
                                 Compare
                               </button>
@@ -1345,13 +1347,13 @@ export default function Page() {
       <Dialog open={showDiffViewer} onOpenChange={setShowDiffViewer}>
         <DialogTrigger></DialogTrigger>
         <DialogPortal>
-          <DialogOverlay className="fixed inset-0 bg-black/50 dark:bg-black/50 data-[state=open]:animate-fadeIn" />
-          <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto z-50 bg-white dark:bg-gray-900 dark:text-white">
+          <DialogOverlay className="data-[state=open]:animate-fadeIn fixed inset-0 bg-black/50 dark:bg-black/50" />
+          <DialogContent className="z-50 max-h-[90vh] max-w-5xl overflow-y-auto bg-white dark:bg-gray-900 dark:text-white">
             <DialogHeader>
-              <DialogTitle className="dark:text-gray-300 text-gray-500">
+              <DialogTitle className="text-gray-500 dark:text-gray-300">
                 Diff Viewer
               </DialogTitle>
-              <DialogDescription className="dark:text-gray-300 text-gray-500">
+              <DialogDescription className="text-gray-500 dark:text-gray-300">
                 Comparing {packageVersion.version} with {compareVersion}
               </DialogDescription>
             </DialogHeader>

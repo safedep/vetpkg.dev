@@ -77,8 +77,8 @@ export default function Home() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen py-2 max-w-4xl mx-auto p-4">
-      <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl mb-4 font-mono">
+    <div className="mx-auto flex min-h-screen max-w-4xl flex-col items-center justify-center p-4 py-2">
+      <h1 className="mb-4 scroll-m-20 font-mono text-4xl font-extrabold tracking-tight lg:text-5xl">
         <span className="ml-2" role="img" aria-label="magnifying glass">
           🔍
         </span>{" "}
@@ -86,14 +86,14 @@ export default function Home() {
         Open Source Package
       </h1>
 
-      <p className="text-lg text-gray-600 dark:text-gray-300 mb-8 max-w-2xl font-mono">
+      <p className="mb-8 max-w-2xl font-mono text-lg text-gray-600 dark:text-gray-300">
         Analyze OSS dependencies for security vulnerabilities, malicious code,
         maintainability issues, and other supply chain risks to protect your
         application.
       </p>
 
-      <div className="flex items-center justify-around max-w-4xl w-full">
-        <div className="flex w-full max-w-lg items-center border border-indigo-200 dark:border-indigo-800 rounded-lg shadow-lg bg-white dark:bg-gray-800 p-6">
+      <div className="flex w-full max-w-4xl items-center justify-around">
+        <div className="flex w-full max-w-lg items-center rounded-lg border border-indigo-200 bg-white p-6 shadow-lg dark:border-indigo-800 dark:bg-gray-800">
           {usePurlBasedQuery && (
             <Form {...purlInputForm}>
               <form
@@ -105,14 +105,14 @@ export default function Home() {
                   name="purl"
                   render={({ field }) => (
                     <FormItem>
-                      <div className="font-mono text-sm text-gray-500 dark:text-gray-400 mb-2">
+                      <div className="mb-2 font-mono text-sm text-gray-500 dark:text-gray-400">
                         Package URL (PURL)
                       </div>
                       <input
                         {...field}
                         type="text"
                         placeholder="pkg:npm/express@4.17.1"
-                        className="w-full px-4 py-3 terminal-input font-code text-sm"
+                        className="terminal-input font-code w-full px-4 py-3 text-sm"
                       />
                       <FormMessage />
                     </FormItem>
@@ -120,17 +120,17 @@ export default function Home() {
                 />
                 <button
                   type="submit"
-                  className="w-full px-4 py-3 btn-primary font-semibold"
+                  className="btn-primary w-full px-4 py-3 font-semibold"
                 >
                   Analyze Package 🚀
                 </button>
 
-                <p className="text-sm text-gray-500 dark:text-gray-400 text-right">
+                <p className="text-right text-sm text-gray-500 dark:text-gray-400">
                   Need help? Switch to{" "}
                   <a
                     href="#"
                     onClick={() => setUsePurlBasedQuery(false)}
-                    className="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300 font-medium"
+                    className="font-medium text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300"
                   >
                     detailed input →
                   </a>
@@ -152,12 +152,12 @@ export default function Home() {
                   name="ecosystem"
                   render={({ field }) => (
                     <FormItem>
-                      <div className="font-mono text-sm text-gray-500 dark:text-gray-400 mb-2">
+                      <div className="mb-2 font-mono text-sm text-gray-500 dark:text-gray-400">
                         Package Ecosystem
                       </div>
                       <select
                         {...field}
-                        className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all dark:text-gray-200"
+                        className="w-full rounded-md border border-gray-200 bg-gray-50 px-4 py-3 shadow-xs transition-all focus:border-transparent focus:ring-2 focus:ring-indigo-500 focus:outline-hidden dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200"
                       >
                         {PACKAGE_ECOSYSTEM_OPTIONS.map((option) => (
                           <option key={option.value} value={option.value}>
@@ -174,14 +174,14 @@ export default function Home() {
                   name="name"
                   render={({ field }) => (
                     <FormItem>
-                      <div className="font-mono text-sm text-gray-500 dark:text-gray-400 mb-2">
+                      <div className="mb-2 font-mono text-sm text-gray-500 dark:text-gray-400">
                         Package Name
                       </div>
                       <input
                         {...field}
                         type="text"
                         placeholder="express"
-                        className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent font-mono text-sm transition-all dark:text-gray-200"
+                        className="w-full rounded-md border border-gray-200 bg-gray-50 px-4 py-3 font-mono text-sm shadow-xs transition-all focus:border-transparent focus:ring-2 focus:ring-indigo-500 focus:outline-hidden dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200"
                       />
                       <FormMessage />
                     </FormItem>
@@ -192,14 +192,14 @@ export default function Home() {
                   name="version"
                   render={({ field }) => (
                     <FormItem>
-                      <div className="font-mono text-sm text-gray-500 dark:text-gray-400 mb-2">
+                      <div className="mb-2 font-mono text-sm text-gray-500 dark:text-gray-400">
                         Version
                       </div>
                       <input
                         {...field}
                         type="text"
                         placeholder="4.17.1"
-                        className="w-full px-4 py-3 terminal-input font-code text-sm"
+                        className="terminal-input font-code w-full px-4 py-3 text-sm"
                       />
                       <FormMessage />
                     </FormItem>
@@ -207,17 +207,17 @@ export default function Home() {
                 />
                 <button
                   type="submit"
-                  className="w-full px-4 py-3 btn-primary font-semibold"
+                  className="btn-primary w-full px-4 py-3 font-semibold"
                 >
                   Analyze Package 🚀
                 </button>
 
-                <p className="text-sm text-gray-500 dark:text-gray-400 text-right">
+                <p className="text-right text-sm text-gray-500 dark:text-gray-400">
                   Know PURL? Switch to{" "}
                   <a
                     href="#"
                     onClick={() => setUsePurlBasedQuery(true)}
-                    className="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300 font-medium"
+                    className="font-medium text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300"
                   >
                     quick input →
                   </a>
